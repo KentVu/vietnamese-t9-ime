@@ -1,3 +1,5 @@
+app/target/
+
 ### Android template
 # Built application files
 *.apk
