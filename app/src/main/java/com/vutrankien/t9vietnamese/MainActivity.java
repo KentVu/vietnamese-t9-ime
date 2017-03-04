@@ -1,4 +1,4 @@
-package com.trankien.t9vietnamese;
+package com.vutrankien.t9vietnamese;
 
 import android.app.*;
 import android.os.*;

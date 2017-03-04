@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.trankien.t9vietnamese" >
+    package="com.vutrankien.t9vietnamese" >
 
     <application
         android:allowBackup="true"
