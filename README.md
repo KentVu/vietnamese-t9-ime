@@ -11,7 +11,8 @@ The T9 input method
 
 Things to consider
 ==================
-- [ ] Which standard to decompose vietnamese (syllable=ascii+accents)
+* [ ] Which standard to decompose vietnamese (syllable=ascii+accents)
+  * http://www.unicode.org/reports/tr15/tr15-23.html#Decomposition
 - [x] Follows the English T9 convention of key assignment
 
 TODO
@@ -19,3 +20,4 @@ TODO
 * [ ] Decompose accented character.
 - [ ] Build a number-to-syllable dictionary.
 - [ ] Support suggestion
+- [ ] Flexibility via settings (accents right after character/accent at end of word) 
