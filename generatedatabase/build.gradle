@@ -1,7 +1,21 @@
 apply plugin: 'java'
 
+repositories {
+    // https://stackoverflow.com/a/44055976/1562087
+    maven {
+        url 'https://maven.google.com'
+        // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
+    }
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.snappydb:snappydb-lib:0.5.2'
+    compile 'com.esotericsoftware.kryo:kryo:2.24.0'
+    compile 'com.android.support:support-annotations:25.3.1'
+    //compile 'com.google.android:android:4.1.1.4'
+    testCompile 'junit:junit:4.12'
+    //compile 'org.androidannotations:androidannotations-core:4.3.1'
 }
 
 sourceCompatibility = "1.7"
