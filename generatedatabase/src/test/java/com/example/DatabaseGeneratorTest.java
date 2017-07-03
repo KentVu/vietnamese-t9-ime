@@ -3,7 +3,7 @@ package com.example;
 
 import android.support.annotation.NonNull;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -26,7 +26,7 @@ public class DatabaseGeneratorTest {
     public void getResourcesTest() throws IOException {
         assertNotNull(new SyllablesResource().readLine());
     }
-    @Test
+    @Test(expected = NullPointerException.class)
     public void getResourcesTest2() throws IOException {
         String file = "syllables.txt";
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);

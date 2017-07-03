@@ -14,25 +14,23 @@ dependencies {
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile 'com.android.support:support-annotations:25.3.1'
     //compile 'com.google.android:android:4.1.1.4'
-//    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
     //compile 'org.androidannotations:androidannotations-core:4.3.1'
-    compile 'org.testng:testng:6.9.6'
+//    compile 'org.testng:testng:6.9.6'
 }
 
-jar {
-    manifest {
-        attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'com.example.GenerateDatabase'
-        )
-    }
-}
+//jar {
+//    manifest {
+//        attributes(
+//                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+//                'Main-Class': 'com.example.GenerateDatabase'
+//        )
+//    }
+//}
 
 test {
     // enable TestNG support (default is JUnit)
-    useTestNG()
-    // show standard out and standard error of the test JVM(s) on the console
-    testLogging.showStandardStreams = true
+//    useTestNG()
     // set a system property for the test JVM(s)
     systemProperty 'some.prop', 'value'
 
@@ -41,7 +39,7 @@ test {
     //exclude 'org/boo/**'
 
     // show standard out and standard error of the test JVM(s) on the console
-    testLogging.showStandardStreams = true
+//    testLogging.showStandardStreams = true
 
     // set heap size for the test JVM(s)
 //    minHeapSize = "128m"
@@ -51,9 +49,9 @@ test {
 //    jvmArgs '-XX:MaxPermSize=256m'
 
     // listen to events in the test execution lifecycle
-    beforeTest { descriptor ->
-        logger.lifecycle("Running test: " + descriptor)
-    }
+//    beforeTest { descriptor ->
+//        logger.lifecycle("Running test: " + descriptor)
+//    }
 
     // listen to standard out and standard error of the test JVM(s)
 //    onOutput { descriptor, event ->
@@ -62,7 +60,7 @@ test {
 }
 
 //application {
-    mainClassName = "com.example.GenerateDatabase"
+//    mainClassName = "com.example.GenerateDatabase"
 //}
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
