@@ -52,8 +52,10 @@ test {
 //    }
 }
 
+// Workaround, support testing from within Android Studio
 task copyResDirectoryToClasses(type: Copy){
-    from "${projectDir}/src/main/resources/com/example"
+//    from "${projectDir}/src/main/resources/com/example"
+    from "${buildDir}/resources/main/com/example"
     into "${buildDir}/classes/main/com/example"
 }
 

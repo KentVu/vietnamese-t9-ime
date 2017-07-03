@@ -5,7 +5,11 @@ import java.io.IOException;
 public class GenerateDatabase {
     public static void main(String[] args) {
         try {
-            System.out.print(new SyllablesResource().readLine());
+            SyllablesResource syllablesResource = new SyllablesResource();
+            do {
+                String line = syllablesResource.readLine();
+                System.out.println(line);
+            } while(syllablesResource.hasNext());
         } catch (IOException e) {
             e.printStackTrace();
         }

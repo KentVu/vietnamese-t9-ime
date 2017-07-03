@@ -10,14 +10,38 @@ import java.net.URL;
  * Created by vutrankien on 17/07/02.
  */
 
-class SyllablesResource {
-    public String readLine() throws IOException {
+class SyllablesResource implements AutoCloseable {
+
+    private final BufferedReader bufferedReader;
+
+    private String nextLine;
+    private String line;
+
+    SyllablesResource() throws IOException {
         URL resource = SyllablesResource.class.getResource("syllables.txt");
-        resource.getFile();
         InputStream inputStream = this.getClass().getResourceAsStream("syllables.txt");
-        String s = new BufferedReader(
+        bufferedReader = new BufferedReader(
                 new InputStreamReader(inputStream)
-        ).readLine();
-        return s;
+        );
+        line = bufferedReader.readLine();
+        nextLine = bufferedReader.readLine();
+    }
+
+    public String readLine() throws IOException {
+        try {
+            nextLine = bufferedReader.readLine();
+            return line;
+        } finally {
+            line = nextLine;
+        }
+    }
+
+    public boolean hasNext() {
+        return nextLine != null;
+    }
+
+    @Override
+    public void close() throws Exception {
+        bufferedReader.close();
     }
 }
