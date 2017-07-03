@@ -3,7 +3,7 @@ package com.example;
 
 import android.support.annotation.NonNull;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collections;
+
+import static org.testng.Assert.assertNotNull;
+
 
 /**
  * Created by vutrankien on 17/07/02.
@@ -22,23 +24,19 @@ public class DatabaseGeneratorTest {
 
     @Test
     public void getResourcesTest() throws IOException {
-        String s = new BufferedReader(
-                new InputStreamReader(
-                        this.getClass().getResourceAsStream("/test/com/example/syllables.txt"))
-        ).readLine();
-        System.out.println(s);
+        assertNotNull(new SyllablesResource().readLine());
     }
     @Test
     public void getResourcesTest2() throws IOException {
-        String file = "com/example/syllables.txt";
+        String file = "syllables.txt";
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);
         InputStreamReader inputStreamReader = new InputStreamReader(in, "UTF-8");
         System.out.print(new BufferedReader(inputStreamReader).readLine());
     }
     @Test
     public void getResourcesTest3() throws IOException {
-        String s = DataStub.readFile(DataStub.BASE_PATH+"com/example/syllables.txt");
-        System.out.print(s.substring(0, 10000));
+        String s = DataStub.readFile(DataStub.BASE_PATH+ "com/example/syllables.txt");
+        System.out.print(s.substring(0, 5000));
     }
 
     public static final class DataStub {
@@ -49,7 +47,7 @@ public class DatabaseGeneratorTest {
             //no instances
         }
         private static String resolveBasePath() {
-            final String path = "./generatedatabase/src/test/resources/";
+            final String path = "./generatedatabase/src/main/resources/";
             String[] list = new File("./").list();
             if (Arrays.asList(list).contains("generatedatabase")) {
                 System.out.println(Arrays.toString(list));
