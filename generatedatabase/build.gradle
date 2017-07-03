@@ -1,7 +1,9 @@
 apply plugin: 'java'
+apply plugin: 'application'
 
 repositories {
     // https://stackoverflow.com/a/44055976/1562087
+    // no com.android.support:support-annotations in maven?!
     maven {
         url 'https://maven.google.com'
         // Alternative URL is 'https://dl.google.com/dl/android/maven2/'
@@ -14,23 +16,14 @@ dependencies {
     compile 'com.esotericsoftware.kryo:kryo:2.24.0'
     compile 'com.android.support:support-annotations:25.3.1'
     //compile 'com.google.android:android:4.1.1.4'
-    testCompile 'junit:junit:4.12'
+//    testCompile 'junit:junit:4.12'
     //compile 'org.androidannotations:androidannotations-core:4.3.1'
-//    compile 'org.testng:testng:6.9.6'
+    testCompile 'org.testng:testng:6.9.6'
 }
-
-//jar {
-//    manifest {
-//        attributes(
-//                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-//                'Main-Class': 'com.example.GenerateDatabase'
-//        )
-//    }
-//}
 
 test {
     // enable TestNG support (default is JUnit)
-//    useTestNG()
+    useTestNG()
     // set a system property for the test JVM(s)
     systemProperty 'some.prop', 'value'
 
@@ -59,8 +52,14 @@ test {
 //    }
 }
 
-//application {
-//    mainClassName = "com.example.GenerateDatabase"
-//}
+task copyResDirectoryToClasses(type: Copy){
+    from "${projectDir}/src/main/resources/com/example"
+    into "${buildDir}/classes/main/com/example"
+}
+
+testClasses.dependsOn(copyResDirectoryToClasses)
+
+mainClassName = "com.example.GenerateDatabase"
+
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
