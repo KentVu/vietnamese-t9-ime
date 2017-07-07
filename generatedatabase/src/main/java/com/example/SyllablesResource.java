@@ -1,6 +1,7 @@
 package com.example;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,8 +19,9 @@ class SyllablesResource implements AutoCloseable {
     private String line;
 
     SyllablesResource() throws IOException {
-        URL resource = SyllablesResource.class.getResource("syllables.txt");
-        InputStream inputStream = this.getClass().getResourceAsStream("syllables.txt");
+        URL resource = SyllablesResource.class.getResource("morphemes.txt");
+        new FileReader(resource.getFile());
+        InputStream inputStream = this.getClass().getResourceAsStream("morphemes.txt");
         bufferedReader = new BufferedReader(
                 new InputStreamReader(inputStream)
         );
