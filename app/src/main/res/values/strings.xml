@@ -8,4 +8,6 @@
     <!-- Labels for subtype -->
     <string name="label_subtype_generic">%s</string>
     <string name="label_subtype_en_GB">English (GB)</string>
+    <string name="database_name">@string/app_name</string>
+    <string name="oops">Oops, %s</string>
 </resources>
