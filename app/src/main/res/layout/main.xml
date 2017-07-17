@@ -1,12 +1,134 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                               xmlns:app="http://schemas.android.com/apk/res-auto"
+                                               xmlns:tools="http://schemas.android.com/tools"
+                                               android:layout_width="match_parent"
+                                               android:layout_height="match_parent"
+                                               android:orientation="vertical"
+                                               tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        app:layout_heightPercent="50%"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/vertical_pane_left"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/text"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="20%">
+    </LinearLayout>
+
+    <TableLayout
+        android:id="@+id/dialpad"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/text"
+        android:layout_toEndOf="@id/vertical_pane_left"
+        android:layout_toRightOf="@id/vertical_pane_left"
+        android:shrinkColumns="*"
+        android:stretchColumns="*"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="60%"
+        >
+
+        <TableRow
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:layout_height="match_parent"
+                android:onClick="onBtnClick"
+                android:text="@string/btn_1"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:layout_height="match_parent"
+                android:text="@string/btn_2"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:layout_height="match_parent"
+                android:text="@string/btn_3"/>
+        </TableRow>
+
+        <TableRow android:layout_weight="1">
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+
+                android:text="@string/btn_4"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_5"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_6"/>
+        </TableRow>
+
+        <TableRow android:layout_weight="1">
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+
+                android:text="@string/btn_7"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_8"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_9"/>
+
+        </TableRow>
+
+        <TableRow android:layout_weight="1">
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+
+                android:text="@string/btn_star"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_0"/>
+
+            <Button
+                style="?android:attr/buttonBarStyle"
+                android:text="@string/btn_pound"/>
+
+        </TableRow>
+
+
+    </TableLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/dialpad"
+        android:layout_toRightOf="@id/dialpad"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="20%"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/btn_right"/>
+    </LinearLayout>
+
+
+</android.support.percent.PercentRelativeLayout>

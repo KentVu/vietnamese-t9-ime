@@ -10,4 +10,17 @@
     <string name="label_subtype_en_GB">English (GB)</string>
     <string name="database_name">@string/app_name</string>
     <string name="oops">Oops, %s</string>
+    <string name="btn_1">1\n</string>
+    <string name="btn_2">2\nabc</string>
+    <string name="btn_3">3\ndef</string>
+    <string name="btn_4">4\nghi</string>
+    <string name="btn_5">5\njkl</string>
+    <string name="btn_6">6\nmno</string>
+    <string name="btn_7">7 pqrs</string>
+    <string name="btn_8">8 tuv</string>
+    <string name="btn_9">9 wxyz</string>
+    <string name="btn_star">*</string>
+    <string name="btn_0">0</string>
+    <string name="btn_pound">#</string>
+    <string name="btn_right"><![CDATA[>]]></string>
 </resources>

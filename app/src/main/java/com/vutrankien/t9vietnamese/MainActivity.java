@@ -2,6 +2,8 @@ package com.vutrankien.t9vietnamese;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.snappydb.DB;
@@ -43,5 +45,9 @@ public class MainActivity extends Activity
                         .getMessage()));
             }
         }
+    }
+
+    public void onBtnClick(View view) {
+        new KLog("MainActivity").d("onBtnClick() btn=" + ((Button) view).getText());
     }
 }
