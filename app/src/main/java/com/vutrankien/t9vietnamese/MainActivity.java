@@ -19,6 +19,9 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        T9KeyboardView inputView = (T9KeyboardView) findViewById(R.id.dialpad2);
+        inputView.setKeyboard(new T9Keyboard(this, R.xml.t9));
+
         // Check database exist
         if (!new File(getString(R.string.database_name)).exists()) {
             // create database

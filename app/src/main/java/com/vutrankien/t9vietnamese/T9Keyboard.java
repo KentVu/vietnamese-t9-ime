@@ -1,9 +1,15 @@
 package com.vutrankien.t9vietnamese;
 
-import android.inputmethodservice.InputMethodService;
+import android.content.Context;
+import android.inputmethodservice.Keyboard;
 
 /**
- * Created by vutrankien on 17/05/02.
+ * Created by vutrankien on 17/07/24.
  */
-public class T9Keyboard extends InputMethodService {
+
+class T9Keyboard extends Keyboard {
+    T9Keyboard(Context context, int xmlLayoutResId) {
+        super(context, xmlLayoutResId);
+    }
+
 }

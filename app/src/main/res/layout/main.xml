@@ -7,18 +7,33 @@
                                                android:orientation="vertical"
                                                tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout
+        android:id="@+id/texts"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="@string/hello_world"
-        app:layout_heightPercent="50%"/>
+        android:orientation="vertical"
+        app:layout_heightPercent="50%">
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/hello_world"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:hint="@string/test_hint"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/vertical_pane_left"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/text"
+        android:layout_below="@id/texts"
         android:layout_weight="1"
         android:baselineAligned="false"
         android:orientation="horizontal"
@@ -27,17 +42,17 @@
     </LinearLayout>
 
     <TableLayout
+        android:visibility="gone"
         android:id="@+id/dialpad"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/text"
+        android:layout_below="@id/texts"
         android:layout_toEndOf="@id/vertical_pane_left"
         android:layout_toRightOf="@id/vertical_pane_left"
         android:shrinkColumns="*"
         android:stretchColumns="*"
         app:layout_heightPercent="50%"
-        app:layout_widthPercent="60%"
-        >
+        app:layout_widthPercent="60%">
 
         <TableRow
             android:layout_height="0dp"
@@ -113,15 +128,25 @@
 
     </TableLayout>
 
+    <com.vutrankien.t9vietnamese.T9KeyboardView
+        android:id="@+id/dialpad2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/texts"
+        android:layout_toEndOf="@id/dialpad"
+        android:layout_toRightOf="@id/dialpad"
+        app:layout_heightPercent="50%"
+        app:layout_widthPercent="60%">
+    </com.vutrankien.t9vietnamese.T9KeyboardView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/dialpad"
-        android:layout_toRightOf="@id/dialpad"
+        android:layout_toEndOf="@id/dialpad2"
+        android:layout_toRightOf="@id/dialpad2"
         app:layout_heightPercent="50%"
-        app:layout_widthPercent="20%"
-        >
+        app:layout_widthPercent="20%">
 
         <TextView
             android:layout_width="match_parent"
@@ -129,6 +154,4 @@
             android:gravity="center"
             android:text="@string/btn_right"/>
     </LinearLayout>
-
-
 </android.support.percent.PercentRelativeLayout>
