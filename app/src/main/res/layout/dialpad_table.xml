@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@android:color/background_light"
+    android:id="@+id/dialpad"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:shrinkColumns="*"
+    android:stretchColumns="*">
+
+    <TableRow
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:layout_height="match_parent"
+            android:onClick="onBtnClick"
+            android:text="@string/btn_1"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:layout_height="match_parent"
+            android:text="@string/btn_2"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:layout_height="match_parent"
+            android:text="@string/btn_3"/>
+    </TableRow>
+
+    <TableRow android:layout_weight="1">
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+
+            android:text="@string/btn_4"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_5"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_6"/>
+    </TableRow>
+
+    <TableRow android:layout_weight="1">
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+
+            android:text="@string/btn_7"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_8"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_9"/>
+
+    </TableRow>
+
+    <TableRow android:layout_weight="1">
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+
+            android:text="@string/btn_star"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_0"/>
+
+        <Button
+            style="?android:attr/buttonBarStyle"
+            android:text="@string/btn_pound"/>
+
+    </TableRow>
+
+
+</TableLayout>
