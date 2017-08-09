@@ -4,11 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by vutrankien on 17/05/27.
- */
 public class T9Engine {
-    public T9Engine(String s) {
+    public T9Engine(String locale) {
     }
 
     public Set<String> candidates(String s) {

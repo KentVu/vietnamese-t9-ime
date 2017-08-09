@@ -15,9 +15,6 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by vutrankien on 17/08/09.
- */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
