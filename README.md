@@ -1,6 +1,8 @@
 vietnamese-t9-ime
 =================
 
+[![Join the chat at https://gitter.im/KentVu/vietnamese-t9-ime](https://badges.gitter.im/KentVu/vietnamese-t9-ime.svg)](https://gitter.im/KentVu/vietnamese-t9-ime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 An old-fashioned keypad based input method (T9) for Vietnamese, support accents
 
 The T9 input method
