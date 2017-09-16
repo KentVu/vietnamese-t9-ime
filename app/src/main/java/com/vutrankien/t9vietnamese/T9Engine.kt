@@ -28,10 +28,11 @@ constructor(context: Context, locale: String) {
     fun candidates(numseq: String): Array<out String>? {
 //        return dbWrapper.getArray(numseq,String::class.java)
 //        return dbWrapper.
+        return dbWrapper.findKeys(numseq)
     }
 }
 
-class DBWrapper(private val context: Context, private val locale: String) /*TODO delegator*/: DB by DBFactory.open(context) {
+class DBWrapper(private val context: Context, private val locale: String) : DB by DBFactory.open(context) {
     var snappydb = DBFactory.open(context, locale)
 
     init {
@@ -44,21 +45,9 @@ class DBWrapper(private val context: Context, private val locale: String) /*TODO
         }
     }
 
-    fun get(key: String): String {
-        return snappydb.get(key)
-    }
-
     fun recreate() {
         snappydb.destroy()
         snappydb = DBFactory.open(context, locale)
-    }
-
-    fun put(key: String, value: String) {
-        snappydb.put(key, value)
-    }
-
-    fun <T> put(key: String, array: Array<T>) {
-        snappydb.put(key, array)
     }
 
     fun put(key: String, freq: Int) {
@@ -72,8 +61,8 @@ class LazyT9Engine(val ctx: Context, val locale: String): ReadOnlyProperty<T9Eng
 }
 
 class T9EngineFactory(context: Context) {
-    val viVNEngine: T9Engine by lazy { T9Engine(context, "vi-VN") }
-    val enUSEngine: T9Engine by lazy { T9Engine(context, "en-US") }
+    val viVNEngine: T9Engine by lazy { T9Engine(context, LOCALE_VN) }
+    val enUSEngine: T9Engine by lazy { T9Engine(context, LOCALE_US) }
 }
 
 //val viVNEngine: T9Engine by LazyT9Engine(context, "vi-VN")
@@ -81,14 +70,17 @@ class T9EngineFactory(context: Context) {
 var viVNEngine: T9Engine? = null
 var enUSEngine: T9Engine? = null
 
+val LOCALE_VN = "vi-VN"
+val LOCALE_US = "en-US"
+
 fun Context.getEngineFor(locale: String): T9Engine {
     return when (locale) {
-        "vi-VN" -> viVNEngine ?: run {
-            viVNEngine = T9Engine(this, "vi-VN")
+        LOCALE_VN -> viVNEngine ?: run {
+            viVNEngine = T9Engine(this, LOCALE_VN)
             viVNEngine!!
         }
-        "en-US" -> enUSEngine ?: run {
-            enUSEngine = T9Engine(this, locale)
+        LOCALE_US -> enUSEngine ?: run {
+            enUSEngine = T9Engine(this, LOCALE_US)
             enUSEngine!!
         }
         else -> throw UnsupportedOperationException()
