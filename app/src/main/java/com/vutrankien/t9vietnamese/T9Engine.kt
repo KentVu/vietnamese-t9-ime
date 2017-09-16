@@ -41,7 +41,15 @@ constructor(context: Context, locale: String): AutoCloseable {
 
         val keys = dbWrapper.findKeys(numseq)
 
-        return keys.map { dbWrapper.get(numseq2word(numseq)) }.toSet()
+        return keys.map {
+            try {
+//                dbWrapper.get(numseq2word(it))
+                numseq2word(it)
+            } catch(e: SnappydbException) {
+                // TODO delete this it's too paranoid!!!
+                ""
+            }
+        }.filter { it != "" }.toSet()
     }
 
     private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String {
