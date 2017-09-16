@@ -8,6 +8,7 @@ import com.snappydb.SnappydbException;
 import com.vutrankien.t9vietnamese.MainActivity;
 import com.vutrankien.t9vietnamese.T9Engine;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +39,9 @@ public class EngineTests {
         final HashMap<String, String[]> testCases = new HashMap<>();
         testCases.put("24236", new String[]{"chào"});
         testCases.put("864", new String[]{"tôi"});
-        testEngineNumToString(testCases, new T9Engine(context, "vi-VN"));
+        final T9Engine engine = new T9Engine(context, "vi-VN");
+        testEngineNumToString(testCases, engine);
+        engine.close();
     }
 
     @Test
@@ -48,22 +51,28 @@ public class EngineTests {
         testCases.put("362867", new String[]{"doctor"});
         final T9Engine engine = new T9Engine(context, "en-US");
         testEngineNumToString(testCases, engine);
+        engine.close();
     }
 
     private void testEngineNumToString(HashMap<String, String[]> testCases, T9Engine engine) {
         for (Map.Entry<String, String[]> testCase : testCases.entrySet()) {
-            String[] candiateStrings = engine.candidates(testCase.getKey());
+            Set<String> candiateStrings = engine.candidates(testCase.getKey());
             for (String cand : testCase.getValue()) {
                 assertTrue(
-                        String.format("[%s] not containing [%s], all candidates:%s", testCase.getKey(), cand, Arrays.toString(candiateStrings)),
-                        //candiateStrings.contains(cand)
-                        Arrays.asList(candiateStrings).contains(cand));
+                        String.format("[%s] not containing [%s], all candidates:%s", testCase.getKey(), cand, candiateStrings),
+                        candiateStrings.contains(cand));
+                        //Arrays.asList(candiateStrings).contains(cand));
             }
         }
     }
     @Test
     public void testStringToNumStandardConfigurationViVN() {
         // TODO number to wordlist query
+
+    }
+
+    @After
+    public void tearDown() throws Exception {
 
     }
 }

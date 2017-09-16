@@ -4,54 +4,79 @@ import android.content.Context
 import com.snappydb.DB
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
+import org.intellij.lang.annotations.Pattern
+import timber.log.Timber
+import timber.log.Timber.e
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 private val log = KLog("T9Engine")
 
 class T9Engine @Throws(SnappydbException::class)
-constructor(context: Context, locale: String) {
-    val dbWrapper = DBWrapper(context, locale)
+constructor(context: Context, locale: String): AutoCloseable {
+    var dbWrapper = DBWrapper(context, locale)
 
     init {
-        if (dbWrapper.get("HELO") == "On your mark, sir!") {
+        if (dbWrapper.validate()) {
             log.i("DB OK!")
         } else {
             log.i("Destroying malicious database and reopen it!")
-            dbWrapper.recreate()
+            dbWrapper = dbWrapper.recreate()
             dbWrapper.put("HELO", "On your mark, sir!")
 //            dbWrapper.put("24236", arrayOf("chào"))
+//            dbWrapper.put("chào", arrayOf("24236"))
             dbWrapper.put("chào", 0)
+//            put("24236", arrayOf("chào"))
+//            dbWrapper.put("chào", 0)
         }
     }
 
-    fun candidates(numseq: String): Array<out String>? {
+    override fun close() {
+        dbWrapper.close()
+    }
+
+    fun candidates(numseq: String): Set<String> {
 //        return dbWrapper.getArray(numseq,String::class.java)
 //        return dbWrapper.
-        return dbWrapper.findKeys(numseq)
+
+        val keys = dbWrapper.findKeys(numseq)
+
+        return keys.map { dbWrapper.get(numseq2word(numseq)) }.toSet()
+    }
+
+    private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String {
+        /* TODO #3 */
+        return mapOf<String, String>("24236" to "chào").get(numseq)!!
     }
 }
 
 class DBWrapper(private val context: Context, private val locale: String) : DB by DBFactory.open(context) {
-    var snappydb = DBFactory.open(context, locale)
+//    var snappydb = DBFactory.open(context, locale)
 
     init {
+    }
+
+    fun recreate(): DBWrapper {
+        destroy()
+        val newWrapper = DBWrapper(context, locale)
+        return newWrapper
+    }
+
+    fun validate(): Boolean {
         // powerful magic entry to check if were talking to the right database
-        if (snappydb.get("HELO") != "On your mark, sir!") {
-            // initialize databasem
-            snappydb.destroy()
-            snappydb = DBFactory.open(context, locale)
-            snappydb.put("24236", arrayOf("chào"))
+        val magicEntry = try {
+            get("HELO")
+        } catch (e: SnappydbException) {
+            e(e);""
         }
-    }
-
-    fun recreate() {
-        snappydb.destroy()
-        snappydb = DBFactory.open(context, locale)
-    }
-
-    fun put(key: String, freq: Int) {
-        snappydb.put(key, freq)
+        if (magicEntry != "On your mark, sir!") {
+            // initialize databasem
+//            destroy()
+//            snappydb = DBFactory.open(context, locale)
+//            throw UnsupportedOperationException("Invalid database!!")
+            return false
+        }
+        return true
     }
 
 }

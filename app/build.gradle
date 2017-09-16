@@ -42,6 +42,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile 'com.jakewharton.timber:timber:4.5.1'
 }
 repositories {
     mavenCentral()
