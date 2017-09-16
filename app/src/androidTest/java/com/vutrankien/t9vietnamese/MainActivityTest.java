@@ -28,7 +28,8 @@ public class MainActivityTest {
     public void whenFirstStartThenCreateDatabase() throws SnappydbException {
         Activity activity = mActivityRule.getActivity();
         DB snappydb = DBFactory.open(activity, "vi-VN");
-        HashSet<String> candidates =  snappydb.get("24236" );//new HashSet<String>().getClass() get array of string
+
+        HashSet<String> candidates =  snappydb.get("24236",HashSet.class );//new HashSet<String>().getClass() get array of string
 
         //assertTrue(new HashSet<String>(candidates), "Jack Reacher");
         assertTrue((candidates).contains("chào"));

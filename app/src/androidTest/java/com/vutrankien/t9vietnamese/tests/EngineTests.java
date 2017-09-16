@@ -13,7 +13,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,16 +52,18 @@ public class EngineTests {
 
     private void testEngineNumToString(HashMap<String, String[]> testCases, T9Engine engine) {
         for (Map.Entry<String, String[]> testCase : testCases.entrySet()) {
-            Set<String> candiateStrings = engine.candidates(testCase.getKey());
+            String[] candiateStrings = engine.candidates(testCase.getKey());
             for (String cand : testCase.getValue()) {
                 assertTrue(
-                        String.format("[%s] not containing [%s], all candidates:%s", testCase.getKey(), cand, candiateStrings),
-                        candiateStrings.contains(cand));
+                        String.format("[%s] not containing [%s], all candidates:%s", testCase.getKey(), cand, Arrays.toString(candiateStrings)),
+                        //candiateStrings.contains(cand)
+                        Arrays.asList(candiateStrings).contains(cand));
             }
         }
     }
     @Test
     public void testStringToNumStandardConfigurationViVN() {
+        // TODO number to wordlist query
 
     }
 }

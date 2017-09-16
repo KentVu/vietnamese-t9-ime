@@ -14,6 +14,7 @@ Things to consider
 * [ ] Which standard to decompose vietnamese (syllable=ascii+accents)
   * http://www.unicode.org/reports/tr15/tr15-23.html#Decomposition
 * [x] Follows the English T9 convention of key assignment
+number to wordlist query
 
 TODO
 ====
