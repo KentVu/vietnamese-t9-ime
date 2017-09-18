@@ -2,35 +2,43 @@ package com.vutrankien.t9vietnamese.tests
 
 import android.content.Context
 import android.support.test.InstrumentationRegistry
-import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 
 import com.snappydb.SnappydbException
-import com.vutrankien.t9vietnamese.MainActivity
+import com.vutrankien.t9vietnamese.EnginePromise
 import com.vutrankien.t9vietnamese.T9Engine
 import com.vutrankien.t9vietnamese.getEngineFor
 
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import java.util.Arrays
 import java.util.HashMap
-import java.util.HashSet
 
 import junit.framework.Assert.assertTrue
 
+/**
+ * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
+ */
 @RunWith(AndroidJUnit4::class)
 class EngineTests {
 //    @Rule
 //    val mActivityRule = ActivityTestRule(MainActivity::class.java)
     lateinit var context: Context
+    lateinit var viVnEngine: T9Engine
+    init {
+
+    }
     @Before
     fun setUp() {
 //        context = mActivityRule.activity
         context = InstrumentationRegistry.getTargetContext()
+        try {
+            viVnEngine = context.getEngineFor("vi-VN")
+        } catch(e: EnginePromise) {
+            viVnEngine = e.getBlocking()
+        }
     }
 
     @Test
@@ -40,9 +48,9 @@ class EngineTests {
         val testCases = HashMap<String, Array<String>>()
         testCases.put("24236", arrayOf("chào"))
         testCases.put("864", arrayOf("tôi"))
-        val engine = context.getEngineFor("vi-VN")
-        testEngineNumToString(testCases, engine)
-        engine.close()
+
+        testEngineNumToString(testCases, viVnEngine)
+        viVnEngine.close()
     }
 
     @Test
