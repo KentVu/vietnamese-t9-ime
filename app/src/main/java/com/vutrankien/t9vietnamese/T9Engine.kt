@@ -35,14 +35,7 @@ constructor(private val context: Context, locale: String): AutoCloseable {
         // initialize database
         dbWrapper.put("HELO", MAGIC)
         val inputStream = context.assets.open("morphemes.txt")
-        val reader = InputStreamReader(inputStream)
-//        BufferedReader(reader)
-//        val reader1 = inputStream.bufferedReader()
-//        while (reader1.readLine() != null) {
-//        }
         inputStream.bufferedReader().forEachLine { dbWrapper.put(it, 0) }
-        //            put("24236", arrayOf("chào"))
-        //            dbWrapper.put("chào", 0)
     }
 
     fun isDbValid(): Boolean {
@@ -72,12 +65,17 @@ constructor(private val context: Context, locale: String): AutoCloseable {
 //        return keys.map {
 //            numseq2word(it)
 //        }.filter { it != "" }.toSet()
-        return dbWrapper.findKeys(numseq2word(numseq)).toSet()
+//        return dbWrapper.findKeys(numseq2word(numseq)).toSet()
+        return with(numseq2word(numseq)){
+            this?.let {
+                dbWrapper.findKeys(this).toSet()
+            } ?: emptySet()
+        }
     }
 
-    private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String {
+    private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String? {
         /* TODO #3 */
-        return mapOf<String, String>("24236" to "chào").get(numseq)!!
+        return mapOf<String, String>("24236" to "chào").get(numseq)
     }
 }
 
