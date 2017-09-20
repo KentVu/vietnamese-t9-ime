@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'
     implementation 'io.reactivex:rxkotlin:2.0.0-RC1'
+    implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
 //noinspection GradleDependency
     implementation 'com.android.support:percent:25.4.0'
     // Required for local unit tests (JUnit 4 framework)

@@ -1,58 +1,39 @@
 package com.vutrankien.t9vietnamese
 
 import android.content.Context
-import com.snappydb.DB
+import android.database.sqlite.SQLiteDatabase
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.intellij.lang.annotations.Pattern
+import org.jetbrains.anko.db.*
 import timber.log.Timber
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 
 private val log = KLog("T9Engine")
 
+private val MAGIC:Int = 0xA11600D
 val LOCALE_VN = "vi-VN"
 val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
 constructor(context: Context, locale: String): AutoCloseable {
-    var dbWrapper = DBWrapper(context, locale)
+    var dbWrapper : DBWrapper = SqliteDBWrapper(context, locale)
 
-    private val MAGIC = "On your mark, sir!"
 
     init {
-        if (isDbValid()) {
+        if (dbWrapper.isDbValid()) {
             log.i("DB OK!")
         } else {
-//            initializeDb()
+//            initialize()
             throw EnginePromise(this, context)
         }
 
     }
 
-    fun initializeDb(context: Context) {
+    fun initialize(context: Context) {
         log.i("Destroying malicious database and reopen it!")
         dbWrapper = dbWrapper.recreate()
-        // initialize database
-        dbWrapper.put("HELO", MAGIC)
         val inputStream = context.assets.open("morphemes.txt")
         inputStream.bufferedReader().forEachLine { dbWrapper.put(it, 0) }
-    }
-
-    fun isDbValid(): Boolean {
-        // powerful magic entry to check if were talking to the right database
-        val magicEntry = try {
-            dbWrapper.get("HELO")
-        } catch (e: SnappydbException) {
-//            Timber.e(e.message)
-//            Timber.e(Exception(e))
-            Timber.w(e)
-            ""
-        }
-        if (magicEntry != MAGIC) {
-            return false
-        }
-        return true
     }
 
     override fun close() {
@@ -81,24 +62,165 @@ constructor(context: Context, locale: String): AutoCloseable {
     }
 }
 
+
+class SqliteDBWrapper(private val context: Context, locale: String) : DBWrapper {
+    private val database: T9SqlHelper
+        get() = T9SqlHelper.getInstance(context.applicationContext)
+
+    override fun isDbValid(): Boolean {
+        return get("HELO") == MAGIC
+    }
+
+    override fun recreate(): DBWrapper {
+//        database.deleteTable()
+        database.clearTable()
+        database.put("HELO", MAGIC)
+        return this
+    }
+
+    override fun put(key: String, value: Int) {
+        database.put(key, value)
+    }
+
+    override fun findKeys(key: String): Array<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun get(key: String): Int? {
+        return database.get(key)
+    }
+
+    override fun close() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese") {
+
+        companion object {
+            private var instance: T9SqlHelper? = null
+
+            @Synchronized
+            fun getInstance(ctx: Context): T9SqlHelper {
+                if (instance == null) {
+                    instance = T9SqlHelper(ctx.applicationContext)
+                }
+                return instance!!
+            }
+        }
+
+        private val TABLE_NAME = "WordFreq"
+        private val COLUMN_WORD = "word"
+        private val COLUMN_FREQ = "freq"
+
+        override fun onCreate(db: SQLiteDatabase) {
+            db.createTable(TABLE_NAME, true,
+                    "_id" to INTEGER + PRIMARY_KEY,
+                    COLUMN_WORD to TEXT,
+                    COLUMN_FREQ to INTEGER)
+        }
+
+        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        }
+
+        fun deleteTable() {
+            use {
+                //            delete("WordFreq")
+                dropTable(TABLE_NAME)
+                onCreate(this)
+            }
+        }
+
+        fun put(key: String, value: Int) {
+            use {
+                insert(TABLE_NAME,
+                        COLUMN_WORD to key,
+                        COLUMN_FREQ to value)
+            }
+        }
+
+        fun clearTable() {
+            use {
+                delete(TABLE_NAME)
+            }
+        }
+
+        fun get(key: String): Int? {
+            return use {
+                select(TABLE_NAME).column(COLUMN_FREQ).whereArgs("$COLUMN_WORD = '$key'")
+                        .parseOpt(IntParser)
+            }
+        }
+
+    }
+}
+
 class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
     fun getBlocking(): T9Engine {
-        t9Engine.initializeDb(context)
+        t9Engine.initialize(context)
         return t9Engine
     }
 
 }
 
-class DBWrapper(private val context: Context, private val locale: String) : DB by DBFactory.open(context) {
-//    var snappydb = DBFactory.open(context, locale)
+interface DBWrapper {
+    fun recreate(): DBWrapper
+    fun findKeys(key: String): Array<String>
+    fun put(key: String, value: Int)
+    fun get(key: String): Int?
+    fun close()
+    fun isDbValid(): Boolean
+
+}
+
+class SnappyDBWrapper(private val context: Context, private val locale: String): DBWrapper {
+
+    override fun isDbValid(): Boolean {
+        // powerful magic entry to check if were talking to the right database
+        val magicEntry = try {
+            get("HELO")
+        } catch (e: SnappydbException) {
+//            Timber.e(e.message)
+//            Timber.e(Exception(e))
+            Timber.w(e)
+            ""
+        }
+        if (magicEntry != MAGIC) {
+            return false
+        }
+        return true
+    }
+
+    override fun close() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun get(key: String): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun put(key: String, value: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun findKeys(key: String): Array<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    var snappydb = DBFactory.open(context, locale)
 
     init {
     }
 
-    fun recreate(): DBWrapper {
+    override fun recreate(): DBWrapper {
         destroy()
-        val newWrapper = DBWrapper(context, locale)
+        // initialize database
+        val newWrapper = SnappyDBWrapper(context, locale)
+        newWrapper.put("HELO", MAGIC)
         return newWrapper
+    }
+
+    private fun destroy() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
@@ -162,3 +284,7 @@ fun Context.getEngineFor(locale: String): T9Engine {
 
     }
 }
+
+// Access property for Context
+//private val Context.t9database: T9SqlHelper
+//    get() = T9SqlHelper.getInstance(applicationContext)
