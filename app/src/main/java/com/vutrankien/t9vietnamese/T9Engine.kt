@@ -41,21 +41,16 @@ constructor(context: Context, locale: String): AutoCloseable {
     }
 
     fun candidates(numseq: String): Set<String> {
-
-//        val keys = dbWrapper.findKeys(numseq)
-
-//        return keys.map {
-//            numseq2word(it)
-//        }.filter { it != "" }.toSet()
 //        return dbWrapper.findKeys(numseq2word(numseq)).toSet()
-        return with(numseq2word(numseq)){
-            this?.let {
-                dbWrapper.findKeys(this).toSet()
-            } ?: emptySet()
-        }
+
+        return numseq2word(numseq)?.let {
+            dbWrapper.findKeys(it).toSet()
+        } ?: emptySet()
     }
 
-    private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String? {
+    private fun numseq2word(
+            @Pattern(value= """^\d+""") numseq: String
+    ): String? {
         /* TODO #3 */
 //        mapOf<String, String>("2" to "abc")
         return mapOf<String, String>("24236" to "chào").get(numseq)
