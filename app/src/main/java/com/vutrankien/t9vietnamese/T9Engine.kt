@@ -6,16 +6,16 @@ import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.intellij.lang.annotations.Pattern
 import timber.log.Timber
-import java.io.BufferedInputStream
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 private val log = KLog("T9Engine")
 
+val LOCALE_VN = "vi-VN"
+val LOCALE_US = "en-US"
+
 class T9Engine @Throws(EnginePromise::class)
-constructor(private val context: Context, locale: String): AutoCloseable {
+constructor(context: Context, locale: String): AutoCloseable {
     var dbWrapper = DBWrapper(context, locale)
 
     private val MAGIC = "On your mark, sir!"
@@ -25,11 +25,12 @@ constructor(private val context: Context, locale: String): AutoCloseable {
             log.i("DB OK!")
         } else {
 //            initializeDb()
-            throw EnginePromise(this)
+            throw EnginePromise(this, context)
         }
+
     }
 
-    fun initializeDb() {
+    fun initializeDb(context: Context) {
         log.i("Destroying malicious database and reopen it!")
         dbWrapper = dbWrapper.recreate()
         // initialize database
@@ -75,13 +76,14 @@ constructor(private val context: Context, locale: String): AutoCloseable {
 
     private fun numseq2word(@Pattern(value= """^\d+""") numseq: String): String? {
         /* TODO #3 */
+//        mapOf<String, String>("2" to "abc")
         return mapOf<String, String>("24236" to "chào").get(numseq)
     }
 }
 
-class EnginePromise(private val t9Engine: T9Engine) : Exception() {
+class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
     fun getBlocking(): T9Engine {
-        t9Engine.initializeDb()
+        t9Engine.initializeDb(context)
         return t9Engine
     }
 
@@ -101,9 +103,35 @@ class DBWrapper(private val context: Context, private val locale: String) : DB b
 
 }
 
-class LazyT9Engine(val ctx: Context, val locale: String): ReadOnlyProperty<T9Engine?, T9Engine> {
-    operator override fun getValue(thisRef: T9Engine?, property: KProperty<*>): T9Engine = thisRef ?: T9Engine(ctx, locale)
-}
+data class PadConfiguration(
+        val num1: Set<Char>,
+        val num2: Set<Char>,
+        val num3: Set<Char>,
+        val num4: Set<Char>,
+        val num5: Set<Char>,
+        val num6: Set<Char>,
+        val num7: Set<Char>,
+        val num8: Set<Char>,
+        val num9: Set<Char>,
+        val num0: Set<Char>
+)
+//object StandardConfiguration: PadConfiguration(num1 = setOf('a', 'b', 'c'))
+//val StandardConfiguration = PadConfiguration(num1 = setOf('a', 'b', 'c'))
+val configurations =
+        mapOf<String, PadConfiguration>(
+                LOCALE_VN to PadConfiguration(
+                        num2 = linkedSetOf('a', 'ă', 'â', 'b', 'c'),
+                        num3 = linkedSetOf('d', 'đ', 'e', 'ê', 'f'),
+                        num4 = linkedSetOf('g', 'h', 'i', 'ê', 'f'),
+                        num5 = linkedSetOf('j', 'k', 'l', 'ê', 'f'),
+                        num6 = linkedSetOf('m', 'n', 'o', 'ê', 'f'),
+                        num7 = linkedSetOf('p', 'q', 'r', 's', 'f'),
+                        num8 = linkedSetOf('t', 'u', 'v', 'ê', 'f'),
+                        num9 = linkedSetOf('w', 'x', 'y', 'z', 'f'),
+                        num0 = linkedSetOf('d', 'đ', 'e', 'ê', 'f'),
+                        num1 = linkedSetOf('d', 'đ', 'e', 'ê', 'f')
+                )
+        )
 
 class T9EngineFactory(context: Context) {
     val viVNEngine: T9Engine by lazy { T9Engine(context, LOCALE_VN) }
@@ -115,10 +143,6 @@ class T9EngineFactory(context: Context) {
 var viVNEngine: T9Engine? = null
 var enUSEngine: T9Engine? = null
 
-val LOCALE_VN = "vi-VN"
-val LOCALE_US = "en-US"
-
-// TODO engineUninitializedException
 // TODO Asynchronize this
 fun Context.getEngineFor(locale: String): T9Engine {
     return when (locale) {
