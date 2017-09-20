@@ -16,7 +16,7 @@ val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
 constructor(context: Context, locale: String): AutoCloseable {
-    var dbWrapper : DBWrapper = SqliteDBWrapper(context, locale)
+    var dbWrapper : DBWrapper = T9SqlHelper(context)
 
 
     init {
@@ -63,9 +63,48 @@ constructor(context: Context, locale: String): AutoCloseable {
 }
 
 
-class SqliteDBWrapper(private val context: Context, locale: String) : DBWrapper {
-    private val database: T9SqlHelper
-        get() = T9SqlHelper.getInstance(context.applicationContext)
+class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese"), DBWrapper {
+
+    companion object {
+        private var instance: T9SqlHelper? = null
+
+        @Synchronized
+        fun getInstance(ctx: Context): T9SqlHelper {
+            if (instance == null) {
+                instance = T9SqlHelper(ctx.applicationContext)
+            }
+            return instance!!
+        }
+    }
+
+    private val TABLE_NAME = "WordFreq"
+    private val COLUMN_WORD = "word"
+    private val COLUMN_FREQ = "freq"
+
+    override fun onCreate(db: SQLiteDatabase) {
+        db.createTable(TABLE_NAME, true,
+                "_id" to INTEGER + PRIMARY_KEY,
+                COLUMN_WORD to TEXT + UNIQUE,
+                COLUMN_FREQ to INTEGER)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    }
+
+    override fun put(key: String, value: Int) {
+        use {
+            insert(TABLE_NAME,
+                    COLUMN_WORD to key,
+                    COLUMN_FREQ to value)
+        }
+    }
+
+    override fun get(key: String): Int? {
+        return use {
+            select(TABLE_NAME).column(COLUMN_FREQ).whereArgs("$COLUMN_WORD = '$key'")
+                    .parseOpt(IntParser)
+        }
+    }
 
     override fun isDbValid(): Boolean {
         return get("HELO") == MAGIC
@@ -73,85 +112,42 @@ class SqliteDBWrapper(private val context: Context, locale: String) : DBWrapper 
 
     override fun recreate(): DBWrapper {
 //        database.deleteTable()
-        database.clearTable()
-        database.put("HELO", MAGIC)
+        clearTable()
+        put("HELO", MAGIC)
         return this
     }
 
-    override fun put(key: String, value: Int) {
-        database.put(key, value)
-    }
+    private val DEFAULT_LIMIT = 10
 
     override fun findKeys(key: String): Array<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return use {
+            select(TABLE_NAME, COLUMN_WORD)
+                    .whereArgs("$COLUMN_WORD LIKE '$key%'")
+                    .orderBy(COLUMN_FREQ).limit(DEFAULT_LIMIT)
+                    .parseList(StringParser)
+                    .toTypedArray()
+        }
     }
 
-    override fun get(key: String): Int? {
-        return database.get(key)
+    fun deleteTable() {
+        use {
+            //            delete("WordFreq")
+            dropTable(TABLE_NAME)
+            onCreate(this)
+        }
     }
 
-    override fun close() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun clearTable() {
+        use {
+            delete(TABLE_NAME)
+        }
     }
 
-    class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese") {
+}
 
-        companion object {
-            private var instance: T9SqlHelper? = null
-
-            @Synchronized
-            fun getInstance(ctx: Context): T9SqlHelper {
-                if (instance == null) {
-                    instance = T9SqlHelper(ctx.applicationContext)
-                }
-                return instance!!
-            }
-        }
-
-        private val TABLE_NAME = "WordFreq"
-        private val COLUMN_WORD = "word"
-        private val COLUMN_FREQ = "freq"
-
-        override fun onCreate(db: SQLiteDatabase) {
-            db.createTable(TABLE_NAME, true,
-                    "_id" to INTEGER + PRIMARY_KEY,
-                    COLUMN_WORD to TEXT,
-                    COLUMN_FREQ to INTEGER)
-        }
-
-        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        }
-
-        fun deleteTable() {
-            use {
-                //            delete("WordFreq")
-                dropTable(TABLE_NAME)
-                onCreate(this)
-            }
-        }
-
-        fun put(key: String, value: Int) {
-            use {
-                insert(TABLE_NAME,
-                        COLUMN_WORD to key,
-                        COLUMN_FREQ to value)
-            }
-        }
-
-        fun clearTable() {
-            use {
-                delete(TABLE_NAME)
-            }
-        }
-
-        fun get(key: String): Int? {
-            return use {
-                select(TABLE_NAME).column(COLUMN_FREQ).whereArgs("$COLUMN_WORD = '$key'")
-                        .parseOpt(IntParser)
-            }
-        }
-
-    }
+abstract class SqliteDBWrapper(private val context: Context, locale: String) : DBWrapper {
+    private val database: T9SqlHelper
+        get() = T9SqlHelper.getInstance(context.applicationContext)
 }
 
 class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
@@ -203,7 +199,7 @@ class SnappyDBWrapper(private val context: Context, private val locale: String):
     }
 
     override fun findKeys(key: String): Array<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return snappydb.findKeys(key)
     }
 
     var snappydb = DBFactory.open(context, locale)
