@@ -7,6 +7,9 @@ import com.snappydb.SnappydbException
 import org.intellij.lang.annotations.Pattern
 import org.jetbrains.anko.db.*
 import timber.log.Timber
+import timber.log.Timber.d
+import timber.log.Timber.w
+import java.io.Closeable
 
 private val log = KLog("T9Engine")
 
@@ -15,7 +18,7 @@ val LOCALE_VN = "vi-VN"
 val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
-constructor(context: Context, locale: String): AutoCloseable {
+constructor(context: Context, locale: String): Closeable {
     var dbWrapper : DBWrapper = T9SqlHelper(context)
 
 
@@ -32,8 +35,22 @@ constructor(context: Context, locale: String): AutoCloseable {
     fun initialize(context: Context) {
         log.i("Destroying malicious database and reopen it!")
         dbWrapper = dbWrapper.recreate()
+//        val fd = context.assets.openFd("morphemes.txt")
+//        val fd = context.assets.openNonAssetFd("morphemes.txt")
         val inputStream = context.assets.open("morphemes.txt")
-        inputStream.bufferedReader().forEachLine { dbWrapper.put(it, 0) }
+//        val inputStream = fd.createInputStream()
+        var step = 0
+        var bytesRead = 0
+        // https://stackoverflow.com/a/6992255
+        val flength = inputStream.available()
+//        val flength = fd.length
+        inputStream.bufferedReader().forEachLine {
+            val lastStep = step
+            bytesRead += it.toByteArray().size + 1
+            step = (bytesRead / (flength / 100))
+            if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
+            dbWrapper.put(it, 0)
+        }
     }
 
     override fun close() {
@@ -58,7 +75,7 @@ constructor(context: Context, locale: String): AutoCloseable {
 }
 
 
-class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese"), DBWrapper {
+class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese.db"), DBWrapper {
 
     companion object {
         private var instance: T9SqlHelper? = null
@@ -153,17 +170,29 @@ class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exce
 
 }
 
-interface DBWrapper {
+interface DBWrapper : Closeable {
     fun recreate(): DBWrapper
-    fun findKeys(key: String): Array<String>
+    fun findKeys(key: String): Array<out String>
     fun put(key: String, value: Int)
     fun get(key: String): Int?
-    fun close()
+    override fun close()
     fun isDbValid(): Boolean
-
 }
 
-class SnappyDBWrapper(private val context: Context, private val locale: String): DBWrapper {
+class SnappyDBWrapper(private val context: Context, private val locale: String) : DBWrapper {
+    val snappydb = DBFactory.open(context, locale)
+
+    init {
+    }
+
+    override fun recreate(): DBWrapper {
+        snappydb.destroy()
+        snappydb.close()
+        // initialize database
+        val newWrapper = SnappyDBWrapper(context, locale)
+        newWrapper.put("HELO", MAGIC)
+        return newWrapper
+    }
 
     override fun isDbValid(): Boolean {
         // powerful magic entry to check if were talking to the right database
@@ -181,37 +210,23 @@ class SnappyDBWrapper(private val context: Context, private val locale: String):
         return true
     }
 
-    override fun close() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun get(key: String): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return snappydb.getInt(key)
     }
 
     override fun put(key: String, value: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        snappydb.put(key, value)
     }
 
-    override fun findKeys(key: String): Array<String> {
-        return snappydb.findKeys(key)
+    override fun findKeys(key: String): Array<out String> = try {
+        snappydb.findKeys(key)!!
+    } catch (e: Exception) {
+        w(e)
+        emptyArray<String>()
     }
 
-    var snappydb = DBFactory.open(context, locale)
-
-    init {
-    }
-
-    override fun recreate(): DBWrapper {
-        destroy()
-        // initialize database
-        val newWrapper = SnappyDBWrapper(context, locale)
-        newWrapper.put("HELO", MAGIC)
-        return newWrapper
-    }
-
-    private fun destroy() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun close() {
+        snappydb.close()
     }
 
 }
@@ -275,7 +290,3 @@ fun Context.getEngineFor(locale: String): T9Engine {
 
     }
 }
-
-// Access property for Context
-//private val Context.t9database: T9SqlHelper
-//    get() = T9SqlHelper.getInstance(applicationContext)
