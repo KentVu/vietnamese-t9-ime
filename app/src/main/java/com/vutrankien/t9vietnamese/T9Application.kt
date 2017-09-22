@@ -11,9 +11,6 @@ import timber.log.Timber.DebugTree
  */
 
 class T9Application : Application(){
-    val engine : T9EngineFactory by lazy {
-        T9EngineFactory(this)
-    }
 
     override fun onCreate() {
         super.onCreate()

@@ -19,8 +19,8 @@ val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
 constructor(context: Context, locale: String): Closeable {
-    var dbWrapper : DBWrapper = T9SqlHelper(context)
-
+    val configurations = Configuration(locale)
+    var dbWrapper : DBWrapper = T9SqlHelper(context, configurations.dbname)
 
     init {
         if (dbWrapper.isDbValid()) {
@@ -29,27 +29,34 @@ constructor(context: Context, locale: String): Closeable {
 //            initialize()
             throw EnginePromise(this, context)
         }
-
     }
 
     fun initialize(context: Context) {
         log.i("Destroying malicious database and reopen it!")
         dbWrapper = dbWrapper.recreate()
 //        val fd = context.assets.openFd("morphemes.txt")
-//        val fd = context.assets.openNonAssetFd("morphemes.txt")
-        val inputStream = context.assets.open("morphemes.txt")
+        val inputStream = context.assets.open(configurations.wordListFile)
 //        val inputStream = fd.createInputStream()
         var step = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255
         val flength = inputStream.available()
 //        val flength = fd.length
-        inputStream.bufferedReader().forEachLine {
-            val lastStep = step
-            bytesRead += it.toByteArray().size + 1
-            step = (bytesRead / (flength / 100))
-            if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
-            dbWrapper.put(it, 0)
+        inputStream.bufferedReader().useLines {
+            var count = 0
+            it.groupBy {
+                val numEachTransaction = 200
+                count++
+                return@groupBy count/numEachTransaction
+            }.values.forEach {
+                dbWrapper.putAll(it)
+                val lastStep = step
+                bytesRead += it.fold(0) { i, s ->
+                    i + s.toByteArray().size + 1
+                }
+                step = (bytesRead / (flength / 100))
+                if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
+            }
         }
     }
 
@@ -70,25 +77,24 @@ constructor(context: Context, locale: String): Closeable {
     ): String? {
         /* TODO #3 */
 //        mapOf<String, String>("2" to "abc")
+
         return mapOf<String, String>("24236" to "chào").get(numseq)
     }
 }
 
-
-class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese.db"), DBWrapper {
-
+class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {
     companion object {
-        private var instance: T9SqlHelper? = null
 
+        private var instance: T9SqlHelper? = null
         @Synchronized
-        fun getInstance(ctx: Context): T9SqlHelper {
+        fun getInstance(ctx: Context, dbname: String): T9SqlHelper {
             if (instance == null) {
-                instance = T9SqlHelper(ctx.applicationContext)
+                instance = T9SqlHelper(ctx.applicationContext, dbname)
             }
             return instance!!
         }
-    }
 
+    }
     private val TABLE_NAME = "WordFreq"
     private val COLUMN_WORD = "word"
     private val COLUMN_FREQ = "freq"
@@ -108,6 +114,16 @@ class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese.db"
             insert(TABLE_NAME,
                     COLUMN_WORD to key,
                     COLUMN_FREQ to value)
+        }
+    }
+
+    override fun putAll(keys: List<String>, defaultValue: Int) {
+        use {
+            transaction {
+                keys.forEach { key ->
+                    put(key, defaultValue)
+                }
+            }
         }
     }
 
@@ -157,11 +173,6 @@ class T9SqlHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "t9vietnamese.db"
 
 }
 
-abstract class SqliteDBWrapper(private val context: Context, locale: String) : DBWrapper {
-    private val database: T9SqlHelper
-        get() = T9SqlHelper.getInstance(context.applicationContext)
-}
-
 class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
     fun getBlocking(): T9Engine {
         t9Engine.initialize(context)
@@ -177,6 +188,7 @@ interface DBWrapper : Closeable {
     fun get(key: String): Int?
     override fun close()
     fun isDbValid(): Boolean
+    fun putAll(keys: List<String>, defaultValue: Int = 0)
 }
 
 class SnappyDBWrapper(private val context: Context, private val locale: String) : DBWrapper {
@@ -218,6 +230,10 @@ class SnappyDBWrapper(private val context: Context, private val locale: String) 
         snappydb.put(key, value)
     }
 
+    override fun putAll(keys: List<String>, defaultValue: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun findKeys(key: String): Array<out String> = try {
         snappydb.findKeys(key)!!
     } catch (e: Exception) {
@@ -231,43 +247,6 @@ class SnappyDBWrapper(private val context: Context, private val locale: String) 
 
 }
 
-data class PadConfiguration(
-        val num1: Set<Char>,
-        val num2: Set<Char>,
-        val num3: Set<Char>,
-        val num4: Set<Char>,
-        val num5: Set<Char>,
-        val num6: Set<Char>,
-        val num7: Set<Char>,
-        val num8: Set<Char>,
-        val num9: Set<Char>,
-        val num0: Set<Char>
-)
-//object StandardConfiguration: PadConfiguration(num1 = setOf('a', 'b', 'c'))
-//val StandardConfiguration = PadConfiguration(num1 = setOf('a', 'b', 'c'))
-val configurations =
-        mapOf<String, PadConfiguration>(
-                LOCALE_VN to PadConfiguration(
-                        num2 = linkedSetOf('a', 'ă', 'â', 'b', 'c'),
-                        num3 = linkedSetOf('d', 'đ', 'e', 'ê', 'f'),
-                        num4 = linkedSetOf('g', 'h', 'i', 'ê', 'f'),
-                        num5 = linkedSetOf('j', 'k', 'l', 'ê', 'f'),
-                        num6 = linkedSetOf('m', 'n', 'o', 'ê', 'f'),
-                        num7 = linkedSetOf('p', 'q', 'r', 's', 'f'),
-                        num8 = linkedSetOf('t', 'u', 'v', 'ê', 'f'),
-                        num9 = linkedSetOf('w', 'x', 'y', 'z', 'f'),
-                        num0 = linkedSetOf('d', 'đ', 'e', 'ê', 'f'),
-                        num1 = linkedSetOf('d', 'đ', 'e', 'ê', 'f')
-                )
-        )
-
-class T9EngineFactory(context: Context) {
-    val viVNEngine: T9Engine by lazy { T9Engine(context, LOCALE_VN) }
-    val enUSEngine: T9Engine by lazy { T9Engine(context, LOCALE_US) }
-}
-
-//val viVNEngine: T9Engine by LazyT9Engine(context, "vi-VN")
-
 var viVNEngine: T9Engine? = null
 var enUSEngine: T9Engine? = null
 
@@ -275,18 +254,14 @@ var enUSEngine: T9Engine? = null
 fun Context.getEngineFor(locale: String): T9Engine {
     return when (locale) {
         LOCALE_VN -> viVNEngine ?: run {
-            viVNEngine = T9Engine(this, LOCALE_VN)
+            viVNEngine = T9Engine(this, locale)
             viVNEngine!!
         }
         LOCALE_US -> enUSEngine ?: run {
-            enUSEngine = T9Engine(this, LOCALE_US)
+            enUSEngine = T9Engine(this, locale)
             enUSEngine!!
         }
         else -> throw UnsupportedOperationException()
-
-//            if (viVNEngine != null) viVNEngine!! else {
-//                viVNEngine = T9Engine(this, "vi-VN"); viVNEngine!!
-//            }
 
     }
 }
