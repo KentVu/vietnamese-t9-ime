@@ -65,8 +65,6 @@ constructor(context: Context, locale: String): Closeable {
     }
 
     fun candidates(numseq: String): Set<String> {
-//        return dbWrapper.findKeys(numseq2word(numseq)).toSet()
-
         return numseq2word(numseq)?.let {
             dbWrapper.findKeys(it).toSet()
         } ?: emptySet()
@@ -76,8 +74,11 @@ constructor(context: Context, locale: String): Closeable {
             @Pattern(value= """^\d+""") numseq: String
     ): String? {
         /* TODO #3 */
-//        mapOf<String, String>("2" to "abc")
-
+        numseq.fold(StringBuilder()) { sb, num ->
+            val chars = configurations.pad[num].chars
+            chars.forEach { sb.append("$it%") }
+            sb
+        }
         return mapOf<String, String>("24236" to "chào").get(numseq)
     }
 }

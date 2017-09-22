@@ -17,7 +17,7 @@ public class JavaTests {
     public void normalizerTest() {
         //new Normalizer()
         String chào = Normalizer.normalize("chào sắc huyền hỏi ngã nặng âươđ", Normalizer.Form
-                .NFD);
+                .NFKD);
         System.out.println(chào);
         //System.out.print(chào.toCharArray());
 
@@ -25,7 +25,8 @@ public class JavaTests {
         for (int i = 0; i < charArray.length; i++) {
             Character c = charArray[i];
             //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                System.out.printf("%s %d %s\n", c, Character.codePointAt(charArray, i), Character
+                System.out.printf("%s %d %<X %s\n", c, Character.codePointAt(charArray, i),
+                        Character
                         .getName(Character.codePointAt(charArray, i)));
             //} else {
             //    System.out.printf("%s %d\n", c, Character.codePointAt(charArray, i));
