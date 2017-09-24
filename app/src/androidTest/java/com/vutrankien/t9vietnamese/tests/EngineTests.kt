@@ -66,7 +66,8 @@ class EngineTests {
 
     private fun testEngineNumToString(testCases: Map<String, Array<String>>, engine: T9Engine) {
         for ((key, value) in testCases) {
-            val candiateStrings = engine.candidates(key)
+            engine.input(key)
+            val candiateStrings = engine.currentCandidates()
             for (cand in value) {
                 assertTrue(
                         String.format("[%s] not containing [%s], all candidates:%s", key, cand, candiateStrings),

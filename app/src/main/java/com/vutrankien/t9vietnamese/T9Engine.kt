@@ -10,6 +10,7 @@ import timber.log.Timber
 import timber.log.Timber.d
 import timber.log.Timber.w
 import java.io.Closeable
+import java.text.Normalizer
 
 private val log = KLog("T9Engine")
 
@@ -49,7 +50,12 @@ constructor(context: Context, locale: String): Closeable {
                 count++
                 return@groupBy count/numEachTransaction
             }.values.forEach {
-                dbWrapper.putAll(it)
+
+                dbWrapper.putAll(
+                        it.map {
+                            it.decomposeVietnamese()
+                        }
+                )
                 val lastStep = step
                 bytesRead += it.fold(0) { i, s ->
                     i + s.toByteArray().size + 1
@@ -64,10 +70,19 @@ constructor(context: Context, locale: String): Closeable {
         dbWrapper.close()
     }
 
-    fun candidates(numseq: String): Set<String> {
-        return numseq2word(numseq)?.let {
+    fun input(numseq: String): Unit {
+        numseq.forEach { input(it) }
+        numseq2word(numseq)?.let {
             dbWrapper.findKeys(it).toSet()
         } ?: emptySet()
+    }
+
+    private fun input(numseq: Char) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun currentCandidates(): Set<String> {
+        TODO()
     }
 
     private fun numseq2word(
@@ -81,6 +96,34 @@ constructor(context: Context, locale: String): Closeable {
         }
         return mapOf<String, String>("24236" to "chào").get(numseq)
     }
+}
+
+private fun String.decomposeVietnamese(): String {
+    /* 774 0x306 COMBINING BREVE */
+    val BREVE = '̆'
+    /* 770 0x302 COMBINING CIRCUMFLEX ACCENT */
+    val CIRCUMFLEX_ACCENT = '̂'
+    /* 795 31B COMBINING HORN */
+    val HORN = '̛'
+    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace(("" +
+            "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)").toRegex()) {
+//        when(it.value) {
+//            "ă" -> "ă"
+//            "Ă" -> "Ă"
+//            "â" -> "â"
+//            "Â" -> "Â"
+//        }
+        Normalizer.normalize(it.value, Normalizer.Form.NFKC)
+    }
+//            .joinToString
+//    (separator =
+//    "") {
+//        {
+//            when (it) {
+//                else -> return@map it
+//            }
+//        }
+//    }
 }
 
 class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {

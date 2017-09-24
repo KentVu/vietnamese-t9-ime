@@ -16,8 +16,8 @@ public class JavaTests {
     @Test
     public void normalizerTest() {
         //new Normalizer()
-        String chào = Normalizer.normalize("chào sắc huyền hỏi ngã nặng âươđ", Normalizer.Form
-                .NFKD);
+        String chào = Normalizer.normalize("chào sắc huyền hỏi ngã nặng âươđ ĂÂƯƠĐ",
+                Normalizer.Form.NFKD);
         System.out.println(chào);
         //System.out.print(chào.toCharArray());
 
