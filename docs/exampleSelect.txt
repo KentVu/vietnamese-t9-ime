@@ -1,0 +1,17 @@
+# https://stackoverflow.com/a/10812989/1562087
+sqlite3 t9vietnamese.db 'SELECT *
+FROM ( SELECT *
+	FROM WordFreq
+	 WHERE word LIKE "a_%"
+	 LIMIT 10 )
+UNION SELECT *
+ FROM
+    ( SELECT *
+     FROM WordFreq
+     WHERE word LIKE "b_%"
+     LIMIT 10 )
+UNION SELECT *
+ FROM ( SELECT *
+	 FROM WordFreq
+	 WHERE word LIKE "C_%"
+	 LIMIT 10) '

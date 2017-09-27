@@ -11,6 +11,7 @@ import timber.log.Timber.d
 import timber.log.Timber.w
 import java.io.Closeable
 import java.text.Normalizer
+import java.util.*
 
 private val log = KLog("T9Engine")
 
@@ -77,8 +78,11 @@ constructor(context: Context, locale: String): Closeable {
         } ?: emptySet()
     }
 
-    private fun input(numseq: Char) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private val currentNumSeq = mutableListOf<Char>()
+
+    private fun input(num: Char) {
+        currentNumSeq.push(num)
+        configurations.pad[num].chars.for
     }
 
     fun currentCandidates(): Set<String> {
@@ -98,6 +102,8 @@ constructor(context: Context, locale: String): Closeable {
     }
 }
 
+private fun <E> MutableList<E>.push(num: E) = add(num)
+
 private fun String.decomposeVietnamese(): String {
     /* 774 0x306 COMBINING BREVE */
     val BREVE = '̆'
@@ -115,15 +121,6 @@ private fun String.decomposeVietnamese(): String {
 //        }
         Normalizer.normalize(it.value, Normalizer.Form.NFKC)
     }
-//            .joinToString
-//    (separator =
-//    "") {
-//        {
-//            when (it) {
-//                else -> return@map it
-//            }
-//        }
-//    }
 }
 
 class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {
