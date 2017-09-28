@@ -93,7 +93,10 @@ constructor(context: Context, locale: String): Closeable {
         // filter combinations
         if (currentNumSeq.size > 1) {
 //            currentCombinations.forEach { dbWrapper.findKeys(...) }
-            dbWrapper.existingPrefix(currentCombinations)
+            val existingPrefix = dbWrapper.existingPrefix(currentCombinations)
+            currentCombinations = currentCombinations.filter { comb ->
+                existingPrefix.any { it.startsWith(comb) }
+            }.toSet()
 //            currentNumSeq.cartesianMul(0,1)
         }
 //        configurations.pad[num].chars.toS
@@ -226,22 +229,9 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
                     ORDER BY $COLUMN_FREQ DESC
             LIMIT 10 )"""
         }
-//        .fold(queryBuilder) { queryBuilder, sqlSelect ->
-//            queryBuilder.buildUnionQuery()
-//        }
-        //.joinToString(" UNION ")
         val queryBuilder = SQLiteQueryBuilder()
         val sql = queryBuilder.buildUnionQuery(selects.toTypedArray(), null, null)
         return use {
-//            prefixes.forEach {
-//                with(queryBuilder) {
-//                    tables =
-//                            """( SELECT *
-//        FROM $TABLE_NAME
-//        WHERE $COLUMN_WORD LIKE "$it%"
-//LIMIT 10 )"""
-//                }
-//            }
             rawQuery(sql, null).parseList(StringParser).toSet()
         }
     }
