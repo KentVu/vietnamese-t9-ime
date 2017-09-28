@@ -1,7 +1,9 @@
 package com.vutrankien.t9vietnamese
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteQueryBuilder
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.intellij.lang.annotations.Pattern
@@ -79,10 +81,22 @@ constructor(context: Context, locale: String): Closeable {
     }
 
     private val currentNumSeq = mutableListOf<Char>()
+    private val currentCandidates = mutableSetOf<String>()
+
+    private var currentCombinations = setOf<String>()
 
     private fun input(num: Char) {
         currentNumSeq.push(num)
-        configurations.pad[num].chars.for
+//        currentCandidates.addAll(configurations.pad[num].chars)
+//        currentCandidates.cartesianMul(configurations.pad[num].chars)
+        currentCombinations *= (configurations.pad[num].chars)
+        // filter combinations
+        if (currentNumSeq.size > 1) {
+//            currentCombinations.forEach { dbWrapper.findKeys(...) }
+            dbWrapper.existingPrefix(currentCombinations)
+//            currentNumSeq.cartesianMul(0,1)
+        }
+//        configurations.pad[num].chars.toS
     }
 
     fun currentCandidates(): Set<String> {
@@ -100,6 +114,30 @@ constructor(context: Context, locale: String): Closeable {
         }
         return mapOf<String, String>("24236" to "chào").get(numseq)
     }
+}
+
+/**
+ * Cartesian multiply a Set of Strings with a Set of Chars
+ *
+ * <br/>i.e. Append each char to each string
+ */
+private operator fun Set<String>.times(chars: Set<Char>): Set<String> {
+    val newSet = mutableSetOf<String>()
+    if (size == 0)
+        newSet.addAll(chars)
+    else
+        chars.forEach { char -> forEach { string -> newSet.add(string + char) } }
+    return newSet
+}
+
+private fun Set<String>.addAll(chars: Set<Char>): MutableSet<String> {
+    val newSet = toMutableSet()
+    chars.forEach { newSet.add(it.toString()) }
+    return newSet
+}
+
+private fun MutableSet<String>.addAll(chars: Set<Char>) {
+    chars.forEach { add(it.toString()) }
 }
 
 private fun <E> MutableList<E>.push(num: E) = add(num)
@@ -126,7 +164,10 @@ private fun String.decomposeVietnamese(): String {
 class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {
     companion object {
 
+        private val DEFAULT_LIMIT = 10
+
         private var instance: T9SqlHelper? = null
+
         @Synchronized
         fun getInstance(ctx: Context, dbname: String): T9SqlHelper {
             if (instance == null) {
@@ -134,8 +175,8 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
             }
             return instance!!
         }
-
     }
+
     private val TABLE_NAME = "WordFreq"
     private val COLUMN_WORD = "word"
     private val COLUMN_FREQ = "freq"
@@ -175,6 +216,36 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
         }
     }
 
+    @SuppressLint("Recycle")
+    override fun existingPrefix(prefixes: Set<String>): Set<String> {
+        val selects = prefixes.map {
+            """SELECT $COLUMN_WORD
+            FROM ( SELECT $COLUMN_WORD
+                    FROM $TABLE_NAME
+                    WHERE $COLUMN_WORD LIKE "$it%"
+                    ORDER BY $COLUMN_FREQ DESC
+            LIMIT 10 )"""
+        }
+//        .fold(queryBuilder) { queryBuilder, sqlSelect ->
+//            queryBuilder.buildUnionQuery()
+//        }
+        //.joinToString(" UNION ")
+        val queryBuilder = SQLiteQueryBuilder()
+        val sql = queryBuilder.buildUnionQuery(selects.toTypedArray(), null, null)
+        return use {
+//            prefixes.forEach {
+//                with(queryBuilder) {
+//                    tables =
+//                            """( SELECT *
+//        FROM $TABLE_NAME
+//        WHERE $COLUMN_WORD LIKE "$it%"
+//LIMIT 10 )"""
+//                }
+//            }
+            rawQuery(sql, null).parseList(StringParser).toSet()
+        }
+    }
+
     override fun isDbValid(): Boolean {
         return get("HELO") == MAGIC
     }
@@ -186,12 +257,10 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
         return this
     }
 
-    private val DEFAULT_LIMIT = 10
-
-    override fun findKeys(key: String): Array<String> {
+    override fun findKeys(prefix: String): Array<String> {
         return use {
             select(TABLE_NAME, COLUMN_WORD)
-                    .whereArgs("$COLUMN_WORD LIKE '$key%'")
+                    .whereArgs("$COLUMN_WORD LIKE '$prefix%'")
                     .orderBy(COLUMN_FREQ).limit(DEFAULT_LIMIT)
                     .parseList(StringParser)
                     .toTypedArray()
@@ -224,12 +293,13 @@ class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exce
 
 interface DBWrapper : Closeable {
     fun recreate(): DBWrapper
-    fun findKeys(key: String): Array<out String>
+    fun findKeys(prefix: String): Array<out String>
     fun put(key: String, value: Int)
     fun get(key: String): Int?
     override fun close()
     fun isDbValid(): Boolean
     fun putAll(keys: List<String>, defaultValue: Int = 0)
+    fun existingPrefix(prefixes: Set<String>): Set<String>
 }
 
 class SnappyDBWrapper(private val context: Context, private val locale: String) : DBWrapper {
@@ -275,11 +345,15 @@ class SnappyDBWrapper(private val context: Context, private val locale: String) 
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun findKeys(key: String): Array<out String> = try {
-        snappydb.findKeys(key)!!
+    override fun findKeys(prefix: String): Array<out String> = try {
+        snappydb.findKeys(prefix)!!
     } catch (e: Exception) {
         w(e)
         emptyArray<String>()
+    }
+
+    override fun existingPrefix(prefixes: Set<String>): Set<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun close() {
