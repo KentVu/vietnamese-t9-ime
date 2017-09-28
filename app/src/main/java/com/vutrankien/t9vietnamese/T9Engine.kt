@@ -13,7 +13,6 @@ import timber.log.Timber.d
 import timber.log.Timber.w
 import java.io.Closeable
 import java.text.Normalizer
-import java.util.*
 
 private val log = KLog("T9Engine")
 
@@ -27,7 +26,7 @@ constructor(context: Context, locale: String): Closeable {
     var dbWrapper : DBWrapper = T9SqlHelper(context, configurations.dbname)
 
     init {
-        if (dbWrapper.isDbValid()) {
+        if (dbWrapper.haveMagic()) {
             log.i("DB OK!")
         } else {
 //            initialize()
@@ -38,14 +37,11 @@ constructor(context: Context, locale: String): Closeable {
     fun initialize(context: Context) {
         log.i("Destroying malicious database and reopen it!")
         dbWrapper = dbWrapper.recreate()
-//        val fd = context.assets.openFd("morphemes.txt")
         val inputStream = context.assets.open(configurations.wordListFile)
-//        val inputStream = fd.createInputStream()
         var step = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255
         val flength = inputStream.available()
-//        val flength = fd.length
         inputStream.bufferedReader().useLines {
             var count = 0
             it.groupBy {
@@ -53,7 +49,6 @@ constructor(context: Context, locale: String): Closeable {
                 count++
                 return@groupBy count/numEachTransaction
             }.values.forEach {
-
                 dbWrapper.putAll(
                         it.map {
                             it.decomposeVietnamese()
@@ -67,6 +62,8 @@ constructor(context: Context, locale: String): Closeable {
                 if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
             }
         }
+        // put magic at last to mark database stable (avoid app crash)
+        dbWrapper.putMagic()
     }
 
     override fun close() {
@@ -81,7 +78,12 @@ constructor(context: Context, locale: String): Closeable {
     }
 
     private val currentNumSeq = mutableListOf<Char>()
-    private val currentCandidates = mutableSetOf<String>()
+    private var _currentCandidates = setOf<String>()
+    var currentCandidates: Set<String>
+        get() = _currentCandidates.map { it.composeVietnamese() }.toSet()
+        set(value) {
+            _currentCandidates = value
+        }
 
     private var currentCombinations = setOf<String>()
 
@@ -93,17 +95,12 @@ constructor(context: Context, locale: String): Closeable {
         // filter combinations
         if (currentNumSeq.size > 1) {
 //            currentCombinations.forEach { dbWrapper.findKeys(...) }
-            val existingPrefix = dbWrapper.existingPrefix(currentCombinations)
+            _currentCandidates = dbWrapper.existingPrefix(currentCombinations)
             currentCombinations = currentCombinations.filter { comb ->
-                existingPrefix.any { it.startsWith(comb) }
+                _currentCandidates.any { it.startsWith(comb) }
             }.toSet()
-//            currentNumSeq.cartesianMul(0,1)
         }
-//        configurations.pad[num].chars.toS
-    }
-
-    fun currentCandidates(): Set<String> {
-        TODO()
+        d("after pushing [$num${configurations.pad[num].chars}]: s${currentNumSeq}c${currentCombinations}cands$currentCandidates")
     }
 
     private fun numseq2word(
@@ -116,6 +113,12 @@ constructor(context: Context, locale: String): Closeable {
             sb
         }
         return mapOf<String, String>("24236" to "chào").get(numseq)
+    }
+
+    fun flush() {
+        currentNumSeq.clear()
+        currentCombinations = setOf()
+        currentCandidates = setOf()
     }
 }
 
@@ -153,7 +156,7 @@ private fun String.decomposeVietnamese(): String {
     /* 795 31B COMBINING HORN */
     val HORN = '̛'
     return Normalizer.normalize(this, Normalizer.Form.NFKD).replace(("" +
-            "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)").toRegex()) {
+            "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oO]$CIRCUMFLEX_ACCENT").toRegex()) {
 //        when(it.value) {
 //            "ă" -> "ă"
 //            "Ă" -> "Ă"
@@ -164,10 +167,13 @@ private fun String.decomposeVietnamese(): String {
     }
 }
 
+private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.Form
+        .NFKC)
+
 class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {
     companion object {
 
-        private val DEFAULT_LIMIT = 10
+        private val DEFAULT_LIMIT = 5
 
         private var instance: T9SqlHelper? = null
 
@@ -236,15 +242,18 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
         }
     }
 
-    override fun isDbValid(): Boolean {
+    override fun haveMagic(): Boolean {
         return get("HELO") == MAGIC
     }
 
     override fun recreate(): DBWrapper {
 //        database.deleteTable()
         clearTable()
-        put("HELO", MAGIC)
         return this
+    }
+
+    override fun putMagic() {
+        put("HELO", MAGIC)
     }
 
     override fun findKeys(prefix: String): Array<String> {
@@ -287,9 +296,10 @@ interface DBWrapper : Closeable {
     fun put(key: String, value: Int)
     fun get(key: String): Int?
     override fun close()
-    fun isDbValid(): Boolean
+    fun haveMagic(): Boolean
     fun putAll(keys: List<String>, defaultValue: Int = 0)
     fun existingPrefix(prefixes: Set<String>): Set<String>
+    fun putMagic()
 }
 
 class SnappyDBWrapper(private val context: Context, private val locale: String) : DBWrapper {
@@ -307,7 +317,7 @@ class SnappyDBWrapper(private val context: Context, private val locale: String) 
         return newWrapper
     }
 
-    override fun isDbValid(): Boolean {
+    override fun haveMagic(): Boolean {
         // powerful magic entry to check if were talking to the right database
         val magicEntry = try {
             get("HELO")
@@ -321,6 +331,10 @@ class SnappyDBWrapper(private val context: Context, private val locale: String) 
             return false
         }
         return true
+    }
+
+    override fun putMagic() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun get(key: String): Int {
