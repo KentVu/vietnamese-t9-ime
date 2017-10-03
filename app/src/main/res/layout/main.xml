@@ -1,80 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                               xmlns:app="http://schemas.android.com/apk/res-auto"
-                                               xmlns:tools="http://schemas.android.com/tools"
-                                               android:layout_width="match_parent"
-                                               android:layout_height="match_parent"
-                                               android:orientation="vertical"
-                                               tools:context=".MainActivity">
-
-    <LinearLayout
-        android:id="@+id/texts"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_heightPercent="50%">
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/hello_world"/>
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:hint="@string/test_hint"/>
-    </LinearLayout>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/percentRelativeLayout"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:orientation="vertical"
+                                             tools:context=".MainActivity"
+                                             tools:layout_editor_absoluteX="0dp"
+                                             tools:layout_editor_absoluteY="81dp">
 
 
-    <LinearLayout
-        android:id="@+id/vertical_pane_left"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/texts"
-        android:layout_weight="1"
-        android:baselineAligned="false"
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/hello_world"
+        android:onClick="onCandidateClick"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_25"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:focusable="true"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_horizontal_25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="20%">
-    </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintGuide_percent="0.25"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <include layout="@layout/dialpad_table"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:layout_below="@id/texts"
-             android:layout_toEndOf="@id/vertical_pane_left"
-             android:layout_toRightOf="@id/vertical_pane_left"
-             app:layout_heightPercent="50%"
-             app:layout_widthPercent="60%"/>
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/test_hint"
+        app:layout_constraintBottom_toTopOf="@id/guideline_horizontal_50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_25"/>
 
-    <com.vutrankien.t9vietnamese.T9KeyboardView
-        android:visibility="gone"
-        android:id="@+id/dialpad2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/texts"
-        android:layout_toEndOf="@id/dialpad"
-        android:layout_toRightOf="@id/dialpad"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="60%">
-    </com.vutrankien.t9vietnamese.T9KeyboardView>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_horizontal_50"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@id/dialpad2"
-        android:layout_toRightOf="@id/dialpad2"
-        app:layout_heightPercent="50%"
-        app:layout_widthPercent="20%">
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_vertical_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/btn_right"/>
-    </LinearLayout>
-</android.support.percent.PercentRelativeLayout>
+    <include
+        android:id="@+id/dialpad"
+        layout="@layout/dialpad_table"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline_vertical_80"
+        app:layout_constraintStart_toEndOf="@id/guideline_vertical_20"
+        app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_50"
+        android:layout_marginRight="8dp"/>
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_vertical_80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.8"/>
+
+    <TextView
+        android:id="@+id/btn_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/btn_right"
+        app:layout_constraintTop_toTopOf="@id/dialpad"
+        app:layout_constraintStart_toEndOf="@id/dialpad"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</android.support.constraint.ConstraintLayout>

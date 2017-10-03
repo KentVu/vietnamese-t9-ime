@@ -80,27 +80,41 @@ constructor(context: Context, locale: String): Closeable {
     private val currentNumSeq = mutableListOf<Char>()
     private var _currentCandidates = setOf<String>()
     var currentCandidates: Set<String>
-        get() = _currentCandidates.map { it.composeVietnamese() }.toSet()
-        set(value) {
+        get() = if (!numOnlyMode)
+            _currentCandidates.map { it.composeVietnamese() }.toSet()
+        else setOf(currentNumSeq.joinToString(separator = ""))
+        private set(value) {
             _currentCandidates = value
         }
 
     private var currentCombinations = setOf<String>()
+    /**
+     * * `true`: No more candidates from DB, returning current numseq
+     */
+    private var numOnlyMode = false
 
-    private fun input(num: Char) {
+    fun input(num: Char) {
         currentNumSeq.push(num)
-//        currentCandidates.addAll(configurations.pad[num].chars)
-//        currentCandidates.cartesianMul(configurations.pad[num].chars)
-        currentCombinations *= (configurations.pad[num].chars)
-        // filter combinations
-        if (currentNumSeq.size > 1) {
-//            currentCombinations.forEach { dbWrapper.findKeys(...) }
-            _currentCandidates = dbWrapper.existingPrefix(currentCombinations)
-            currentCombinations = currentCombinations.filter { comb ->
-                _currentCandidates.any { it.startsWith(comb) }
-            }.toSet()
+        if (!numOnlyMode) {
+            currentCombinations *= (configurations.pad[num].chars)
+            // filter combinations
+            if (currentNumSeq.size > 1) {
+                // Only start from 2 numbers and beyond
+                _currentCandidates = dbWrapper.existingPrefix(currentCombinations)
+                if (!_currentCandidates.isEmpty())
+                    currentCombinations = currentCombinations.filter { comb ->
+                            _currentCandidates.any { it.startsWith(comb) }
+                        }.toSet()
+                else {
+                    w("seq$currentNumSeq generates no candidate!!")
+                    numOnlyMode = true
+                    currentCombinations = setOf()
+                }
+            }
+        } else {
+            d("NumOnlyMode!")
         }
-        d("after pushing [$num${configurations.pad[num].chars}]: s${currentNumSeq}c${currentCombinations}cands$currentCandidates")
+        d("after pushing [$num${configurations.pad[num].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
     }
 
     private fun numseq2word(
@@ -119,6 +133,7 @@ constructor(context: Context, locale: String): Closeable {
         currentNumSeq.clear()
         currentCombinations = setOf()
         currentCandidates = setOf()
+        numOnlyMode = false
     }
 }
 
@@ -155,7 +170,7 @@ private fun String.decomposeVietnamese(): String {
     val CIRCUMFLEX_ACCENT = '̂'
     /* 795 31B COMBINING HORN */
     val HORN = '̛'
-    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace(("" +
+    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace((
             "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oO]$CIRCUMFLEX_ACCENT").toRegex()) {
 //        when(it.value) {
 //            "ă" -> "ă"
@@ -282,8 +297,11 @@ class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, d
 
 }
 
+/**
+ * Promise to provide engine after initializing
+ */
 class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
-    fun getBlocking(): T9Engine {
+    fun initializeThenGetBlocking(): T9Engine {
         t9Engine.initialize(context)
         return t9Engine
     }
