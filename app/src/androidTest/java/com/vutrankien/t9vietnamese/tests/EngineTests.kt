@@ -37,7 +37,7 @@ class EngineTests {
         try {
             viVnEngine = context.getEngineFor("vi-VN")
         } catch(e: EnginePromise) {
-            viVnEngine = e.getBlocking()
+            viVnEngine = e.initializeThenGetBlocking()
         }
     }
 
