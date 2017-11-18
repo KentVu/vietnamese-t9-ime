@@ -7,11 +7,13 @@ import android.database.sqlite.SQLiteQueryBuilder
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.jetbrains.anko.db.*
+import org.trie4j.Trie
+import org.trie4j.io.TrieReader
+import org.trie4j.io.TrieWriter
 import org.trie4j.patricia.MapPatriciaTrie
+import org.trie4j.util.TrieMap
 import timber.log.Timber
-import java.io.Closeable
-import java.io.File
-import java.io.FileWriter
+import java.io.*
 
 interface DBWrapper : Closeable {
     fun clear()
@@ -26,12 +28,20 @@ interface DBWrapper : Closeable {
 
 private val MAGIC:Int = 0xA11600D
 
-class TrieDB(private val fileDir: File) : DBWrapper {
+class TrieDB(fileDir: File) : DBWrapper {
 
     private val TRIE_FILENAME = "trie"
-    val trie = MapPatriciaTrie<Int>()
+//    val trie = MapPatriciaTrie<Int>()
+    val trie : MapPatriciaTrie<Int>
 
     private val trieFile = File(fileDir, TRIE_FILENAME)
+
+    init {
+        trie =
+            if (trieFile.exists())
+                TrieReader(FileInputStream(trieFile)).read() as MapPatriciaTrie<Int>
+            else MapPatriciaTrie()
+    }
 
     override fun clear() {
         trieFile.delete()
@@ -46,7 +56,7 @@ class TrieDB(private val fileDir: File) : DBWrapper {
     }
 
     override fun close() {
-        trie.dump(FileWriter(trieFile))
+        TrieWriter(FileOutputStream(trieFile)).write(trie)
     }
 
     private val MAGIC_KEY = "HELO"
