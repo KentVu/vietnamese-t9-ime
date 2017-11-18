@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.vutrankien.t9vietnamese"
@@ -36,6 +36,7 @@ dependencies {
     implementation 'io.reactivex:rxkotlin:2.0.0-RC1'
     implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.github.takawitter:trie4j:0.9.7'
     // Required for local unit tests (JUnit 4 framework)
     testImplementation 'junit:junit:4.12'
     // Required for instrumented tests

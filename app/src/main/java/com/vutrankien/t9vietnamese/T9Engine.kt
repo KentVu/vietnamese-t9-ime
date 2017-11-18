@@ -1,14 +1,6 @@
 package com.vutrankien.t9vietnamese
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteQueryBuilder
-import com.snappydb.DBFactory
-import com.snappydb.SnappydbException
-import org.intellij.lang.annotations.Pattern
-import org.jetbrains.anko.db.*
-import timber.log.Timber
 import timber.log.Timber.d
 import timber.log.Timber.w
 import java.io.Closeable
@@ -16,27 +8,41 @@ import java.text.Normalizer
 
 private val log = KLog("T9Engine")
 
-private val MAGIC:Int = 0xA11600D
 val LOCALE_VN = "vi-VN"
 val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
 constructor(context: Context, locale: String): Closeable {
     val configurations = Configuration(locale)
-    var dbWrapper : DBWrapper = T9SqlHelper(context, configurations.dbname)
+    val dbWrapper : DBWrapper = TrieDB(context.filesDir)
+
+    private val currentNumSeq = mutableListOf<Char>()
+    private var _currentCandidates = setOf<String>()
+    var currentCandidates: Set<String>
+        get() = if (!numOnlyMode)
+            _currentCandidates.map { it.composeVietnamese() }.toSet()
+        else setOf(currentNumSeq.joinToString(separator = ""))
+        private set(value) {
+            _currentCandidates = value
+        }
+
+    private var currentCombinations = setOf<String>()
+    /**
+     * * `true`: No more candidates from DB, returning current numseq
+     */
+    private var numOnlyMode = false
 
     init {
         if (dbWrapper.haveMagic()) {
             log.i("DB OK!")
         } else {
-//            initialize()
             throw EnginePromise(this, context)
         }
     }
 
     fun initialize(context: Context) {
         log.i("Destroying malicious database and reopen it!")
-        dbWrapper = dbWrapper.recreate()
+        dbWrapper.clear()
         val inputStream = context.assets.open(configurations.wordListFile)
         var step = 0
         var bytesRead = 0
@@ -70,28 +76,11 @@ constructor(context: Context, locale: String): Closeable {
         dbWrapper.close()
     }
 
-    fun input(numseq: String): Unit {
+    fun input(numseq: String) {
         numseq.forEach { input(it) }
-        numseq2word(numseq)?.let {
-            dbWrapper.findKeys(it).toSet()
-        } ?: emptySet()
     }
 
-    private val currentNumSeq = mutableListOf<Char>()
-    private var _currentCandidates = setOf<String>()
-    var currentCandidates: Set<String>
-        get() = if (!numOnlyMode)
-            _currentCandidates.map { it.composeVietnamese() }.toSet()
-        else setOf(currentNumSeq.joinToString(separator = ""))
-        private set(value) {
-            _currentCandidates = value
-        }
-
-    private var currentCombinations = setOf<String>()
-    /**
-     * * `true`: No more candidates from DB, returning current numseq
-     */
-    private var numOnlyMode = false
+    private fun <E> MutableList<E>.push(num: E) = add(num)
 
     fun input(num: Char) {
         currentNumSeq.push(num)
@@ -117,18 +106,6 @@ constructor(context: Context, locale: String): Closeable {
         d("after pushing [$num${configurations.pad[num].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
     }
 
-    private fun numseq2word(
-            @Pattern(value= """^\d+""") numseq: String
-    ): String? {
-        /* TODO #3 */
-        numseq.fold(StringBuilder()) { sb, num ->
-            val chars = configurations.pad[num].chars
-            chars.forEach { sb.append("$it%") }
-            sb
-        }
-        return mapOf<String, String>("24236" to "chào").get(numseq)
-    }
-
     fun flush() {
         currentNumSeq.clear()
         currentCombinations = setOf()
@@ -151,17 +128,9 @@ private operator fun Set<String>.times(chars: Set<Char>): Set<String> {
     return newSet
 }
 
-private fun Set<String>.addAll(chars: Set<Char>): MutableSet<String> {
-    val newSet = toMutableSet()
-    chars.forEach { newSet.add(it.toString()) }
-    return newSet
-}
-
 private fun MutableSet<String>.addAll(chars: Set<Char>) {
     chars.forEach { add(it.toString()) }
 }
-
-private fun <E> MutableList<E>.push(num: E) = add(num)
 
 private fun String.decomposeVietnamese(): String {
     /* 774 0x306 COMBINING BREVE */
@@ -185,118 +154,6 @@ private fun String.decomposeVietnamese(): String {
 private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.Form
         .NFKC)
 
-class T9SqlHelper(ctx: Context, dbname: String) : ManagedSQLiteOpenHelper(ctx, dbname), DBWrapper {
-    companion object {
-
-        private val DEFAULT_LIMIT = 5
-
-        private var instance: T9SqlHelper? = null
-
-        @Synchronized
-        fun getInstance(ctx: Context, dbname: String): T9SqlHelper {
-            if (instance == null) {
-                instance = T9SqlHelper(ctx.applicationContext, dbname)
-            }
-            return instance!!
-        }
-    }
-
-    private val TABLE_NAME = "WordFreq"
-    private val COLUMN_WORD = "word"
-    private val COLUMN_FREQ = "freq"
-
-    override fun onCreate(db: SQLiteDatabase) {
-        db.createTable(TABLE_NAME, true,
-                "_id" to INTEGER + PRIMARY_KEY,
-                COLUMN_WORD to TEXT + UNIQUE,
-                COLUMN_FREQ to INTEGER)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-    }
-
-    override fun put(key: String, value: Int) {
-        use {
-            insert(TABLE_NAME,
-                    COLUMN_WORD to key,
-                    COLUMN_FREQ to value)
-        }
-    }
-
-    override fun putAll(keys: List<String>, defaultValue: Int) {
-        use {
-            transaction {
-                keys.forEach { key ->
-                    put(key, defaultValue)
-                }
-            }
-        }
-    }
-
-    override fun get(key: String): Int? {
-        return use {
-            select(TABLE_NAME).column(COLUMN_FREQ).whereArgs("$COLUMN_WORD = '$key'")
-                    .parseOpt(IntParser)
-        }
-    }
-
-    @SuppressLint("Recycle")
-    override fun existingPrefix(prefixes: Set<String>): Set<String> {
-        val selects = prefixes.map {
-            """SELECT $COLUMN_WORD
-            FROM ( SELECT $COLUMN_WORD
-                    FROM $TABLE_NAME
-                    WHERE $COLUMN_WORD LIKE "$it%"
-                    ORDER BY $COLUMN_FREQ DESC
-            LIMIT 10 )"""
-        }
-        val queryBuilder = SQLiteQueryBuilder()
-        val sql = queryBuilder.buildUnionQuery(selects.toTypedArray(), null, null)
-        return use {
-            rawQuery(sql, null).parseList(StringParser).toSet()
-        }
-    }
-
-    override fun haveMagic(): Boolean {
-        return get("HELO") == MAGIC
-    }
-
-    override fun recreate(): DBWrapper {
-//        database.deleteTable()
-        clearTable()
-        return this
-    }
-
-    override fun putMagic() {
-        put("HELO", MAGIC)
-    }
-
-    override fun findKeys(prefix: String): Array<String> {
-        return use {
-            select(TABLE_NAME, COLUMN_WORD)
-                    .whereArgs("$COLUMN_WORD LIKE '$prefix%'")
-                    .orderBy(COLUMN_FREQ).limit(DEFAULT_LIMIT)
-                    .parseList(StringParser)
-                    .toTypedArray()
-        }
-    }
-
-    fun deleteTable() {
-        use {
-            //            delete("WordFreq")
-            dropTable(TABLE_NAME)
-            onCreate(this)
-        }
-    }
-
-    fun clearTable() {
-        use {
-            delete(TABLE_NAME)
-        }
-    }
-
-}
-
 /**
  * Promise to provide engine after initializing
  */
@@ -304,82 +161,6 @@ class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exce
     fun initializeThenGetBlocking(): T9Engine {
         t9Engine.initialize(context)
         return t9Engine
-    }
-
-}
-
-interface DBWrapper : Closeable {
-    fun recreate(): DBWrapper
-    fun findKeys(prefix: String): Array<out String>
-    fun put(key: String, value: Int)
-    fun get(key: String): Int?
-    override fun close()
-    fun haveMagic(): Boolean
-    fun putAll(keys: List<String>, defaultValue: Int = 0)
-    fun existingPrefix(prefixes: Set<String>): Set<String>
-    fun putMagic()
-}
-
-class SnappyDBWrapper(private val context: Context, private val locale: String) : DBWrapper {
-    val snappydb = DBFactory.open(context, locale)
-
-    init {
-    }
-
-    override fun recreate(): DBWrapper {
-        snappydb.destroy()
-        snappydb.close()
-        // initialize database
-        val newWrapper = SnappyDBWrapper(context, locale)
-        newWrapper.put("HELO", MAGIC)
-        return newWrapper
-    }
-
-    override fun haveMagic(): Boolean {
-        // powerful magic entry to check if were talking to the right database
-        val magicEntry = try {
-            get("HELO")
-        } catch (e: SnappydbException) {
-//            Timber.e(e.message)
-//            Timber.e(Exception(e))
-            Timber.w(e)
-            ""
-        }
-        if (magicEntry != MAGIC) {
-            return false
-        }
-        return true
-    }
-
-    override fun putMagic() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun get(key: String): Int {
-        return snappydb.getInt(key)
-    }
-
-    override fun put(key: String, value: Int) {
-        snappydb.put(key, value)
-    }
-
-    override fun putAll(keys: List<String>, defaultValue: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun findKeys(prefix: String): Array<out String> = try {
-        snappydb.findKeys(prefix)!!
-    } catch (e: Exception) {
-        w(e)
-        emptyArray<String>()
-    }
-
-    override fun existingPrefix(prefixes: Set<String>): Set<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun close() {
-        snappydb.close()
     }
 
 }

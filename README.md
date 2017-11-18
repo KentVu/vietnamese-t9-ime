@@ -9,14 +9,17 @@ The T9 input method
 ===================
 (From https://en.wikipedia.org/wiki/T9_(predictive_text)#Design )
 
-    T9's objective is to make it easier to type text messages. It allows words to be entered by a single keypress for each letter, as opposed to the multi-tap approach used in conventional mobile phone text entry, in which several letters are associated with each key, and selecting one letter often requires multiple keypresses.
+    T9's objective is to make it easier to type text messages. It allows words
+    to be entered by a single keypress for each letter, as opposed to the
+    multi-tap approach used in conventional mobile phone text entry, in which
+    several letters are associated with each key, and selecting one letter often
+    requires multiple keypresses.
 
 Things to consider
 ==================
 * [x] Which standard to decompose vietnamese (syllable=ascii+accents)
   * http://www.unicode.org/reports/tr15/tr15-23.html#Decomposition
 * [x] Follows the English T9 convention of key assignment
-number to wordlist query
 
 TODO
 ====
@@ -26,6 +29,7 @@ TODO
 * [ ] Flexibility via settings (accents right after character/accent at end of word)
 * [ ] Support add new word to dictionary
 * [ ] Flick input mode (for registering new word)
+* [ ] [Frecency](https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Frecency_algorithm) algorithm
 
 
 References
