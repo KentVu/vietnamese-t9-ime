@@ -11,7 +11,7 @@ val padConfigurations =
                                 /*huyền*/)),
                         num4 = KeyConfig(Normal, linkedSetOf('g', 'h', 'i', '̉' /*hỏi*/)),
                         num5 = KeyConfig(Normal, linkedSetOf('j', 'k', 'l', '̃' /*ngã*/)),
-                        num6 = KeyConfig(Normal, linkedSetOf('m', 'n', 'o', 'ô', 'ơ', ' ' /*nặng*/)),
+                        num6 = KeyConfig(Normal, linkedSetOf('m', 'n', 'o', 'ô', 'ơ', '̣' /*nặng*/)),
                         num7 = KeyConfig(Normal, linkedSetOf('p', 'q', 'r', 's')),
                         num8 = KeyConfig(Normal, linkedSetOf('t', 'u', 'ư', 'v')),
                         num9 = KeyConfig(Normal, linkedSetOf('w', 'x', 'y', 'z')),

@@ -139,16 +139,9 @@ private fun String.decomposeVietnamese(): String {
     val CIRCUMFLEX_ACCENT = '̂'
     /* 795 31B COMBINING HORN */
     val HORN = '̛'
-    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace((
-            "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oO]$CIRCUMFLEX_ACCENT").toRegex()) {
-//        when(it.value) {
-//            "ă" -> "ă"
-//            "Ă" -> "Ă"
-//            "â" -> "â"
-//            "Â" -> "Â"
-//        }
-        Normalizer.normalize(it.value, Normalizer.Form.NFKC)
-    }
+    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace(
+            ("([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT").toRegex()
+    ) {Normalizer.normalize(it.value, Normalizer.Form.NFKC)}
 }
 
 private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.Form

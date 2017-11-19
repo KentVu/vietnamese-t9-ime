@@ -46,7 +46,8 @@ class EngineTests {
         // new Locale.Builder().setLanguageTag("vi").build()
         val testCases = mapOf(
                 "24236" to arrayOf("chào"),
-                "864" to arrayOf("tôi"))
+                "864" to arrayOf("tôi"),
+                "6444367" to arrayOf("nghiệp"))
 
         testEngineNumToString(testCases, viVnEngine)
         viVnEngine.close()

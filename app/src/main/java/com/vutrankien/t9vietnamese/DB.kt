@@ -7,11 +7,7 @@ import android.database.sqlite.SQLiteQueryBuilder
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.jetbrains.anko.db.*
-import org.trie4j.Trie
-import org.trie4j.io.TrieReader
-import org.trie4j.io.TrieWriter
 import org.trie4j.patricia.MapPatriciaTrie
-import org.trie4j.util.TrieMap
 import timber.log.Timber
 import java.io.*
 
@@ -38,9 +34,16 @@ class TrieDB(fileDir: File) : DBWrapper {
 
     init {
         trie =
-            if (trieFile.exists())
-                TrieReader(FileInputStream(trieFile)).read() as MapPatriciaTrie<Int>
-            else MapPatriciaTrie()
+                try {
+                    ObjectInputStream(FileInputStream(trieFile))
+                            .use { it.readObject() as MapPatriciaTrie<Int> }
+                } catch (ex: Exception) {
+                    MapPatriciaTrie()
+                }
+//            if (trieFile.exists())
+//                ObjectInputStream(FileInputStream(trieFile))
+//                        .use { it.readObject() as MapPatriciaTrie<Int> }
+//            else MapPatriciaTrie()
     }
 
     override fun clear() {
@@ -56,7 +59,7 @@ class TrieDB(fileDir: File) : DBWrapper {
     }
 
     override fun close() {
-        TrieWriter(FileOutputStream(trieFile)).write(trie)
+        ObjectOutputStream(FileOutputStream(trieFile)).writeObject(trie)
     }
 
     private val MAGIC_KEY = "HELO"
