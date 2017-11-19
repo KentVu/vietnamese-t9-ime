@@ -132,16 +132,22 @@ private fun MutableSet<String>.addAll(chars: Set<Char>) {
     chars.forEach { add(it.toString()) }
 }
 
+/* 774 0x306 COMBINING BREVE */
+const private val BREVE = '̆'
+/* 770 0x302 COMBINING CIRCUMFLEX ACCENT */
+const private val CIRCUMFLEX_ACCENT = '̂'
+/* 795 31B COMBINING HORN */
+const private val HORN = '̛'
+/* 803 323 COMBINING DOT BELOW */
+const private val DOT_BELOW = '̣'
+
 private fun String.decomposeVietnamese(): String {
-    /* 774 0x306 COMBINING BREVE */
-    val BREVE = '̆'
-    /* 770 0x302 COMBINING CIRCUMFLEX ACCENT */
-    val CIRCUMFLEX_ACCENT = '̂'
-    /* 795 31B COMBINING HORN */
-    val HORN = '̛'
-    return Normalizer.normalize(this, Normalizer.Form.NFKD).replace(
-            ("([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT").toRegex()
-    ) {Normalizer.normalize(it.value, Normalizer.Form.NFKC)}
+    return Normalizer.normalize(this, Normalizer.Form.NFKD)
+            .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), """$1$CIRCUMFLEX_ACCENT$DOT_BELOW""")
+            .replace(
+                ("([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT").toRegex()
+            ) {Normalizer.normalize(it.value, Normalizer.Form.NFKC)}
+
 }
 
 private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.Form
