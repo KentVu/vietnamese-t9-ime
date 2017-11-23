@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.snappydb:snappydb-lib:0.5.2'
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation 'io.reactivex:rxkotlin:2.0.0-RC1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.19.3'
     implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.github.takawitter:trie4j:0.9.7'
@@ -46,4 +46,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     implementation 'com.android.support:support-v4:27.0.1'
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

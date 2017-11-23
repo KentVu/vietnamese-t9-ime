@@ -6,8 +6,11 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.find
-import timber.log.Timber
 import timber.log.Timber.d
 
 class MainActivity : Activity() {
@@ -20,9 +23,25 @@ class MainActivity : Activity() {
             engine = getEngineFor("vi-VN")
         } catch (e: EnginePromise) {
             displayError(e)
-            engine = e.initializeThenGetBlocking()
+            launch(UI) {
+                engine = run(CommonPool) {
+                    e.initializeThenGetBlocking()
+                }
+                displayInfo(R.string.notify_initialized)
+            }/*.invokeOnCompletion {
+            }*/
+//            runBlocking {
+////                runOnUiThread {
+////                }
+//            }
         }
 
+    }
+
+    private fun displayInfo(resId: Int) {
+        val textView = find<TextView>(R.id.text)
+        textView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
+        textView.text = getString(resId)
     }
 
     private fun displayError(e: Exception) {

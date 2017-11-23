@@ -115,7 +115,8 @@ private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.F
 /**
  * Promise to provide engine after initializing
  */
-class EnginePromise(val context: Context, private val db: TrieDB, val locale: String) : Exception() {
+class EnginePromise(val context: Context, private val db: TrieDB, val locale: String) : Exception
+("The engine is not initialized!") {
 
     fun initialize(db: DBWrapper) {
         log.i("Destroying malicious database and reopen it!")
@@ -158,7 +159,6 @@ class EnginePromise(val context: Context, private val db: TrieDB, val locale: St
 private var viVNEngine: T9Engine? = null
 private var enUSEngine: T9Engine? = null
 
-// TODO Asynchronize this
 fun Context.getEngineFor(locale: String): T9Engine {
     val dbWrapper = TrieDB(filesDir)
     return when (locale) {
