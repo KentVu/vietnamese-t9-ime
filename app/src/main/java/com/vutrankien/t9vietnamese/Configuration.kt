@@ -24,15 +24,32 @@ val padConfigurations =
 
 val wordListFiles = mapOf<String, String>(LOCALE_VN to "morphemes.txt")
 
-class Configuration(locale: String) {
-    private val UNSUPPORTED_MSG = "Locale $locale unsupported"
+private fun UNSUPPORTED_MSG(locale: String) = "Locale $locale unsupported"
 
-    val pad = padConfigurations[locale] ?:
-            throw UnsupportedOperationException(UNSUPPORTED_MSG)
-    val wordListFile = wordListFiles[locale]
-    val dbname = mapOf<String, String>(
+object configurations {
+    operator fun get(locale: String): Configuration {
+        return when (locale) {
+            in LOCALE_VN -> VNConfiguration
+            else -> throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
+        }
+    }
+}
+
+interface Configuration {
+    val pad: PadConfiguration
+    val wordListFile: String
+    val dbname: String
+}
+
+object VNConfiguration: Configuration {
+    private val locale = LOCALE_VN
+
+    override val pad = padConfigurations[locale] ?:
+            throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
+    override val wordListFile = wordListFiles[locale] ?: throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
+    override val dbname = mapOf<String, String>(
             LOCALE_VN to "t9vietnamese.db"
-    )[locale] ?: throw UnsupportedOperationException(UNSUPPORTED_MSG)
+    )[locale] ?: throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
 }
 
 enum class KeyTypes {

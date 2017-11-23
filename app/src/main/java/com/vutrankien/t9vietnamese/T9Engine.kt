@@ -12,9 +12,8 @@ val LOCALE_VN = "vi-VN"
 val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EnginePromise::class)
-constructor(context: Context, locale: String): Closeable {
-    val configurations = Configuration(locale)
-    val dbWrapper : DBWrapper = TrieDB(context.filesDir)
+constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
+    private val configuration = configurations[locale]
 
     private val currentNumSeq = mutableListOf<Char>()
     private var _currentCandidates = setOf<String>()
@@ -32,46 +31,6 @@ constructor(context: Context, locale: String): Closeable {
      */
     private var numOnlyMode = false
 
-    init {
-        if (dbWrapper.haveMagic()) {
-            log.i("DB OK!")
-        } else {
-            throw EnginePromise(this, context)
-        }
-    }
-
-    fun initialize(context: Context) {
-        log.i("Destroying malicious database and reopen it!")
-        dbWrapper.clear()
-        val inputStream = context.assets.open(configurations.wordListFile)
-        var step = 0
-        var bytesRead = 0
-        // https://stackoverflow.com/a/6992255
-        val flength = inputStream.available()
-        inputStream.bufferedReader().useLines {
-            var count = 0
-            it.groupBy {
-                val numEachTransaction = 200
-                count++
-                return@groupBy count/numEachTransaction
-            }.values.forEach {
-                dbWrapper.putAll(
-                        it.map {
-                            it.decomposeVietnamese()
-                        }
-                )
-                val lastStep = step
-                bytesRead += it.fold(0) { i, s ->
-                    i + s.toByteArray().size + 1
-                }
-                step = (bytesRead / (flength / 100))
-                if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
-            }
-        }
-        // put magic at last to mark database stable (avoid app crash)
-        dbWrapper.putMagic()
-    }
-
     override fun close() {
         dbWrapper.close()
     }
@@ -85,7 +44,7 @@ constructor(context: Context, locale: String): Closeable {
     fun input(num: Char) {
         currentNumSeq.push(num)
         if (!numOnlyMode) {
-            currentCombinations *= (configurations.pad[num].chars)
+            currentCombinations *= (configuration.pad[num].chars)
             // filter combinations
             if (currentNumSeq.size > 1) {
                 // Only start from 2 numbers and beyond
@@ -103,7 +62,7 @@ constructor(context: Context, locale: String): Closeable {
         } else {
             d("NumOnlyMode!")
         }
-        d("after pushing [$num${configurations.pad[num].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
+        d("after pushing [$num${configuration.pad[num].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
     }
 
     fun flush() {
@@ -143,7 +102,7 @@ const private val DOT_BELOW = '̣'
 
 private fun String.decomposeVietnamese(): String {
     return Normalizer.normalize(this, Normalizer.Form.NFKD)
-            .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), """$1$CIRCUMFLEX_ACCENT$DOT_BELOW""")
+            .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), "$1$CIRCUMFLEX_ACCENT$DOT_BELOW")
             .replace(
                 ("([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT").toRegex()
             ) {Normalizer.normalize(it.value, Normalizer.Form.NFKC)}
@@ -156,26 +115,64 @@ private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.F
 /**
  * Promise to provide engine after initializing
  */
-class EnginePromise(private val t9Engine: T9Engine, val context: Context) : Exception() {
+class EnginePromise(val context: Context, private val db: TrieDB, val locale: String) : Exception() {
+
+    fun initialize(db: DBWrapper) {
+        log.i("Destroying malicious database and reopen it!")
+        db.clear()
+        val inputStream = context.assets.open(configurations[locale].wordListFile)
+        var step = 0
+        var bytesRead = 0
+        // https://stackoverflow.com/a/6992255
+        val flength = inputStream.available()
+        inputStream.bufferedReader().useLines {
+            var count = 0
+            it.groupBy {
+                val numEachTransaction = 200
+                count++
+                return@groupBy count/numEachTransaction
+            }.values.forEach {
+                db.putAll(
+                        it.map {
+                            it.decomposeVietnamese()
+                        }
+                )
+                val lastStep = step
+                bytesRead += it.fold(0) { i, s ->
+                    i + s.toByteArray().size + 1
+                }
+                step = (bytesRead / (flength / 100))
+                if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
+            }
+        }
+        // put magic at last to mark database stable (avoid app crash)
+        db.putMagic()
+    }
     fun initializeThenGetBlocking(): T9Engine {
-        t9Engine.initialize(context)
-        return t9Engine
+        initialize(db)
+        return T9Engine(locale, db)
     }
 
 }
 
-var viVNEngine: T9Engine? = null
-var enUSEngine: T9Engine? = null
+private var viVNEngine: T9Engine? = null
+private var enUSEngine: T9Engine? = null
 
 // TODO Asynchronize this
 fun Context.getEngineFor(locale: String): T9Engine {
+    val dbWrapper = TrieDB(filesDir)
     return when (locale) {
         LOCALE_VN -> viVNEngine ?: run {
-            viVNEngine = T9Engine(this, locale)
-            viVNEngine!!
+            if (dbWrapper.haveMagic()) {
+                log.i("DB OK!")
+                viVNEngine = T9Engine(locale, dbWrapper)
+                viVNEngine!!
+            } else {
+                throw EnginePromise(this, dbWrapper, locale)
+            }
         }
         LOCALE_US -> enUSEngine ?: run {
-            enUSEngine = T9Engine(this, locale)
+            enUSEngine = T9Engine(locale, dbWrapper)
             enUSEngine!!
         }
         else -> throw UnsupportedOperationException()
