@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese
 
 import android.app.Activity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -26,14 +27,8 @@ class MainActivity : Activity() {
 
     private fun displayError(e: Exception) {
         // database not exists included?
-        val textView = findViewById(R.id.text) as TextView
-        val color: Int
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            color = getColor(android.R.color.holo_red_dark)
-        } else {
-            @Suppress("DEPRECATION")
-            color = resources.getColor(android.R.color.holo_red_dark)
-        }
+        val textView: TextView = findViewById(R.id.text)
+        val color = ContextCompat.getColor(this, android.R.color.holo_red_dark)
         textView.setTextColor(color)
         textView.text = getString(R.string.oops, e
                 .message)

@@ -10,13 +10,12 @@ import com.vutrankien.t9vietnamese.T9Engine
 import com.vutrankien.t9vietnamese.getEngineFor
 
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.util.HashMap
-
-import junit.framework.Assert.assertTrue
 
 /**
  * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
@@ -45,9 +44,10 @@ class EngineTests {
     @Throws(SnappydbException::class)
     fun testNumToStringViVN() {
         // new Locale.Builder().setLanguageTag("vi").build()
-        val testCases = HashMap<String, Array<String>>()
-        testCases.put("24236", arrayOf("chào"))
-        testCases.put("864", arrayOf("tôi"))
+        val testCases = mapOf(
+                "24236" to arrayOf("chào"),
+                "864" to arrayOf("tôi"),
+                "6444367" to arrayOf("nghiệp"))
 
         testEngineNumToString(testCases, viVnEngine)
         viVnEngine.close()
@@ -56,9 +56,8 @@ class EngineTests {
     @Test
     @Throws(SnappydbException::class)
     fun testNumToStringEnUsLocale() {
-        val testCases = HashMap<String, Array<String>>()
-        testCases.put("43556", arrayOf("hello"))
-        testCases.put("362867", arrayOf("doctor"))
+        val testCases = mapOf("43556" to arrayOf("hello"),
+                "362867" to arrayOf("doctor"))
         val engine = context.getEngineFor("en-US")
         testEngineNumToString(testCases, engine)
         engine.close()
