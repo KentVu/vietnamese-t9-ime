@@ -18,24 +18,10 @@ import java.util.HashSet
 
 import org.junit.Assert.*
 
-@RunWith(AndroidJUnit4::class)
+/**
+ * This suppose to contains UI related tests
+ */
+//@RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-
-    @Rule
-    var mActivityRule = ActivityTestRule(MainActivity::class.java)
-
-    @Test
-    @Throws(SnappydbException::class)
-    fun whenFirstStartThenCreateDatabase() {
-        // it's too obvious we don't need to test it
-//        val activity = mActivityRule.activity
-//        val snappydb = DBFactory.open(activity, "vi-VN")
-//
-//        val candidates = snappydb.get("24236", HashSet<*>::class.java)//new HashSet<String>().getClass() get array of string
-//
-//        //assertTrue(new HashSet<String>(candidates), "Jack Reacher");
-//        assertTrue(candidates.contains("chào"))
-//        snappydb.close()
-    }
 
 }

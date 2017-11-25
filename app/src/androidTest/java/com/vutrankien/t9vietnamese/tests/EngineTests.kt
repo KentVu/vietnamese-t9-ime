@@ -53,7 +53,8 @@ class EngineTests {
         viVnEngine.close()
     }
 
-    @Test
+    // Temporarily disable this test, concentrating on vi-VN locale
+//    @Test
     @Throws(SnappydbException::class)
     fun testNumToStringEnUsLocale() {
         val testCases = mapOf("43556" to arrayOf("hello"),
@@ -75,12 +76,6 @@ class EngineTests {
                 //Arrays.asList(candiateStrings).contains(cand));
             }
         }
-    }
-
-    @Test
-    fun testStringToNumStandardConfigurationViVN() {
-        // TODO number to wordlist query
-
     }
 
     @After
