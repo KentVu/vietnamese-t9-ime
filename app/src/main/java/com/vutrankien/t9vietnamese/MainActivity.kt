@@ -11,6 +11,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.find
+import timber.log.Timber
 import timber.log.Timber.d
 
 class MainActivity : Activity() {
@@ -19,21 +20,21 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        try {
-            engine = getEngineFor("vi-VN")
-        } catch (e: EnginePromise) {
-            displayError(e)
-            launch(UI) {
-                engine = run(CommonPool) {
+        launch(UI) {
+            Timber.i("Start initializing")
+            engine = try {
+                displayInfo(R.string.engine_loading)
+                run(CommonPool) {
+                    getEngineFor("vi-VN")
+                }
+            } catch (e: EnginePromise) {
+                displayError(e)
+                run(CommonPool) {
                     e.initializeThenGetBlocking()
                 }
-                displayInfo(R.string.notify_initialized)
-            }/*.invokeOnCompletion {
-            }*/
-//            runBlocking {
-////                runOnUiThread {
-////                }
-//            }
+            }
+            Timber.i("Initialization Completed!")
+            displayInfo(R.string.notify_initialized)
         }
 
     }

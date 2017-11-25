@@ -75,11 +75,6 @@ class TrieDB(fileDir: File) : DBWrapper {
     override fun existingPrefix(prefixes: Set<String>): Set<String> =
             prefixes.flatMap {
                 trie.predictiveSearch(it)
-//                if (trie.contains(it)) setOf(it) else trie.predictiveSearch(it)
-//                trie.predictiveSearch(it).let { searchResult ->
-//                    if (trie.contains(it)) searchResult.union(setOf(it)) else searchResult
-//                if (trie.contains(it)) trie.predictiveSearch(it).union(setOf(it))
-//                else trie.predictiveSearch(it)
             }.toSet()
 
     override fun putMagic() {
