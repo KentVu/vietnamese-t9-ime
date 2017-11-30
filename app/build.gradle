@@ -14,6 +14,18 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // This block is different from the one you use to link Gradle
+        // to your CMake build script.
+        externalNativeBuild {
+            cmake {
+                // Use the following syntax when passing arguments to variables:
+                // arguments "-DVAR_NAME=ARGUMENT".
+                arguments "-DANDROID_TOOLCHAIN=clang",
+//                        "-DSTDC_HEADER=1",
+//                        "-DANDROID_STL=gnustl_static",
+                        "-DANDROID_PLATFORM=android-14"
+            }
+        }
     }
     buildTypes {
         release {
@@ -24,6 +36,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_6
         targetCompatibility JavaVersion.VERSION_1_6
+    }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
     }
 }
 
