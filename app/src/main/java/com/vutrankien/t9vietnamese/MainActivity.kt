@@ -6,35 +6,37 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.find
 import timber.log.Timber.d
+import timber.log.Timber.i
 
 class MainActivity : Activity() {
     lateinit var engine: T9Engine
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) = runBlocking<Unit> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        try {
-            engine = getEngineFor("vi-VN")
-        } catch (e: EnginePromise) {
-            displayError(e)
-            launch(UI) {
-                engine = run(CommonPool) {
-                    e.initializeThenGetBlocking()
-                }
-                displayInfo(R.string.notify_initialized)
-            }/*.invokeOnCompletion {
-            }*/
-//            runBlocking {
-////                runOnUiThread {
-////                }
-//            }
+        i("Start initializing")
+            try {
+                displayInfo(R.string.engine_loading)
+        launch(CommonPool) {
+                engine = getEngineFor("vi-VN")
+        }.invokeOnCompletion {
+            displayInfo(R.string.notify_initialized)
         }
+            } catch (e: EnginePromise) {
+                displayError(e)
+                launch(CommonPool) {
+                    engine = e.initializeThenGetBlocking()
+                }
+            }
+        i("Initialization Completed!")
+
+    }
 
     }
 
