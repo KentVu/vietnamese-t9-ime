@@ -12,6 +12,7 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.find
 import timber.log.Timber.d
+import timber.log.Timber.i
 
 class MainActivity : Activity() {
     lateinit var engine: T9Engine
@@ -19,23 +20,28 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        try {
-            engine = getEngineFor("vi-VN")
-        } catch (e: EnginePromise) {
-            displayError(e)
-            launch(UI) {
-                engine = run(CommonPool) {
+        launch(UI) {
+            i("Start initializing")
+            engine = try {
+                displayInfo(R.string.engine_loading)
+                run(CommonPool) {
+                    getEngineFor("vi-VN")
+                }
+            } catch (e: EnginePromise) {
+                displayError(e)
+                run(CommonPool) {
                     e.initializeThenGetBlocking()
                 }
-                displayInfo(R.string.notify_initialized)
-            }/*.invokeOnCompletion {
-            }*/
-//            runBlocking {
-////                runOnUiThread {
-////                }
-//            }
+            }
+            i("Initialization Completed!")
+            displayInfo(R.string.notify_initialized)
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        engine.close()
     }
 
     private fun displayInfo(resId: Int) {
@@ -45,7 +51,6 @@ class MainActivity : Activity() {
     }
 
     private fun displayError(e: Exception) {
-        // database not exists included?
         val textView: TextView = findViewById(R.id.text)
         val color = ContextCompat.getColor(this, android.R.color.holo_red_dark)
         textView.setTextColor(color)
