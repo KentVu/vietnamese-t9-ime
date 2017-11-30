@@ -6,16 +6,14 @@ import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.find
 import timber.log.Timber.d
 
 class MainActivity : Activity() {
     lateinit var engine: T9Engine
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) = runBlocking<Unit> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
@@ -23,12 +21,14 @@ class MainActivity : Activity() {
             engine = getEngineFor("vi-VN")
         } catch (e: EnginePromise) {
             displayError(e)
-            launch(UI) {
-                engine = run(CommonPool) {
-                    e.initializeThenGetBlocking()
-                }
+            launch(CommonPool) {
+                engine = e.initializeThenGetBlocking()
+            }.invokeOnCompletion {
                 displayInfo(R.string.notify_initialized)
-            }/*.invokeOnCompletion {
+            }
+//            launch(UI) {
+//            }
+            /*.invokeOnCompletion {
             }*/
 //            runBlocking {
 ////                runOnUiThread {
