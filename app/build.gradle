@@ -14,6 +14,18 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // This block is different from the one you use to link Gradle
+        // to your CMake build script.
+        externalNativeBuild {
+            cmake {
+                // Use the following syntax when passing arguments to variables:
+                // arguments "-DVAR_NAME=ARGUMENT".
+                arguments "-DANDROID_TOOLCHAIN=clang",
+//                        "-DSTDC_HEADER=1",
+//                        "-DANDROID_STL=gnustl_static",
+                        "-DANDROID_PLATFORM=android-14"
+            }
+        }
     }
     buildTypes {
         release {
@@ -25,6 +37,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_6
         targetCompatibility JavaVersion.VERSION_1_6
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {
@@ -33,7 +50,7 @@ dependencies {
     implementation 'com.snappydb:snappydb-lib:0.5.2'
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'
-    implementation 'io.reactivex:rxkotlin:2.0.0-RC1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.19.3'
     implementation "org.jetbrains.anko:anko-sqlite:$anko_version"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.github.takawitter:trie4j:0.9.7'
@@ -46,4 +63,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.1'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     implementation 'com.android.support:support-v4:27.0.1'
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

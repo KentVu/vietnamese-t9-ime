@@ -24,4 +24,6 @@
     <string name="btn_pound">#</string>
     <string name="btn_right"><![CDATA[>]]></string>
     <string name="test_hint">test here</string>
+    <string name="notify_initialized">Engine initialized!</string>
+    <string name="engine_loading">Loading engine…</string>
 </resources>

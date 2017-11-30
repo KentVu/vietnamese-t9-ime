@@ -7,13 +7,18 @@ An old-fashioned keypad based input method (T9) for Vietnamese, support accents
 
 The T9 input method
 ===================
-(From https://en.wikipedia.org/wiki/T9_(predictive_text)#Design )
+(From [Wikipedia](https://en.wikipedia.org/wiki/T9_(predictive_text)#Design) )
 
     T9's objective is to make it easier to type text messages. It allows words
     to be entered by a single keypress for each letter, as opposed to the
     multi-tap approach used in conventional mobile phone text entry, in which
     several letters are associated with each key, and selecting one letter often
     requires multiple keypresses.
+
+Design goals
+============
+* Mimic the t9 input!
+* Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
 
 Things to consider
 ==================
