@@ -1,4 +1,5 @@
 language: android
+sudo: true
 
 # Shamelessly copied from https://github.com/pestrada/android-tdd-playground/blob/master/app/build.gradle
 android:
@@ -30,13 +31,13 @@ android:
 addons:
   apt_packages:
     - pandoc
-  artifacts:
-    paths:
-      - $(git ls-files -o | grep app/build/outputs | tr "\n" ":")
 
 before_install:
-  - git clone --depth=1 https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
-  - export ANDROID_NDK_HOME=$HOME/android-ndk-root
+  # if [ `uname -m` = x86_64]; then
+  - wget https://dl.google.com/android/repository/android-ndk-r16-linux-x86_64.zip
+  - unzip -q android-ndk-r16-linux-x86_64.zip
+  - export ANDROID_NDK_HOME=`pwd`/android-ndk-r16
+  - mkdir -v $ANDROID_HOME/licenses && echo -ne "8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > $ANDROID_HOME/licenses/android-sdk-license && cat $ANDROID_HOME/licenses/android-sdk-license
 
 # Emulator Management: Create, Start and Wait
 before_script:
@@ -46,16 +47,18 @@ before_script:
   - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew connectedAndroidTest
+  - ./gradlew build connectedAndroidTest
   # print lint results details
-  - for f in app/build/outputs/lint-results.html; do pandoc $f -t plain; done
+  - for f in app/build/reports/lint-results.html; do pandoc $f -t plain; done
+  - for f in app/build/reports/androidTests/connected/*.html; do pandoc $f -t plain; done
 
 deploy:
+  skip_cleanup: true
   provider: bintray
   file: "bintray-descriptor.json"
   user: "kentvu"
   key:
-    secure: lhgmoQG0FMJbXbV68+Q3dyqJR4Z/DKFGhTkvskcvnYAF1rdwl+wzwyNhXB7Xjr8q9cKDq30aQgJ31FP60654UKorV/q4p2d/1CNLhK/Tq4bPOMCZKza6xbYezYzUjp5nFBlZkReR/s5wwqPS4Yl+Jo3lpQuwBy4j52m7XxWIlk1xDr7JADmRmtJkRbUio8twzUv2AzbKbBACzf8W5N2Lf7zxAlwRuQPpiFlzoflQkIeb2756UXU9t2yi4DPWFFRhySK+o+fI28jF7PrTMlTqOL9L6PAkSkULu+Sq43+YsSAqbXhq8Kn+774pFGJln8fvm0bsriGY+YOfd4dLYTvKTqoZVcCeXeJbBxHX0jN+maETWM8A50KRYaWUy+XjgbEyBopeLZsOV8nY+j97sR5DZIMQsIS+rvlwxOzD5MQbj4rUCbLD+vkyiDwRUR/iiRC5V4wDTXsZZ9nZxy4PzKApw3iadRZmb3Qph/kFZ3jO+BI8ai1efukOZIktDjvniJd6lJ6yGIjHmOEOrixEP6B9cOHJOkkPpgpaAiHvraLkVGQA8WQZqR9jfZddUfoSRvfOPyCqm2GGi8UpHST7gotdlubiW0KQ2GqeCM+9uHjrn4T21+enEaRe53J+L9+LCRfVsfs2Eupbh8eftcQ9IzKP31YgpL5PMLIKLY1P30tbG28=
+    secure: "hpZPPt/ygLw6fLlkLq64/xQNWf23Z7QDcS+xKvDQ6qX+ULUyrpav4v37KLTRHgtwOcG3HOScOQwkAa06HRBsSlCnTfNKpxS9Vs4rZPdyZaxYanumXHdLc47wvNC2EpzN22S4Juv4rKAtONHgFbZzggmTC9oC3Cb3OAA/+sgF3IdhC7uO+cfCw7PBaD8ZUYupu/8uorOyZcDAFhxyyBxoGGKUAbqcgKVhSMS+XmoVhPAc6wAlRQWWzz09nUK4eAG2m7g+3V192zy6BZb4J1JIIAeiEL5UnmF72u4Ar7fm+E2Uc7kxFnUFISNYbKn5tkruiUgPCzOXPScLhB7T/O0r108VHq9zppJWT/5Husv3udRgoPoY54JFNZmmC2VDbnQiH+GUxYW64jS16vqDAFsicEMdugNd8pc+pPRyv3ZaXT0JhsS+LjhstJlyEb7im4dxwRrYkzh7AHJFtiq4wHwlKcZADpe9LUvpgFXLoDBAOFVnKg0C8UL13tjNiqJJN9zSlRsEd54HHzykr1TwC5l70GlTSSjzToPqDlpCdx+mtiVFyVLmTKPerGZqspVcyZ6i5PlHCEubgc00uVb1BnglfFeZZoUfNdM7WLby78F5HPTTlJTpllNuGDVXBggSot0jwXrCEH0vkrTMbGOBiiMnMxJ2SuJ+trWC6gG0DZe/SIs="
 
 #  passphrase: "Optional. In case a passphrase is configured on Bintray and GPG signing is used"
 #  dry-run: "Optional. If true, skips sending requests to Bintray. Useful for testing your configuration"

@@ -31,8 +31,8 @@
 
   "files":
   [
-    {"includePattern": "app/build/outputs/apk/(.*)*/(.*\\.apk)", "excludePattern": ".*/do-not-deploy/.*", "uploadPattern": "apk/$2"},
-    {"includePattern": "app/build/outputs/(.*)*/(.*)*/(.*)", "uploadPattern": "testResults/$3"}
+    {"includePattern": "app/build/outputs/apk/(.*)/(.*\\.apk)", "excludePattern": ".*/do-not-deploy/.*", "uploadPattern": "apk/$2"},
+    {"includePattern": "app/build/reports/(.*)*", "uploadPattern": "testResults/$1"}
   ],
   "publish": true
 }
