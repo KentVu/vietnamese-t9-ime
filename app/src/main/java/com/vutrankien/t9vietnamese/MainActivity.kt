@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese
 
 import android.app.Activity
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
@@ -36,7 +37,6 @@ class MainActivity : Activity() {
             i("Initialization Completed!")
             displayInfo(R.string.notify_initialized)
         }
-
     }
 
     override fun onDestroy() {
@@ -60,7 +60,7 @@ class MainActivity : Activity() {
 
     fun onBtnClick(view: View) {
         val text = (view as Button).text
-        d("onBtnClick() btn=" + text)
+        d("onBtnClick() btn=" + text.substring(0..1))
 //        engine.input(text.substring(0..1))
         engine.input(text[0])
         find<TextView>(R.id.text).text = engine.currentCandidates.take(10).joinToString()
@@ -68,6 +68,12 @@ class MainActivity : Activity() {
 
     fun onCandidateClick(view: View) {
         d("onCandidateClick()")
+        engine.flush()
+        (view as TextView).text = ""
+    }
+
+    fun onBtnStarClick(view: View) {
+        d("onBtnStarClick()")
         engine.flush()
         (view as TextView).text = ""
     }

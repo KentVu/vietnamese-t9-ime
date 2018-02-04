@@ -118,11 +118,16 @@ private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.F
 class EnginePromise(val context: Context, private val db: TrieDB, val locale: String) : Exception
 ("The engine is not initialized!") {
 
-    fun initialize(db: DBWrapper) {
+}
+
+// It knows all the words of a language
+class T9Wordlist(val context: Context, private val db: TrieDB, val locale: String) {
+
+    fun writeToDb(db: DBWrapper) {
         log.i("Destroying malicious database and reopen it!")
         db.clear()
         val inputStream = context.assets.open(configurations[locale].wordListFile)
-        var step = 0
+        var progress = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255
         val flength = inputStream.available()
@@ -138,22 +143,24 @@ class EnginePromise(val context: Context, private val db: TrieDB, val locale: St
                             it.decomposeVietnamese()
                         }
                 )
-                val lastStep = step
+                val lastPercent = progress
                 bytesRead += it.fold(0) { i, s ->
                     i + s.toByteArray().size + 1
                 }
-                step = (bytesRead / (flength / 100))
-                if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
+                progress = (bytesRead / flength) * 100
+                if (lastPercent != progress) {
+                    d("Written $bytesRead / $flength to db ($progress%)")
+                }
             }
         }
         // put magic at last to mark database stable (avoid app crash)
         db.putMagic()
     }
+
     fun initializeThenGetBlocking(): T9Engine {
         initialize(db)
         return T9Engine(locale, db)
     }
-
 }
 
 private var viVNEngine: T9Engine? = null

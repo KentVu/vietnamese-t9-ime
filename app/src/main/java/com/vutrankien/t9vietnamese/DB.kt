@@ -33,6 +33,8 @@ class TrieDB(fileDir: File) : DBWrapper {
     private val trieFile = File(fileDir, TRIE_FILENAME)
 
     init {
+        // The java deserialization thing, y'know :|
+        @Suppress("UNCHECKED_CAST")
         trie =
                 try {
                     ObjectInputStream(FileInputStream(trieFile))
@@ -40,10 +42,6 @@ class TrieDB(fileDir: File) : DBWrapper {
                 } catch (ex: Exception) {
                     MapPatriciaTrie()
                 }
-//            if (trieFile.exists())
-//                ObjectInputStream(FileInputStream(trieFile))
-//                        .use { it.readObject() as MapPatriciaTrie<Int> }
-//            else MapPatriciaTrie()
     }
 
     override fun clear() {

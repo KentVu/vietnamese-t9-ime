@@ -32,7 +32,7 @@
   "files":
   [
     {"includePattern": "app/build/outputs/apk/(.*)/(.*\\.apk)", "excludePattern": ".*/do-not-deploy/.*", "uploadPattern": "apk/$2"},
-    {"includePattern": "app/build/reports/(.*)*", "uploadPattern": "testResults/$1"}
+    {"includePattern": "app/build/reports/(.*)/(.*)", "uploadPattern": "reports/$1/$2"}
   ],
   "publish": true
 }

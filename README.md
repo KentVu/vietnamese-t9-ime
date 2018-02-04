@@ -3,6 +3,7 @@ vietnamese-t9-ime
 
 [![Join the chat at https://gitter.im/KentVu/vietnamese-t9-ime](https://badges.gitter.im/KentVu/vietnamese-t9-ime.svg)](https://gitter.im/KentVu/vietnamese-t9-ime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/KentVu/vietnamese-t9-ime.svg?branch=master)](https://travis-ci.org/KentVu/vietnamese-t9-ime)
+[ ![Download](https://api.bintray.com/packages/kentvu/t9vietnamese/t9-vietnamese-ime/images/download.svg) ](https://bintray.com/kentvu/t9vietnamese/t9-vietnamese-ime/_latestVersion)
 
 An old-fashioned keypad based input method (T9) for Vietnamese, support accents
 
