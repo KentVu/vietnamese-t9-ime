@@ -1,0 +1,851 @@
+# from http://xltiengviet.wikia.com/wiki/Tên_người_Việt_Nam
+Ái	 
+Ấm	Male	 
+An	Male	 
+Án	Male	 
+Anh	 
+Ánh	 
+Ân	Male	 
+Ấn	Male	 
+Ẩn	Male	 
+Ấp	Male	 
+Ất	Male	 
+Âu	Male	 
+Ấu	Male	 
+Ba	 
+Bá	Male	 
+Bạ	Male	 
+Bạc	Male	 
+Bách	Male	 
+Bạch	Male	 
+Bái	Male	 
+Bài	Male	 
+Ban	Male	 
+Bản	Male	 
+Bàng	Male	 
+Bảng	Male	 
+Báo	Male	 
+Bào	Male	 
+Bảo	Male	 
+Bạt	Male	 
+Báu	Male	 
+Bắc	Male	 
+Bằng	Male	 
+Bặt	Male	 
+Bân	Male	 
+Bật	Male	 
+Bến	Male	 
+Bền	Male	 
+Bi	Male	 
+Bích	 
+Biên	Male	 
+Biền	Male	 
+Biện	Male	 
+Biểu	Male	 
+Bính	Male	 
+Bình	Male	 
+Bố	Male	 
+Bổ	Male	 
+Bộ	Male	 
+Bốc	Male	 
+Bộc	Male	 
+Bôi	Male	 
+Bối	Male	 
+Bồi	Male	 
+Bội	Male	 
+Bôn	Male	 
+Bốn	Male	 
+Bổn	Male	 
+Bông	 
+Bồng	Male	 
+Bổng	Male	 
+Bột	Male	 
+Bùi	Male	 
+Buông	Male	 
+Bút	Male	 
+Bưng	Male	 
+Bưu	Male	 
+Ca	Male	 
+Cai	Male	 
+Cam	 
+Can	Male	 
+Canh	Male	 
+Cảnh	Male	 
+Cán	Male	 
+Cao	Male	 
+Cảo	Male	 
+Cát	Male	 
+Căn	Male	 
+Cầm	Female	 
+Cẩm	 
+Cần	Male	 
+Cẩn	Male	 
+Cận	Male	 
+Cật	Male	 
+Câu	Male	 
+Cầu	Male	 
+Chanh	 
+Chánh	Male	 
+Chăm	Male	 
+Châm	 
+Chân	Male	 
+Chấn	Male	 
+Chẩn	Male	 
+Chấp	Male	 
+Chất	Male	 
+Châu	 
+Chế	 
+Chi	 
+Chí	Male	 
+Chỉ	Male	 
+Chiêm	Male	 
+Chiếm	Male	 
+Chiến	Male	 
+Chiêu	Male	 
+Chiếu	Male	 
+Chinh	Male	 
+Chính	Male	 
+Chình	Male	 
+Chỉnh	Male	 
+Chu	Male	 
+Chú	Male	 
+Chủ	Male	 
+Chúa	Male	 
+Chúc	Male	 
+Chung	Male	 
+Chủng	Male	 
+Chuyên	Male	 
+Chuyển	Male	 
+Chư	Male	 
+Chử	Male	 
+Chức	Male	 
+Chước	Male	 
+Chương	Male	 
+Chưởng	 
+Cổ	Male	 
+Côn	Male	 
+Cổn	Male	 
+Công	Male	 
+Cống	Male	 
+Cơ	Male	 
+Cú	Male	 
+Cù	Male	 
+Cúc	 
+Cung	Male	 
+Củng	Male	 
+Cư	Male	 
+Cứ	Male	 
+Cừ	Male	 
+Cử	Male	 
+Cự	Male	 
+Cương	Male	 
+Cường	Male	 
+Cửu	Male	 
+Cữu	Male	 
+Cựu	Male	 
+Danh	 
+Dao	Male	 
+Dân	Male	 
+Dần	Male	 
+Dẫn	Male	 
+Dật	Male	 
+Di	Male	 
+Dị	Male	 
+Dịch	Male	 
+Diêm	Male	 
+Diễm	 
+Diệm	Male	 
+Diếp	Male	 
+Diệp	 
+Diệu	 
+Dinh	 
+Dĩnh	Male	 
+Do	Male	 
+Doãn	Male	 
+Doanh	 
+Du	Male	 
+Dũ	Male	 
+Dụ	Male	 
+Duật	Male	 
+Dục	Male	 
+Duệ	Male	 
+Dung	 
+Dũng	Male	 
+Dụng	Male	 
+Duy	 
+Duyên	Female	 
+Duyệt	Male	 
+Dư	Male	 
+Dự	Male	 
+Dực	Male	 
+Dược	Male	 
+Dương	Male	 
+Dưỡng	Male	 
+Ðạc	Male	 
+Ðãi	Male	 
+Ðại	Male	 
+Ðam	Male	 
+Ðàm	Male	 
+Ðảm	Male	 
+Ðạm	Male	 
+Ðan	Male	 
+Ðán	Male	 
+Ðàn	Male	 
+Ðản	Male	 
+Ðào	 
+Ðang	Male	 
+Ðàng	Male	 
+Ðảng	Male	 
+Ðào	 
+Ðảo	Male	 
+Ðạo	Male	 
+Ðạt	Male	 
+Ðắc	Male	 
+Ðăng	Male	 
+Ðằng	Male	 
+Ðẳng	Male	 
+Ðẩu	Male	 
+Ðậu	 
+Ðể	Male	 
+Ðệ	Male	 
+Ðiềm	Male	 
+Ðiền	Male	 
+Ðiệp	Male	 
+Ðiều	Male	 
+Ðiểu	Male	 
+Ðinh	Male	 
+Ðính	Male	 
+Ðình	Male	 
+Ðỉnh	Male	 
+Ðĩnh	Male	 
+Ðịnh	Male	 
+Ðoá	Male	 
+Ðoài	Male	 
+Ðoái	Male	 
+Ðoan	Male	 
+Ðoàn	Male	 
+Ðô	Male	 
+Ðổ	Male	 
+Ðộ	Male	 
+Ðốc	Male	 
+Ðối	Male	 
+Ðôn	Male	 
+Ðông	 
+Ðồng	Male	 
+Ðổng	Male	 
+Ðới	Male	 
+Ðơn	Male	 
+Ðủ	Male	 
+Ðức	Male	 
+Ðược	Male	 
+Ðương	Male	 
+Ðường	Male	 
+Em	Female	 
+Gia	Male	 
+Giá	Male	 
+Giả	Male	 
+Giác	Male	 
+Giai	Male	 
+Giải	Male	 
+Giám	Male	 
+Gián	Male	 
+Giản	Male	 
+Giang	 
+Giảng	Male	 
+Giao	 
+Giáo	Male	 
+Giáp	Male	 
+Giàu	Male	 
+Giới	Male	 
+Giũ	Male	 
+Hà	Male	 
+Hạ	 
+Hạc	Male	 
+Hách	Male	 
+Hai	 
+Hài	Male	 
+Hải	Male	 
+Hàm	Male	 
+Hán	Male	 
+Hàn	Male	 
+Hãn	Male	 
+Hạn	Male	 
+Hạng	Male	 
+Hanh	Male	 
+Hành	Male	 
+Hạnh	 
+Hào	Male	 
+Hảo	 
+Hạo	Male	 
+Hạp	Male	 
+Hạt	Male	 
+Hằng	Female	 
+Hân	 
+Hậu	Male	 
+Hiến	Male	 
+Hiền	 
+Hiển	Male	 
+Hiệp	Male	 
+Hiệt	Male	 
+Hiếu	 
+Hiểu	Male	 
+Hiệu	Male	 
+Hinh	Male	 
+Hoa	Female	 
+Hoá	Male	 
+Hoà	 
+Hoạch	Male	 
+Hoài	 
+Hoán	Male	 
+Hoàn	Male	 
+Hoàng	Male	 
+Hoành	Male	 
+Hoạnh	Male	 
+Học	Male	 
+Hoạt	Male	 
+Hồ	Male	 
+Hổ	Male	 
+Hộ	Male	 
+Hối	Male	 
+Hồi	 
+Hội	Male	 
+Hồng	Female	 
+Hợp	Male	 
+Huân	Male	 
+Huấn	Male	 
+Huề	Male	 
+Huệ	Female	 
+Hùng	Male	 
+Huy	Male	 
+Huyên	Male	 
+Huyến	Male	 
+Huyền	 
+Huyện	Male	 
+Huynh	Male	 
+Huỳnh	Male	 
+Hứa	Male	 
+Hưng	Male	 
+Hương	 
+Hướng	Male	 
+Hường	Female	 
+Hưởng	Male	 
+Hưu	Male	 
+Hữu	Male	 
+Hựu	Male	 
+Hy	Male	 
+Hỷ	Male	 
+Ích	Male	 
+Keo	 
+Kế	Male	 
+Kết	Male	 
+Kha	Male	 
+Khá	Male	 
+Khả	Male	 
+Khai	Male	 
+Khái	Male	 
+Khải	Male	 
+Kham	Male	 
+Khán	Male	 
+Khang	Male	 
+Kháng	Male	 
+Khảng	Male	 
+Khanh	 
+Khánh	Male	 
+Khảo	Male	 
+Khắc	Male	 
+Khâm	Male	 
+Khẩn	Male	 
+Khấp	Male	 
+Khâu	Male	 
+Khê	 
+Khiêm	Male	 
+Khiết	Male	 
+Khiêu	Male	 
+Khinh	Male	 
+Khoa	Male	 
+Khoá	Male	 
+Khoả	Male	 
+Khoách	Male	 
+Khoái	Male	 
+Khoan	Male	 
+Khoán	Male	 
+Khoát	Male	 
+Khôi	Male	 
+Khôn	Male	 
+Khổng	Male	 
+Khu	Male	 
+Khúc	Male	 
+Khuê	 
+Khuông	Male	 
+Khuyến	Male	 
+Khuyết	Male	 
+Khuynh	Male	 
+Khương	Male	 
+Khưu	Male	 
+Kiêm	Male	 
+Kiểm	Male	 
+Kiệm	Male	 
+Kiên	Male	 
+Kiện	Male	 
+Kiệt	Male	 
+Kiều	Male	 
+Kim	 
+Kinh	Male	 
+Kính	Male	 
+Kỉnh	Male	 
+Kỳ	Male	 
+Kỷ	Male	 
+Kỵ	Male	 
+La	Male	 
+Lạc	Male	 
+Lai	Male	 
+Lài	Female	 
+Lại	Male	 
+Lam	 
+Lãm	Male	 
+Lan	 
+Lang	Male	 
+Lãng	Male	 
+Lanh	Male	 
+Lành	Male	 
+Lãnh	Male	 
+Lạp	Male	 
+Lăng	Male	 
+Lâm	Male	 
+Lân	Male	 
+Lập	Male	 
+Lâu	Male	 
+Lê	 
+Lễ	Male	 
+Lệ	Female	 
+Lịch	Male	 
+Liêm	Male	 
+Liên	 
+Liễn	Male	 
+Liêu	Male	 
+Liễu	Female	 
+Liệu	Male	 
+Linh	 
+Loan	 
+Long	Male	 
+Lô	Male	 
+Lộc	Male	 
+Lôi	Male	 
+Lời	Male	 
+Lợi	Male	 
+Lụa	 
+Luân	Male	 
+Luận	Male	 
+Luật	Male	 
+Lục	Male	 
+Luỹ	Male	 
+Luyến	Male	 
+Luyện	Male	 
+Lư	Male	 
+Lữ	Male	 
+Lực	Male	 
+Lược	Male	 
+Lương	Male	 
+Lượng	Male	 
+Lưu	Male	 
+Lựu	Female	 
+Ly	Male	 
+Lý	Male	 
+Mai	 
+Mại	Male	 
+Mãn	Male	 
+Mạnh	Male	 
+Mão	Male	 
+Mạo	Male	 
+Mẫn	Male	 
+Mầu	 
+Mậu	Male	 
+Mây	 
+Mịch	 
+Minh	 
+Mít	Male	 
+Mộc	Male	 
+Mưu	Male	 
+Nam	Male	 
+Năm	Male	 
+Năng	Male	 
+Nga	Female	 
+Ngạc	Male	 
+Ngãi	Male	 
+Ngạn	Male	 
+Ngân	 
+Nghê	Male	 
+Nghệ	Male	 
+Nghi	Male	 
+Nghị	Male	 
+Nghĩa	 
+Nghiêm	Male	 
+Nghiên	Male	 
+Nghiệp	Male	 
+Nghinh	Male	 
+Ngọ	Male	 
+Ngoã	Male	 
+Ngoan	Female	 
+Ngoạn	Male	 
+Ngọc	 
+Ngô	Male	 
+Ngộ	Male	 
+Ngôn	Male	 
+Ngũ	Male	 
+Ngụ	 
+Ngung	Male	 
+Nguyên	Male	 
+Nguyện	 
+Nguyệt	Female	 
+Ngữ	Male	 
+Ngự	 
+Nhã	 
+Nhạc	Male	 
+Nham	Male	 
+Nhâm	Male	 
+Nhan	Male	 
+Nhàn	 
+Nhạn	Female	 
+Nhậm	Male	 
+Nhân	Male	 
+Nhẫn	Male	 
+Nhất	Male	 
+Nhật	Male	 
+Nhi	Male	 
+Nhĩ	Male	 
+Nhiệm	Male	 
+Nhiên	Male	 
+Nhiếp	Male	 
+Nhiêu	Male	 
+Nhiễu	Male	 
+Nho	Male	 
+Nhu	 
+Nhuận	Male	 
+Nhuệ	Male	 
+Nhung	 
+Như	 
+Nhự	Male	 
+Nhưỡng	Male	 
+Niêm	Male	 
+Niệm	 
+Niên	Male	 
+Ninh	 
+Nội	Male	 
+Nông	Male	 
+Nữ	Female	 
+Nương	Female	 
+Oai	Male	 
+Oanh	Female	 
+Oánh	Male	 
+Ơn	Male	 
+Phả	Male	 
+Phách	Male	 
+Phái	Male	 
+Phàm	Male	 
+Phạm	Male	 
+Phan	Male	 
+Phán	Male	 
+Phát	Male	 
+Phấn	 
+Phê	Male	 
+Phi	Male	 
+Phiên	Male	 
+Phiến	Male	 
+Phiệt	Male	 
+Phiêu	Male	 
+Phó	Male	 
+Phong	Male	 
+Phóng	Male	 
+Phòng	Male	 
+Phô	Male	 
+Phổ	Male	 
+Phồn	Male	 
+Phu	Male	 
+Phú	Male	 
+Phủ	Male	 
+Phụ	Male	 
+Phúc	 
+Phục	Male	 
+Phùng	Male	 
+Phụng	 
+Phức	Male	 
+Phước	Male	 
+Phương	 
+Phượng	Female	 
+Qua	Male	 
+Quá	Male	 
+Quả	Male	 
+Quan	Male	 
+Quán	Male	 
+Quản	Male	 
+Quang	Male	 
+Quảng	Male	 
+Quân	Male	 
+Quận	Male	 
+Quế	Male	 
+Quốc	Male	 
+Quít	Male	 
+Quy	Male	 
+Quý	Male	 
+Quỳ	Male	 
+Quyên	Female	 
+Quyến	Male	 
+Quyền	Male	 
+Quyết	Male	 
+Quýnh	Male	 
+Quỳnh	Female	 
+Sách	Male	 
+Sám	Male	 
+San	Male	 
+Sang	Male	 
+Sáng	Male	 
+Sanh	Male	 
+Sảnh	Male	 
+Sao	 
+Sát	Male	 
+Sắc	Male	 
+Sâm	Male	 
+Sinh	 
+Sĩ	Male	 
+Siêu	Male	 
+Sinh	 
+Sính	Male	 
+Soạn	Male	 
+Song	Male	 
+Sở	Male	 
+Sơn	Male	 
+Sung	Male	 
+Sử	Male	 
+Sứ	Male	 
+Sự	Male	 
+Sương	Female	 
+Sửu	Male	 
+Tá	Male	 
+Tạ	Male	 
+Tác	Male	 
+Tài	Male	 
+Tác	Male	 
+Tam	Male	 
+Tám	 
+Tạo	Male	 
+Tăng	Male	 
+Tâm	 
+Tầm	Male	 
+Tân	Male	 
+Tấn	Male	 
+Tần	Female	 
+Tập	Male	 
+Tất	Male	 
+Tây	Male	 
+Tế	Male	 
+Thạch	Male	 
+Thaí	Male	 
+Thảng	Male	 
+Thanh	 
+Thành	Male	 
+Thạnh	Male	 
+Thao	Male	 
+Thảo	 
+Thăng	Male	 
+Thắng	Male	 
+Thân	Male	 
+Thận	Male	 
+Thập	Male	 
+Thâu	Male	 
+Thế	Male	 
+Thể	 
+Thi	 
+Thí	 
+Thì	Male	 
+Thị	 
+Thích	Male	 
+Thiên	Male	 
+Thiện	Male	 
+Thiệp	Male	 
+Thiết	Male	 
+Thinh	Male	 
+Thịnh	Male	 
+Thọ	Male	 
+Thoa	Female	 
+Thoả	 
+Thoại	Male	 
+Thoàn	Male	 
+Thôi	Male	 
+Thông	Male	 
+Thống	Male	 
+Thời	Male	 
+Thu	 
+Thủ	Male	 
+Thụ	Male	 
+Thuấn	Male	 
+Thuần	Male	 
+Thuận	 
+Thuật	Male	 
+Thúc	Male	 
+Thục	Male	 
+Thuý	Female	 
+Thuỳ	Female	 
+Thuỷ	Female	 
+Thuỵ	Male	 
+Thuyên	Male	 
+Thuyết	Male	 
+Thư	 
+Thứ	Male	 
+Thừa	Male	 
+Thức	Male	 
+Thực	Male	 
+Thước	Male	 
+Thược	Male	 
+Thương	 
+Thường	Male	 
+Thưởng	Male	 
+Thượng	Male	 
+Thy	Female	 
+Tích	Male	 
+Tiêm	Male	 
+Tiềm	Male	 
+Tiên	 
+Tiến	Male	 
+Tiển	Male	 
+Tiễn	Male	 
+Tiếp	Male	 
+Tiết	Male	 
+Tiêu	Male	 
+Tiếu	Male	 
+Tín	Male	 
+Tinh	Male	 
+Tính	Male	 
+Tình	Male	 
+Tỉnh	Male	 
+Tĩnh	Male	 
+Toa	Male	 
+Toả	Male	 
+Toại	Male	 
+Toan	Male	 
+Toán	Male	 
+Toàn	Male	 
+Toản	Male	 
+Toát	Male	 
+Tòng	Male	 
+Tô	Male	 
+Tố	 
+Tộ	Male	 
+Tổ	Male	 
+Tôn	Male	 
+Tồn	Male	 
+Tống	Male	 
+Tốt	Male	 
+Trà	Male	 
+Trác	Male	 
+Trạc	Male	 
+Trạch	Male	 
+Trai	Male	 
+Trang	 
+Tráng	Male	 
+Tràng	Male	 
+Trạng	Male	 
+Trát	Male	 
+Trắc	Male	 
+Trâm	 
+Trầm	Male	 
+Trân	 
+Trấn	Male	 
+Trần	Male	 
+Tri	Male	 
+Trí	Male	 
+Trì	Male	 
+Trị	Male	 
+Trích	Male	 
+Triêm	Male	 
+Triển	Male	 
+Triết	Male	 
+Triều	Male	 
+Triệu	Male	 
+Trinh	Female	 
+Trình	Male	 
+Trịnh	Male	 
+Trọng	Male	 
+Trợ	Male	 
+Trụ	Male	 
+Truật	Male	 
+Trúc	 
+Trung	Male	 
+Truyền	Male	 
+Trữ	Male	 
+Trứ	Male	 
+Trực	Male	 
+Trưng	Male	 
+Trừng	Male	 
+Trước	Male	 
+Trương	Male	 
+Trường	Male	 
+Trưởng	Male	 
+Tú	 
+Tuân	Male	 
+Tuấn	Male	 
+Tuần	Male	 
+Túc	Male	 
+Tuế	Male	 
+Tuệ	Male	 
+Tung	Male	 
+Tùng	Male	 
+Tụng	Male	 
+Tuy	Male	 
+Tuý	 
+Tuỵ	Male	 
+Tuyên	Male	 
+Tuyến	 
+Tuyền	Female	 
+Tuyển	Male	 
+Tuyết	Female	 
+Tư	Male	 
+Tứ	Male	 
+Từ	Male	 
+Tự	Male	 
+Tước	Male	 
+Tương	Male	 
+Tường	Male	 
+Tưởng	Male	 
+Tửu	Male	 
+Tựu	Male	 
+Ty	Male	 
+Tý	Male	 
+Tỵ	Male	 
+Uẩn	Male	 
+Uy	Male	 
+Uỷ	Male	 
+Uyên	Female	 
+Uyển	Female	 
+ƯÔng	Male	 
+Ưu	Male	 
+Vang	Male	 
+Văn	 
+Vân	 
+Vệ	Male	 
+Vị	Male	 
+Viên	Male	 
+Viễn	Male	 
+Viện	Male	 
+Việt	Male	 
+Vinh	 
+Vĩnh	Male	 
+Vịnh	Male	 
+Võ	Male	 
+Vọng	Male	 
+Vũ	Male	 
+Vui	 
+Vỹ	Male	 
+Vương	Male	 
+Vượng	Male	 
+Xa	Male	 
+Xá	Male	 
+Xoài	Male	 
+Xuân	 
+Xuyên	Male	 
+Xuyến	Female	 
+Xương	Male	 
+Xướng	Male	 
+Yêm	Male	 
+Yểm	Male	 
+Yên	Male	 
+Yến	Female	 
