@@ -2,7 +2,7 @@ package com.vutrankien.t9vietnamese
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
+import android.os.SystemClock
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.Button
@@ -11,18 +11,19 @@ import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.run
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.find
-import timber.log.Timber.d
-import timber.log.Timber.i
+import timber.log.Timber.*
 
 class MainActivity : Activity() {
-    lateinit var engine: T9Engine
+    private lateinit var engine: T9Engine
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
         launch(UI) {
             i("Start initializing")
+            val startTime = SystemClock.elapsedRealtime()
             engine = try {
                 displayInfo(R.string.engine_loading)
                 run(CommonPool) {
@@ -31,11 +32,15 @@ class MainActivity : Activity() {
             } catch (e: EnginePromise) {
                 displayError(e)
                 run(CommonPool) {
-                    e.initializeThenGetBlocking()
+                    // e.initializeThenGetBlocking()
+                    T9Wordlist(this@MainActivity, TrieDB(getFileStreamPath(VNConfiguration.dbname)), LOCALE_VN).initializeThenGetBlocking()
                 }
             }
-            i("Initialization Completed!")
+            val loadTime = (SystemClock.elapsedRealtime()
+                    - startTime)
+            i("Initialization Completed! loadTime=$loadTime")
             displayInfo(R.string.notify_initialized)
+            defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
         }
     }
 
@@ -61,9 +66,13 @@ class MainActivity : Activity() {
     fun onBtnClick(view: View) {
         val text = (view as Button).text
         d("onBtnClick() btn=" + text.substring(0..1))
-//        engine.input(text.substring(0..1))
-        engine.input(text[0])
-        find<TextView>(R.id.text).text = engine.currentCandidates.take(10).joinToString()
+        try {
+            engine.input(text[0])
+            find<TextView>(R.id.text).text = engine.currentCandidates.take(10).joinToString()
+        } catch (e: UninitializedPropertyAccessException) {
+            w(e)
+            displayError(e)
+        }
     }
 
     fun onCandidateClick(view: View) {

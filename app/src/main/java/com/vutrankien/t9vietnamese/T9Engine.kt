@@ -158,7 +158,8 @@ class T9Wordlist(val context: Context, private val db: TrieDB, val locale: Strin
     }
 
     fun initializeThenGetBlocking(): T9Engine {
-        initialize(db)
+//        initialize(db)
+        writeToDb(db)
         return T9Engine(locale, db)
     }
 }
