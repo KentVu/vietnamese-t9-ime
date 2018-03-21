@@ -45,5 +45,6 @@ TODO
 
 References-Acknowledgement
 ==========
-* Vietnamese wordlist : https://github.com/duyetdev/vietnamese-wordlist
+* Vietnamese wordlist : http://www.informatik.uni-leipzig.de/~duc/software/misc/wordlist.html
+* Xu ly Tieng Viet wikia: http://xltiengviet.wikia.com/
 * https://docs.oracle.com/javase/tutorial/i18n/text/normalizerapi.html

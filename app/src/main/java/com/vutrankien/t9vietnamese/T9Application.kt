@@ -9,7 +9,6 @@ import timber.log.Timber.DebugTree
 /**
  * Created by vutrankien on 17/08/14.
  */
-
 class T9Application : Application(){
 
     override fun onCreate() {

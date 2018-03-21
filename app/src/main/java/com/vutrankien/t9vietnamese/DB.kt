@@ -9,6 +9,7 @@ import com.snappydb.SnappydbException
 import org.jetbrains.anko.db.*
 import org.trie4j.patricia.MapPatriciaTrie
 import timber.log.Timber
+import timber.log.Timber.i
 import java.io.*
 
 interface DBWrapper : Closeable {
@@ -24,13 +25,13 @@ interface DBWrapper : Closeable {
 
 private val MAGIC:Int = 0xA11600D
 
-class TrieDB(fileDir: File) : DBWrapper {
+class TrieDB(file: File) : DBWrapper {
 
     private val TRIE_FILENAME = "trie"
 //    val trie = MapPatriciaTrie<Int>()
     val trie : MapPatriciaTrie<Int>
 
-    private val trieFile = File(fileDir, TRIE_FILENAME)
+    private val trieFile = file
 
     init {
         // The java deserialization thing, y'know :|
@@ -78,6 +79,30 @@ class TrieDB(fileDir: File) : DBWrapper {
     override fun putMagic() {
         put(MAGIC_KEY, MAGIC)
     }
+
+    fun readFrom(wordList: Wordlist) {
+        i("Destroying malicious database and reopen it!")
+        clear()
+        var step = 0
+        var bytesRead = 0
+        val flength = wordList.bytesCount()
+        wordList.forEachGroup(200) {
+            putAll(
+                    it.map {
+                        it.decomposeVietnamese()
+                    }
+            )
+            val lastStep = step
+            bytesRead += it.fold(0) { i, s ->
+                i + s.toByteArray().size + 1
+            }
+            step = (bytesRead / (flength / 100))
+            if (lastStep != step) Timber.d("Written $bytesRead / $flength to db ($step%)")
+        }
+    }
+
+    val initialized: Boolean
+            get() = haveMagic()
 
 }
 

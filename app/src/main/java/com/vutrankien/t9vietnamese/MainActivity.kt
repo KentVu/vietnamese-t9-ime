@@ -4,6 +4,8 @@ import android.app.Activity
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -14,28 +16,31 @@ import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.find
 import timber.log.Timber.*
+import java.util.concurrent.ForkJoinPool
 
 class MainActivity : Activity() {
     private lateinit var engine: T9Engine
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
+        val recyclerView = find(R.id.recycler_view) as RecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         launch(UI) {
             i("Start initializing")
             val startTime = SystemClock.elapsedRealtime()
-            engine = try {
-                displayInfo(R.string.engine_loading)
+            val locale = "vi-VN"
+            val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
+            displayInfo(R.string.engine_loading)
+            if (!trieDB.initialized) {
+                displayError("The engine is not initialized!")
                 run(CommonPool) {
-                    getEngineFor("vi-VN")
-                }
-            } catch (e: EnginePromise) {
-                displayError(e)
-                run(CommonPool) {
-                    // e.initializeThenGetBlocking()
-                    T9Wordlist(this@MainActivity, TrieDB(getFileStreamPath(VNConfiguration.dbname)), LOCALE_VN).initializeThenGetBlocking()
+                    trieDB.readFrom(Wordlist.ViVNWordList(this@MainActivity))
                 }
             }
+            engine =
+                    T9Engine(locale, trieDB)
+
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)
             i("Initialization Completed! loadTime=$loadTime")
@@ -46,7 +51,12 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        engine.close()
+        try {
+            launch { run(CommonPool) { engine.close() } }
+        } catch (e: Exception) {
+            w(e)
+            displayError(e)
+        }
     }
 
     private fun displayInfo(resId: Int) {
@@ -55,12 +65,15 @@ class MainActivity : Activity() {
         textView.text = getString(resId)
     }
 
-    private fun displayError(e: Exception) {
+    private fun displayError(msg: String) {
         val textView: TextView = findViewById(R.id.text)
         val color = ContextCompat.getColor(this, android.R.color.holo_red_dark)
         textView.setTextColor(color)
-        textView.text = getString(R.string.oops, e
-                .message)
+        textView.text = getString(R.string.oops, msg)
+    }
+
+    private fun displayError(e: Exception) {
+        displayError(e.message ?: "")
     }
 
     fun onBtnClick(view: View) {
@@ -68,7 +81,9 @@ class MainActivity : Activity() {
         d("onBtnClick() btn=" + text.substring(0..1))
         try {
             engine.input(text[0])
-            find<TextView>(R.id.text).text = engine.currentCandidates.take(10).joinToString()
+            val resultWords = engine.currentCandidates.take(10)
+            find<TextView>(R.id.text).text = resultWords.joinToString()
+            find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(resultWords)
         } catch (e: UninitializedPropertyAccessException) {
             w(e)
             displayError(e)

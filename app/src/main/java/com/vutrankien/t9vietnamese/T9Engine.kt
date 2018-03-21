@@ -11,7 +11,7 @@ private val log = KLog("T9Engine")
 val LOCALE_VN = "vi-VN"
 val LOCALE_US = "en-US"
 
-class T9Engine @Throws(EnginePromise::class)
+class T9Engine @Throws(EngineUninitializedException::class)
 constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
     private val configuration = configurations[locale]
 
@@ -100,7 +100,7 @@ const private val HORN = '̛'
 /* 803 323 COMBINING DOT BELOW */
 const private val DOT_BELOW = '̣'
 
-private fun String.decomposeVietnamese(): String {
+internal fun String.decomposeVietnamese(): String {
     return Normalizer.normalize(this, Normalizer.Form.NFKD)
             .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), "$1$CIRCUMFLEX_ACCENT$DOT_BELOW")
             .replace(
@@ -115,7 +115,7 @@ private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.F
 /**
  * Promise to provide engine after initializing
  */
-class EnginePromise(val context: Context, private val db: TrieDB, val locale: String) : Exception
+class EngineUninitializedException(val context: Context, private val db: TrieDB, val locale: String) : Exception
 ("The engine is not initialized!") {
 
 }
@@ -127,7 +127,7 @@ class T9Wordlist(val context: Context, private val db: TrieDB, val locale: Strin
         log.i("Destroying malicious database and reopen it!")
         db.clear()
         val inputStream = context.assets.open(configurations[locale].wordListFile)
-        var progress = 0
+        var step = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255
         val flength = inputStream.available()
@@ -143,25 +143,23 @@ class T9Wordlist(val context: Context, private val db: TrieDB, val locale: Strin
                             it.decomposeVietnamese()
                         }
                 )
-                val lastPercent = progress
+                val lastStep = step
                 bytesRead += it.fold(0) { i, s ->
                     i + s.toByteArray().size + 1
                 }
-                progress = (bytesRead / flength) * 100
-                if (lastPercent != progress) {
-                    d("Written $bytesRead / $flength to db ($progress%)")
-                }
+                step = (bytesRead / (flength / 100))
+                if (lastStep != step) d("Written $bytesRead / $flength to db ($step%)")
             }
         }
         // put magic at last to mark database stable (avoid app crash)
         db.putMagic()
     }
-
     fun initializeThenGetBlocking(): T9Engine {
 //        initialize(db)
         writeToDb(db)
         return T9Engine(locale, db)
     }
+
 }
 
 private var viVNEngine: T9Engine? = null
@@ -176,7 +174,7 @@ fun Context.getEngineFor(locale: String): T9Engine {
                 viVNEngine = T9Engine(locale, dbWrapper)
                 viVNEngine!!
             } else {
-                throw EnginePromise(this, dbWrapper, locale)
+                throw EngineUninitializedException(this, dbWrapper, locale)
             }
         }
         LOCALE_US -> enUSEngine ?: run {

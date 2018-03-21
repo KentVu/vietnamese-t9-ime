@@ -5,7 +5,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 
 import com.snappydb.SnappydbException
-import com.vutrankien.t9vietnamese.EnginePromise
+import com.vutrankien.t9vietnamese.EngineUninitializedException
 import com.vutrankien.t9vietnamese.T9Engine
 import com.vutrankien.t9vietnamese.getEngineFor
 
@@ -14,8 +14,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import java.util.HashMap
 
 /**
  * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
@@ -35,7 +33,7 @@ class EngineTests {
         context = InstrumentationRegistry.getTargetContext()
         try {
             viVnEngine = context.getEngineFor("vi-VN")
-        } catch(e: EnginePromise) {
+        } catch(e: EngineUninitializedException) {
             viVnEngine = e.initializeThenGetBlocking()
         }
     }
