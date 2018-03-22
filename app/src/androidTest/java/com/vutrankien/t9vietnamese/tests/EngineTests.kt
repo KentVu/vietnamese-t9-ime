@@ -5,9 +5,8 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 
 import com.snappydb.SnappydbException
-import com.vutrankien.t9vietnamese.EngineUninitializedException
-import com.vutrankien.t9vietnamese.T9Engine
-import com.vutrankien.t9vietnamese.getEngineFor
+import com.vutrankien.t9vietnamese.*
+import kotlinx.coroutines.experimental.CommonPool
 
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -31,11 +30,17 @@ class EngineTests {
     fun setUp() {
 //        context = mActivityRule.activity
         context = InstrumentationRegistry.getTargetContext()
-        try {
-            viVnEngine = context.getEngineFor("vi-VN")
-        } catch(e: EngineUninitializedException) {
-            viVnEngine = e.initializeThenGetBlocking()
+        val locale = "vi-VN"
+        val trieDB = TrieDB(context.getFileStreamPath(VNConfiguration.dbname))
+        if (!trieDB.initialized) {
+            trieDB.readFrom(Wordlist.ViVNWordList(context))
         }
+        viVnEngine = T9Engine(locale, trieDB)
+//        try {
+//            viVnEngine = context.getEngineFor("vi-VN")
+//        } catch(e: EngineUninitializedException) {
+//            viVnEngine = T9Wordlist(context, TrieDB(context.getFileStreamPath(VNConfiguration.dbname)), LOCALE_VN).initializeThenGetBlocking()
+//        }
     }
 
     @Test

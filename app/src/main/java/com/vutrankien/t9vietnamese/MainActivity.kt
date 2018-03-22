@@ -23,7 +23,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
-        val recyclerView = find(R.id.recycler_view) as RecyclerView
+        val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         launch(UI) {
@@ -38,8 +38,7 @@ class MainActivity : Activity() {
                     trieDB.readFrom(Wordlist.ViVNWordList(this@MainActivity))
                 }
             }
-            engine =
-                    T9Engine(locale, trieDB)
+            engine = T9Engine(locale, trieDB)
 
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)

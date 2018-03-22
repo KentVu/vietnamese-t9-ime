@@ -115,7 +115,7 @@ private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.F
 /**
  * Promise to provide engine after initializing
  */
-class EngineUninitializedException(val context: Context, private val db: TrieDB, val locale: String) : Exception
+class EngineUninitializedException() : Exception
 ("The engine is not initialized!") {
 
 }
@@ -174,7 +174,7 @@ fun Context.getEngineFor(locale: String): T9Engine {
                 viVNEngine = T9Engine(locale, dbWrapper)
                 viVNEngine!!
             } else {
-                throw EngineUninitializedException(this, dbWrapper, locale)
+                throw EngineUninitializedException()
             }
         }
         LOCALE_US -> enUSEngine ?: run {

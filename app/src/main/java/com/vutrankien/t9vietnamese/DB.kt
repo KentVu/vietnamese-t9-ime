@@ -83,22 +83,22 @@ class TrieDB(file: File) : DBWrapper {
     fun readFrom(wordList: Wordlist) {
         i("Destroying malicious database and reopen it!")
         clear()
-        var step = 0
-        var bytesRead = 0
-        val flength = wordList.bytesCount()
-        wordList.forEachGroup(200) {
+        wordList.forEachGroup(200) { group ->
             putAll(
-                    it.map {
+                    group.map {
                         it.decomposeVietnamese()
                     }
             )
-            val lastStep = step
-            bytesRead += it.fold(0) { i, s ->
-                i + s.toByteArray().size + 1
-            }
-            step = (bytesRead / (flength / 100))
-            if (lastStep != step) Timber.d("Written $bytesRead / $flength to db ($step%)")
+            Timber.d("just put ${group.size} more words")
         }
+//        wordList.forEachPercent { percentage, group ->
+//            putAll(
+//                    group.map {
+//                        it.decomposeVietnamese()
+//                    }
+//            )
+//            Timber.d("$percentage% read, ${group.size} more words")
+//        }
     }
 
     val initialized: Boolean
