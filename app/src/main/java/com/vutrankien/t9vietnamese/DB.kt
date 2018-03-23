@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteQueryBuilder
+import android.os.PowerManager
 import com.snappydb.DBFactory
 import com.snappydb.SnappydbException
 import org.jetbrains.anko.db.*
 import org.trie4j.patricia.MapPatriciaTrie
 import timber.log.Timber
+import timber.log.Timber.d
 import timber.log.Timber.i
 import java.io.*
 
@@ -58,7 +60,6 @@ class TrieDB(file: File) : DBWrapper {
     }
 
     override fun close() {
-        ObjectOutputStream(FileOutputStream(trieFile)).writeObject(trie)
     }
 
     private val MAGIC_KEY = "HELO"
@@ -83,22 +84,22 @@ class TrieDB(file: File) : DBWrapper {
     fun readFrom(wordList: Wordlist) {
         i("Destroying malicious database and reopen it!")
         clear()
-        wordList.forEachGroup(200) { group ->
+//        wordList.forEachGroup(200) { group ->
+        wordList.forEachPercent { percentage, group ->
             putAll(
                     group.map {
                         it.decomposeVietnamese()
                     }
             )
-            Timber.d("just put ${group.size} more words")
+//            Timber.d("just put ${group.size} more words")
+            Timber.d("$percentage% read, ${group.size} more words")
         }
-//        wordList.forEachPercent { percentage, group ->
-//            putAll(
-//                    group.map {
-//                        it.decomposeVietnamese()
-//                    }
-//            )
-//            Timber.d("$percentage% read, ${group.size} more words")
-//        }
+        // put magic at last to mark database stable (avoid app crash)
+        putMagic()
+//        val pm:PowerManager
+//        pm.newWakeLock(PowerManager.)
+        ObjectOutputStream(FileOutputStream(trieFile)).use { it.writeObject(trie) }
+        d("Persisted trie to file!")
     }
 
     val initialized: Boolean

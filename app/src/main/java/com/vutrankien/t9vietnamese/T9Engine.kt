@@ -32,7 +32,7 @@ constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
     private var numOnlyMode = false
 
     override fun close() {
-        dbWrapper.close()
+            dbWrapper.close()
     }
 
     fun input(numseq: String) {

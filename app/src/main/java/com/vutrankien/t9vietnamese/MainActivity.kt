@@ -1,45 +1,69 @@
 package com.vutrankien.t9vietnamese
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.os.PowerManager
 import android.os.SystemClock
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
-import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.run
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.find
 import timber.log.Timber.*
 import java.util.concurrent.ForkJoinPool
 
 class MainActivity : Activity() {
+
+    companion object {
+        private val WAKELOCK_TIMEOUT = 60000L
+    }
+
     private lateinit var engine: T9Engine
+    private lateinit var loadEngineDefer: Deferred<T9Engine>
+
+    private lateinit var wakelock: PowerManager.WakeLock
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.main)
         val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakelock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, BuildConfig
+        .APPLICATION_ID)
 
         launch(UI) {
             i("Start initializing")
             val startTime = SystemClock.elapsedRealtime()
             val locale = "vi-VN"
-            val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
             displayInfo(R.string.engine_loading)
-            if (!trieDB.initialized) {
-                displayError("The engine is not initialized!")
-                run(CommonPool) {
+            wakelock.acquire(WAKELOCK_TIMEOUT)
+            loadEngineDefer = async(CommonPool) {
+                val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
+                if (!trieDB.initialized) {
+                    displayError("The engine is not initialized!")
                     trieDB.readFrom(Wordlist.ViVNWordList(this@MainActivity))
                 }
+                T9Engine(locale, trieDB)
             }
-            engine = T9Engine(locale, trieDB)
+            val pollDefer:PollDefer? =
+                if (defaultSharedPreferences.contains("load_time")) PollDefer(loadEngineDefer,
+                        defaultSharedPreferences.getLong("load_time", -1), find(R.id
+                .text))
+                else null
+            engine = loadEngineDefer.await()
 
+            wakelock.run { if(isHeld) release() }
+            pollDefer?.stop()
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)
             i("Initialization Completed! loadTime=$loadTime")
@@ -48,7 +72,13 @@ class MainActivity : Activity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        d("onStop")
+    }
+
     override fun onDestroy() {
+        d("onDestroy")
         super.onDestroy()
         try {
             launch { run(CommonPool) { engine.close() } }
@@ -82,7 +112,7 @@ class MainActivity : Activity() {
             engine.input(text[0])
             val resultWords = engine.currentCandidates.take(10)
             find<TextView>(R.id.text).text = resultWords.joinToString()
-            find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(resultWords)
+            find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
         } catch (e: UninitializedPropertyAccessException) {
             w(e)
             displayError(e)
@@ -99,5 +129,36 @@ class MainActivity : Activity() {
         d("onBtnStarClick()")
         engine.flush()
         (view as TextView).text = ""
+    }
+}
+
+class PollDefer(private val defer: Deferred<*>, private val time: Long, private val textView: TextView) {
+
+    companion object {
+        private val POLL_INTERVAL = 1000L
+    }
+
+    private val mTimer : CountDownTimer
+    init {
+        mTimer = object : CountDownTimer(time, POLL_INTERVAL) {
+            override fun onFinish() {
+                d("onFinish")
+                if (!defer.isCompleted) {
+                    w("engine still loading after $time ms")
+                    textView.text = "engine still loading after $time ms"
+                }
+            }
+
+            override fun onTick(millisUntilFinish: Long) {
+                val percentDone = if (defer.isCompleted) 100 else (time - millisUntilFinish) * 100 / time
+                d("onTick:$millisUntilFinish:$percentDone% done")
+                if (defer.isCompleted) cancel() else
+                    textView.text = "loading $percentDone%"
+            }
+        }
+        mTimer.start()
+    }
+    fun stop() {
+        mTimer.cancel()
     }
 }
