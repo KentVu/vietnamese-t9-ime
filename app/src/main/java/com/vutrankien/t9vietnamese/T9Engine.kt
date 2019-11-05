@@ -36,10 +36,6 @@ constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
             dbWrapper.close()
     }
 
-    fun input(numseq: String) {
-        numseq.forEach { input(it) }
-    }
-
     private fun <E> MutableList<E>.push(num: E) = add(num)
 
     fun input(num: Char) {
@@ -50,7 +46,7 @@ constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
             if (currentNumSeq.size > 1) {
                 // Only start from 2 numbers and beyond
                 _currentCandidates = dbWrapper.existingPrefix(currentCombinations)
-                if (!_currentCandidates.isEmpty())
+                if (_currentCandidates.isNotEmpty())
                     currentCombinations = currentCombinations.filter { comb ->
                             _currentCandidates.any { it.startsWith(comb) }
                         }.toSet()
@@ -71,6 +67,10 @@ constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
         currentCombinations = setOf()
         currentCandidates = setOf()
         numOnlyMode = false
+    }
+
+    fun candidatesFor(input: String): Set<String> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 

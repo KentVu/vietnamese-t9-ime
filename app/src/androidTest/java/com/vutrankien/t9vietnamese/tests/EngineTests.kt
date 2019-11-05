@@ -66,12 +66,13 @@ class EngineTests {
         for ((key, value) in testCases) {
             engine.input(key)
             val candidateStrings = engine.currentCandidates
+            // TODO make engine state-less?
+            //  val candidateStrings = engine.candidatesFor(key)
             for (cand in value) {
                 assertTrue(
                     "[$key] not containing [$cand], all candidates:$candidateStrings",
                         candidateStrings.contains(cand))
                 engine.flush()
-                //Arrays.asList(candiateStrings).contains(cand));
             }
         }
     }
@@ -81,4 +82,8 @@ class EngineTests {
     fun tearDown() {
 
     }
+}
+
+private fun T9Engine.input(numseq: String) {
+    numseq.forEach { input(it) }
 }
