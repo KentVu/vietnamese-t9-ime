@@ -37,12 +37,9 @@ class MainActivity : Activity() {
         val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakelock =
-
-
-
-                powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, BuildConfig
-        .APPLICATION_ID)
+        wakelock = powerManager.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
+                BuildConfig.APPLICATION_ID)
 
         GlobalScope.launch(Dispatchers.Main) {
             i("Start initializing")

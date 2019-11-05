@@ -6,6 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.vutrankien.t9vietnamese"
+        targetSdkVersion 28
         minSdkVersion 15
         versionCode 1
         versionName "1.0"
@@ -26,11 +27,15 @@ android {
     lintOptions {
         abortOnError false
     }
+    useLibrary 'android.test.runner'
+
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
 }
 
 dependencies {
     // implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.snappydb:snappydb-lib:0.5.2'
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'
@@ -44,6 +49,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     // Required for instrumented tests
     androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

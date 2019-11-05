@@ -2,11 +2,9 @@ package com.vutrankien.t9vietnamese.tests
 
 import android.content.Context
 import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnitRunner
-
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.snappydb.SnappydbException
 import com.vutrankien.t9vietnamese.*
-
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -16,7 +14,7 @@ import org.junit.runner.RunWith
 /**
  * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
  */
-@RunWith(AndroidJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 class EngineTests {
 //    @Rule
 //    val mActivityRule = ActivityTestRule(MainActivity::class.java)
@@ -43,7 +41,6 @@ class EngineTests {
     }
 
     @Test
-    @Throws(SnappydbException::class)
     fun testNumToStringViVN() {
         // new Locale.Builder().setLanguageTag("vi").build()
         val testCases = mapOf(
@@ -57,7 +54,6 @@ class EngineTests {
 
     // Temporarily disable this test, concentrating on vi-VN locale
 //    @Test
-    @Throws(SnappydbException::class)
     fun testNumToStringEnUsLocale() {
         val testCases = mapOf("43556" to arrayOf("hello"),
                 "362867" to arrayOf("doctor"))
@@ -72,7 +68,7 @@ class EngineTests {
             val candiateStrings = engine.currentCandidates
             for (cand in value) {
                 assertTrue(
-                        String.format("[%s] not containing [%s], all candidates:%s", key, cand, candiateStrings),
+                    "[$key] not containing [$cand], all candidates:$candiateStrings",
                         candiateStrings.contains(cand))
                 engine.flush()
                 //Arrays.asList(candiateStrings).contains(cand));

@@ -1,7 +1,14 @@
+#https://github.com/codecov/example-android/blob/master/.travis.yml
+#https://guides.codepath.com/android/Setting-up-Travis-CI
+#https://unicorn-utterances.com/posts/travis-ci-for-android/
+env:
+  global:
+    - ANDROID_TARGET=android-22
+    - ANDROID_ABI=armeabi-v7a
 language: android
-sudo: true
+jdk:
+  - oraclejdk8
 
-# Shamelessly copied from https://github.com/pestrada/android-tdd-playground/blob/master/app/build.gradle
 android:
   components:
     # Uncomment the lines below if you want to
@@ -10,15 +17,16 @@ android:
     - platform-tools
 
     # The BuildTools version used by your project
-    - build-tools-27.0.0
+    # lookup below for default buildToolsVersion in accordance to AGP version
+    # https://developer.android.com/studio/releases/gradle-plugin.html#3-4-0
+    - build-tools-28.0.3
 
     # The SDK version used to compile your project
-    - android-22
-    - android-27
+    - android-28
 
     # Additional components
-    #- extra-google-google_play_services
-    #- extra-google-m2repository
+    - extra-google-google_play_services
+    - extra-google-m2repository
     - extra-android-m2repository
     #- addon-google_apis-google-19
 
@@ -26,18 +34,15 @@ android:
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-22
     #- sys-img-armeabi-v7a-android-17
+  licenses:
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 
 # ripped from https://github.com/googlesamples/android-ndk/blob/ae0bb4de/.travis.yml
-addons:
-  apt_packages:
-    - pandoc
-
-before_install:
-  # if [ `uname -m` = x86_64]; then
-  - wget https://dl.google.com/android/repository/android-ndk-r16-linux-x86_64.zip
-  - unzip -q android-ndk-r16-linux-x86_64.zip
-  - export ANDROID_NDK_HOME=`pwd`/android-ndk-r16
-  - mkdir -v $ANDROID_HOME/licenses && echo -ne "8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > $ANDROID_HOME/licenses/android-sdk-license && cat $ANDROID_HOME/licenses/android-sdk-license
+#addons:
+#  apt_packages:
+#    - pandoc
 
 # Emulator Management: Create, Start and Wait
 before_script:
@@ -49,8 +54,15 @@ before_script:
 script:
   - ./gradlew build connectedAndroidTest
   # print lint results details
-  - for f in app/build/reports/lint-results.html; do pandoc $f -t plain; done
-  - for f in app/build/reports/androidTests/connected/*.html; do pandoc $f -t plain; done
+  #- for f in app/build/reports/lint-results.html; do pandoc $f -t plain; done
+  #- for f in app/build/reports/androidTests/connected/*.html; do pandoc $f -t plain; done
+
+#before_install:
+  # if [ `uname -m` = x86_64]; then
+  #- wget https://dl.google.com/android/repository/android-ndk-r16-linux-x86_64.zip
+  #- unzip -q android-ndk-r16-linux-x86_64.zip
+  #- export ANDROID_NDK_HOME=`pwd`/android-ndk-r16
+  #- mkdir -v $ANDROID_HOME/licenses && echo -ne "8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > $ANDROID_HOME/licenses/android-sdk-license && cat $ANDROID_HOME/licenses/android-sdk-license
 
 deploy:
   skip_cleanup: true
