@@ -6,15 +6,14 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.PowerManager
 import android.os.SystemClock
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.find
 import timber.log.Timber.*
@@ -38,16 +37,20 @@ class MainActivity : Activity() {
         val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakelock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, BuildConfig
+        wakelock =
+
+
+
+                powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, BuildConfig
         .APPLICATION_ID)
 
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             i("Start initializing")
             val startTime = SystemClock.elapsedRealtime()
             val locale = "vi-VN"
             displayInfo(R.string.engine_loading)
             wakelock.acquire(WAKELOCK_TIMEOUT)
-            loadEngineDefer = async(CommonPool) {
+            loadEngineDefer = async() {
                 val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
                 if (!trieDB.initialized) {
                     displayError("The engine is not initialized!")
@@ -81,7 +84,7 @@ class MainActivity : Activity() {
         d("onDestroy")
         super.onDestroy()
         try {
-            launch { run(CommonPool) { engine.close() } }
+            GlobalScope.launch { run() { engine.close() } }
         } catch (e: Exception) {
             w(e)
             displayError(e)

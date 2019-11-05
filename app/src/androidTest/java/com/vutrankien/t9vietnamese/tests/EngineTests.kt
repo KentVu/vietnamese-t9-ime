@@ -1,12 +1,11 @@
 package com.vutrankien.t9vietnamese.tests
 
 import android.content.Context
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnitRunner
 
 import com.snappydb.SnappydbException
 import com.vutrankien.t9vietnamese.*
-import kotlinx.coroutines.experimental.CommonPool
 
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -17,7 +16,7 @@ import org.junit.runner.RunWith
 /**
  * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(AndroidJUnitRunner::class)
 class EngineTests {
 //    @Rule
 //    val mActivityRule = ActivityTestRule(MainActivity::class.java)

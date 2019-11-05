@@ -2,10 +2,9 @@ package com.vutrankien.t9vietnamese;
 
 import android.annotation.SuppressLint;
 import android.inputmethodservice.InputMethodService;
-import android.support.constraint.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TableLayout;
 
 /**
  * Created by vutrankien on 17/05/02.
