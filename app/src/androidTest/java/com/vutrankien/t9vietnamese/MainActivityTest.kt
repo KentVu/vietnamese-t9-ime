@@ -8,6 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import org.hamcrest.CoreMatchers.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +19,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
     @get:Rule val mActivityRule = ActivityTestRule<MainActivity>(MainActivity::class.java)
+
+    @Before
+    fun unlockScreen() = mActivityRule.activity.unlockScreen()
 
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
