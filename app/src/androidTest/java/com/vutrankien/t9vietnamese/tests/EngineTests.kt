@@ -1,9 +1,8 @@
 package com.vutrankien.t9vietnamese.tests
 
 import android.content.Context
-import androidx.test.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.snappydb.SnappydbException
+import androidx.test.platform.app.InstrumentationRegistry
 import com.vutrankien.t9vietnamese.*
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -26,7 +25,7 @@ class EngineTests {
     @Before
     fun setUp() {
 //        context = mActivityRule.activity
-        context = InstrumentationRegistry.getTargetContext()
+        context = InstrumentationRegistry.getInstrumentation().targetContext
         val locale = "vi-VN"
         val trieDB = TrieDB(context.getFileStreamPath(VNConfiguration.dbname))
         if (!trieDB.initialized) {
@@ -46,7 +45,8 @@ class EngineTests {
         val testCases = mapOf(
                 "24236" to arrayOf("chào"),
                 "864" to arrayOf("tôi"),
-                "6444367" to arrayOf("nghiệp"))
+                "6444367" to arrayOf("nghiệp"),
+                "6489356" to arrayOf("nguyễn"))
 
         testEngineNumToString(testCases, viVnEngine)
         viVnEngine.close()
@@ -65,11 +65,11 @@ class EngineTests {
     private fun testEngineNumToString(testCases: Map<String, Array<String>>, engine: T9Engine) {
         for ((key, value) in testCases) {
             engine.input(key)
-            val candiateStrings = engine.currentCandidates
+            val candidateStrings = engine.currentCandidates
             for (cand in value) {
                 assertTrue(
-                    "[$key] not containing [$cand], all candidates:$candiateStrings",
-                        candiateStrings.contains(cand))
+                    "[$key] not containing [$cand], all candidates:$candidateStrings",
+                        candidateStrings.contains(cand))
                 engine.flush()
                 //Arrays.asList(candiateStrings).contains(cand));
             }

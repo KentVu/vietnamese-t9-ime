@@ -24,16 +24,9 @@ val padConfigurations =
 
 val wordListFiles = mapOf<String, String>(LOCALE_VN to "morphemes.txt")
 
-private fun UNSUPPORTED_MSG(locale: String) = "Locale $locale unsupported"
+fun UNSUPPORTED_MSG(locale: String) = "Locale $locale unsupported"
 
-object configurations {
-    operator fun get(locale: String): Configuration {
-        return when (locale) {
-            in LOCALE_VN -> VNConfiguration
-            else -> throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
-        }
-    }
-}
+val configurations = mapOf(LOCALE_VN to VNConfiguration)
 
 interface Configuration {
     val pad: PadConfiguration

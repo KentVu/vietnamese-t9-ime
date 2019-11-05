@@ -13,7 +13,8 @@ val LOCALE_US = "en-US"
 
 class T9Engine @Throws(EngineUninitializedException::class)
 constructor(locale: String, val dbWrapper: DBWrapper): Closeable {
-    private val configuration = configurations[locale]
+    private val configuration: Configuration = configurations[locale] ?:
+        throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
 
     private val currentNumSeq = mutableListOf<Char>()
     private var _currentCandidates = setOf<String>()
@@ -102,7 +103,9 @@ const private val DOT_BELOW = '̣'
 
 internal fun String.decomposeVietnamese(): String {
     return Normalizer.normalize(this, Normalizer.Form.NFKD)
+            // rearrange intonation and vowel-mark order.
             .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), "$1$CIRCUMFLEX_ACCENT$DOT_BELOW")
+            // recombine specific vowels.
             .replace(
                 ("([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT").toRegex()
             ) {Normalizer.normalize(it.value, Normalizer.Form.NFKC)}
@@ -126,7 +129,7 @@ class T9Wordlist(val context: Context, private val db: TrieDB, val locale: Strin
     fun writeToDb(db: DBWrapper) {
         log.i("Destroying malicious database and reopen it!")
         db.clear()
-        val inputStream = context.assets.open(configurations[locale].wordListFile)
+        val inputStream = context.assets.open(configurations.getValue(locale).wordListFile)
         var step = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255

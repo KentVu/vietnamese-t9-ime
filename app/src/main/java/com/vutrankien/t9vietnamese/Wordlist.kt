@@ -2,11 +2,12 @@ package com.vutrankien.t9vietnamese
 
 import android.content.Context
 import timber.log.Timber.d
+import java.io.Closeable
 
 /**
  * Created by user on 2018/01/21.
  */
-sealed class Wordlist(context: Context, wordListFile: String) : AutoCloseable {
+sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
 
     private val stream = context.assets.open(wordListFile)
     private val bufferedReader = stream.bufferedReader()
@@ -17,7 +18,7 @@ sealed class Wordlist(context: Context, wordListFile: String) : AutoCloseable {
 
     private fun nextWord(): String = bufferedReader.readLine()
 
-    class ViVNWordList(context:Context): Wordlist(context, configurations[LOCALE_VN].wordListFile)
+    class ViVNWordList(context:Context): Wordlist(context, configurations.getValue(LOCALE_VN).wordListFile)
 
     // https://stackoverflow.com/a/6992255
     private fun bytesCount(): Int = stream.available()
