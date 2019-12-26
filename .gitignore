@@ -65,3 +65,4 @@ freeline_project_description.json
 tags
 /.idea/perl5local.xml
 /_Deparsed_XSubs.pm
+.idea/caches/

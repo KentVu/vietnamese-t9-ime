@@ -7,6 +7,7 @@ import com.vutrankien.t9vietnamese.*
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -40,6 +41,7 @@ class EngineTests {
     }
 
     @Test
+    @Ignore("TODO: Not ready yet")
     fun testNumToStringViVN() {
         // new Locale.Builder().setLanguageTag("vi").build()
         val testCases = mapOf(
