@@ -1,10 +1,20 @@
 package com.vutrankien.t9vietnamese.tests
 
-class Presenter() {
-    private lateinit var view: View
+import kotlinx.coroutines.launch
 
+class Presenter {
     fun attachView(view: View) {
-        this.view = view
+        receiveEvents(view)
+    }
+
+    private fun receiveEvents(view: View) {
+        view.scope.launch {
+            when (view.eventSource.receive()) {
+                Event.START -> {
+                    view.showProgress()
+                }
+            }
+        }
     }
 
 }
