@@ -13,7 +13,8 @@ class Presenter(val engine: T9Engine) {
             when (view.eventSource.receive()) {
                 Event.START -> {
                     view.showProgress()
-                    engine.init()
+                    engine.init().await()
+                    view.showKeyboard()
                 }
             }
         }
