@@ -1,8 +1,9 @@
 package com.vutrankien.t9vietnamese.tests
 
+import com.vutrankien.t9vietnamese.T9Engine
 import kotlinx.coroutines.launch
 
-class Presenter {
+class Presenter(val engine: T9Engine) {
     fun attachView(view: View) {
         receiveEvents(view)
     }
@@ -12,6 +13,7 @@ class Presenter {
             when (view.eventSource.receive()) {
                 Event.START -> {
                     view.showProgress()
+                    engine.init()
                 }
             }
         }
