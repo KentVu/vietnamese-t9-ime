@@ -20,7 +20,8 @@ class PresenterTest {
         every { view.eventSource } returns Channel()
         every { view.scope } returns GlobalScope
 
-        engine = mockk()
+        engine = mockk(relaxUnitFun = true)
+        every { engine.init() } returns GlobalScope.async { }
     }
 
     @Test
@@ -32,12 +33,23 @@ class PresenterTest {
         }
     }
 
+    @Suppress("DeferredResultUnused") // just verify init has called
     @Test
     fun initializeEngineOnStart() = runBlocking {
-        every { engine.init() } returns Unit
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START)
         verify { engine.init() }
         confirmVerified(engine)
+    }
+
+    @Test
+    fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
+        val deferred = async { }
+        every { engine.init() } returns deferred
+        Presenter(engine).attachView(view)
+        view.eventSource.send(Event.START)
+        deferred.await()
+        //assertTrue(engine.initialized) -> engine test!
+        verify { view.showKeyboard() }
     }
 }

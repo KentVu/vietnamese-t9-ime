@@ -8,6 +8,7 @@ interface View {
     val eventSource: Channel<Event>
 
     fun showProgress()
+    fun showKeyboard()
 }
 
 enum class Event {
