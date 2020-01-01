@@ -7,7 +7,6 @@ interface T9Engine {
 
     fun init(): Deferred<Unit>
     fun startInput(): Input
-    fun showCandidates(cand: List<String>)
 
     interface Input {
         fun input(key: Char)

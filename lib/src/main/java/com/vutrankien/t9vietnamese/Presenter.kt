@@ -3,13 +3,20 @@ package com.vutrankien.t9vietnamese
 import kotlinx.coroutines.launch
 
 class Presenter(val engine: T9Engine) {
-    private var stateMgr: State = State.Manager()
+    private lateinit var view: View
+    internal var typingState: TypingState = TypingState.Init(this)
+        set(value) {
+            println("Presenter:TypingState:change: $field -> $value")
+            field = value
+        }
+
 
     fun attachView(view: View) {
         receiveEvents(view)
     }
 
     private fun receiveEvents(view: View) {
+        this.view = view
         view.scope.launch {
             for (eventWithData in view.eventSource) {
                 when (eventWithData.event) {
@@ -19,15 +26,17 @@ class Presenter(val engine: T9Engine) {
                         view.showKeyboard()
                     }
                     Event.KEY_PRESS -> {
-                        stateMgr.keyPress(engine, eventWithData.data ?: error("NULL data: $eventWithData"))
+                        if (typingState is TypingState.Init) {
+                            typingState = TypingState.Typing(this@Presenter, engine)
+                        }
+                        typingState.keyPress(engine, eventWithData.data ?: error("NULL data: $eventWithData"))
                     }
-                    else -> System.err.println("unknown event:$eventWithData")
                 }
             }
         }
     }
 
-    sealed class State {
+    sealed class TypingState {
         open fun keyPress(engine: T9Engine, key: Char) {
             throw IllegalStateException("${javaClass.name}.keyPress($key)")
         }
@@ -36,44 +45,32 @@ class Presenter(val engine: T9Engine) {
             return javaClass.simpleName
         }
 
-        class Manager : State() {
-            internal var state: State = Init(this)
-                set(value) {
-                    println("Presenter:State@Manager:changeState: $field -> $value")
-                    field = value
-                }
-
+        class Init(val presenter: Presenter) : TypingState() {
             override fun keyPress(engine: T9Engine, key: Char) {
-                if (state is Init) {
-                    state = Typing(this, engine)
-                }
-                state.keyPress(engine, key)
-            }
-
-        }
-
-        class Init(val mgr: Manager) : State() {
-            override fun keyPress(engine: T9Engine, key: Char) {
-                mgr.state = Typing(mgr, engine)
+                presenter.typingState = Typing(presenter, engine)
             }
         }
 
-        class Typing(private val mgr: Manager, engine: T9Engine) : State() {
+        class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState() {
             val input: T9Engine.Input = engine.startInput()
             override fun keyPress(engine: T9Engine, key: Char) {
                 if (key != ' ') {
                     input.input(key)
                 } else {
-                    mgr.state = Confirmed(mgr, input.result())
+                    presenter.typingState = Confirmed(presenter, input.result())
                 }
             }
 
         }
 
-        class Confirmed(mgr: Manager, result: List<String>) : State() {
+        class Confirmed(presenter: Presenter, result: List<String>) : TypingState() {
             init {
-                mgr.
+                presenter.onTypingConfirmed(result)
             }
         }
+    }
+
+    private fun onTypingConfirmed(result: List<String>) {
+        view.showCandidates(result)
     }
 }

@@ -9,6 +9,7 @@ interface View {
 
     fun showProgress()
     fun showKeyboard()
+    fun showCandidates(cand: List<String>)
 }
 
 enum class Event {
