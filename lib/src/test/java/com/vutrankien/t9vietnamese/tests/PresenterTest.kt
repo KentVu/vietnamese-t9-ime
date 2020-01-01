@@ -63,6 +63,7 @@ class PresenterTest {
             Presenter(engine).attachView(view)
             view.eventSource.send(Event.KEY_PRESS.withData('4'))
             view.eventSource.send(Event.KEY_PRESS.withData('2'))
+            view.eventSource.send(Event.KEY_PRESS.withData(' '))
             verify { engine.showCandidates(cand) }
         }
     }

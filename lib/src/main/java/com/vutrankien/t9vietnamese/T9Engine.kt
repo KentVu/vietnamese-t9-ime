@@ -10,7 +10,7 @@ interface T9Engine {
     fun showCandidates(cand: List<String>)
 
     interface Input {
-        fun input(key: Byte)
+        fun input(key: Char)
         fun result(): List<String>
     }
 }
