@@ -1,7 +1,6 @@
 package com.vutrankien.t9vietnamese
 
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
 
 class Presenter(val engine: T9Engine) {
     private var stateMgr: State = State.Manager()
@@ -29,34 +28,52 @@ class Presenter(val engine: T9Engine) {
     }
 
     sealed class State {
-        abstract fun keyPress(engine: T9Engine, key: Char)
+        open fun keyPress(engine: T9Engine, key: Char) {
+            throw IllegalStateException("${javaClass.name}.keyPress($key)")
+        }
+
+        override fun toString(): String {
+            return javaClass.simpleName
+        }
 
         class Manager : State() {
-            private var state: State = Init()
+            internal var state: State = Init(this)
+                set(value) {
+                    println("Presenter:State@Manager:changeState: $field -> $value")
+                    field = value
+                }
 
             override fun keyPress(engine: T9Engine, key: Char) {
                 if (state is Init) {
-                    state = Typing(engine)
+                    state = Typing(this, engine)
                 }
                 state.keyPress(engine, key)
             }
 
         }
 
-        class Init: State() {
+        class Init(val mgr: Manager) : State() {
             override fun keyPress(engine: T9Engine, key: Char) {
-                throw IllegalStateException("${javaClass.name}.keyPress($key)")
+                mgr.state = Typing(mgr, engine)
             }
         }
 
-        class Typing(engine: T9Engine) : State() {
+        class Typing(private val mgr: Manager, engine: T9Engine) : State() {
             val input: T9Engine.Input = engine.startInput()
             override fun keyPress(engine: T9Engine, key: Char) {
                 if (key != ' ') {
                     input.input(key)
+                } else {
+                    mgr.state = Confirmed(mgr, input.result())
                 }
             }
 
+        }
+
+        class Confirmed(mgr: Manager, result: List<String>) : State() {
+            init {
+                mgr.
+            }
         }
     }
 }
