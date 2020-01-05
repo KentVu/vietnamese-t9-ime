@@ -21,6 +21,6 @@ public class T9Vietnamese extends InputMethodService {
     }
     @SuppressWarnings("unused")
     public void onBtnClick(View view) {
-        new KLog("T9Vietnamese").d("onBtnClick() btn=" + ((Button) view).getText());
+        new Logging("T9Vietnamese").d("onBtnClick() btn=" + ((Button) view).getText());
     }
 }

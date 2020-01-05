@@ -1,15 +1,17 @@
 package com.vutrankien.t9vietnamese
 
-import android.content.Context
-import timber.log.Timber.d
 import java.io.Closeable
+import java.io.InputStream
+
+interface Wordlist: Closeable {
+    fun forEachPercent(operation: (percentage: Int, Set<String>) -> Any)
+}
 
 /**
- * Created by user on 2018/01/21.
+ * Created by KentVu on 2018/01/21.
  */
-sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
+class DefaultWordlist(val stream: InputStream) : Wordlist {
 
-    private val stream = context.assets.open(wordListFile)
     private val bufferedReader = stream.bufferedReader()
 
     override fun close() {
@@ -17,8 +19,6 @@ sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
     }
 
     private fun nextWord(): String = bufferedReader.readLine()
-
-    class ViVNWordList(context:Context): Wordlist(context, configurations.getValue(LOCALE_VN).wordListFile)
 
     // https://stackoverflow.com/a/6992255
     private fun bytesCount(): Int = stream.available()
@@ -45,7 +45,7 @@ sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
 //        return operation((0..groupSize).map { nextWord()})
     }
 
-    fun forEachPercent(operation: (percentage:Int, Set<String>) -> Any) {
+    override fun forEachPercent(operation: (percentage:Int, Set<String>) -> Any) {
         val flength = bytesCount()
         bufferedReader.useLines {
             var bytesRead = 0
@@ -54,7 +54,7 @@ sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
                 bytesRead += it.toByteArray().size
                 val percentage = bytesRead * 100 / flength
                 if (lastPercentage != percentage)
-                    d("$percentage% read, bytesRead:$bytesRead / " +
+                    println("$percentage% read, bytesRead:$bytesRead / " +
                         "$flength")
                 percentage
             }.forEach { operation(it.key, it.value.toSet()) }
@@ -67,3 +67,4 @@ sealed class Wordlist(context: Context, wordListFile: String) : Closeable {
 //        return operation((0..groupSize).map { nextWord()})
     }
 }
+
