@@ -1,25 +1,15 @@
 package com.vutrankien.t9vietnamese
 
-import android.content.Context
-import kotlinx.coroutines.Deferred
 import java.io.Closeable
+import java.io.File
+import java.io.InputStream
 import java.text.Normalizer
 
 // TODO Have Dagger inject this
 private val log:Logging = JavaLog("T9Engine")
 
-val LOCALE_VN = "vi-VN"
-val LOCALE_US = "en-US"
-
 class OldT9Engine @Throws(EngineUninitializedException::class)
-constructor(locale: String, val db: DB): Closeable, T9Engine {
-    override fun init(): Deferred<Unit> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun startInput(): T9Engine.Input {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+constructor(locale: String, val db: DB): Closeable {
 
     private val configuration: Configuration = configurations[locale] ?:
         throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
@@ -112,12 +102,12 @@ class EngineUninitializedException() : Exception
 }
 
 // It knows all the words of a language
-class T9Wordlist(val context: Context, private val db: TrieDB, val locale: String) {
+class T9Wordlist(val inputStream: InputStream, private val db: TrieDB, val locale: String) {
 
     fun writeToDb(db: DB) {
         log.i("Destroying malicious database and reopen it!")
         db.clear()
-        val inputStream = context.assets.open(configurations.getValue(locale).wordListFile)
+        //val inputStream = context.assets.open(com.vutrankien.t9vietnamese.configurations.getValue(locale).wordListFile)
         var step = 0
         var bytesRead = 0
         // https://stackoverflow.com/a/6992255
@@ -156,12 +146,12 @@ class T9Wordlist(val context: Context, private val db: TrieDB, val locale: Strin
 private var viVNEngine: OldT9Engine? = null
 private var enUSEngine: OldT9Engine? = null
 
-fun Context.getEngineFor(locale: String): OldT9Engine {
+fun getEngineFor(filesDir: File, locale: String): OldT9Engine {
     val dbWrapper = TrieDB(filesDir)
     return when (locale) {
         LOCALE_VN -> viVNEngine ?: run {
             if (dbWrapper.haveMagic()) {
-                log.i("DB OK!")
+                com.vutrankien.t9vietnamese.log.i("DB OK!")
                 viVNEngine = OldT9Engine(locale, dbWrapper)
                 viVNEngine!!
             } else {

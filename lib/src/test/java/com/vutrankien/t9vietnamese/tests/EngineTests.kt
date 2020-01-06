@@ -1,20 +1,25 @@
 package com.vutrankien.t9vietnamese.tests
 
-import com.vutrankien.t9vietnamese.Progress
-import com.vutrankien.t9vietnamese.start
+import com.vutrankien.t9vietnamese.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert
+import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-class ProgressiveReaderTests {
+class EngineTests {
+    @Before
+    fun setUp() {
+        //mock the wordlist!
+    }
+
     @ExperimentalCoroutinesApi
     @Test
-    fun basicFunction() = runBlocking {
+    fun progressiveReaderTest() = runBlocking {
         val content = "a\nb\nc"
         val bytes = content.toByteArray()
         val inputStream = CheckableInputStream(ByteArrayInputStream(bytes))
@@ -40,5 +45,20 @@ class ProgressiveReaderTests {
             super.close()
             closed = true
         }
+    }
+
+    val padConfig = PadConfiguration(
+            num1 = KeyConfig(KeyTypes.Normal, linkedSetOf('a')),
+            num2 = KeyConfig(KeyTypes.Normal, linkedSetOf('b')),
+            num3 = KeyConfig(KeyTypes.Normal, linkedSetOf('c'))
+    )
+
+    @Test
+    fun engineInitializing() = runBlocking {
+        val seeds = "a\nb\nc"
+        val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
+        assertFalse(engine.initialized)
+        engine.init().await()
+        assertTrue(engine.initialized)
     }
 }

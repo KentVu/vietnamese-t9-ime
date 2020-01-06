@@ -3,14 +3,14 @@ package com.vutrankien.t9vietnamese
 import java.io.Closeable
 import java.io.InputStream
 
-interface Wordlist: Closeable {
+interface WordList: Closeable {
     fun forEachPercent(operation: (percentage: Int, Set<String>) -> Any)
 }
 
 /**
  * Created by KentVu on 2018/01/21.
  */
-class DefaultWordlist(val stream: InputStream) : Wordlist {
+class DefaultWordList(val stream: InputStream) : WordList {
 
     private val bufferedReader = stream.bufferedReader()
 

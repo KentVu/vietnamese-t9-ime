@@ -61,7 +61,7 @@ class TrieDB(file: File) : DB {
         put(MAGIC_KEY, MAGIC)
     }
 
-    fun readFrom(wordList: Wordlist) {
+    fun readFrom(wordList: WordList) {
         log.i("I: Destroying malicious database and reopen it!")
         clear()
 //        wordList.forEachGroup(200) { group ->

@@ -2,6 +2,10 @@ package com.vutrankien.t9vietnamese
 
 import com.vutrankien.t9vietnamese.KeyTypes.*
 
+const val LOCALE_VN = "vi-VN"
+const val LOCALE_US = "en-US"
+val DummyKeyConfig = KeyConfig(Normal, linkedSetOf())
+
 val padConfigurations =
         mapOf<String, PadConfiguration>(
                 LOCALE_VN to PadConfiguration(
@@ -51,18 +55,18 @@ enum class KeyTypes {
 data class KeyConfig(val type: KeyTypes, val chars: Set<Char> = emptySet())
 
 data class PadConfiguration(
-        val num1: KeyConfig,
-        val num2: KeyConfig,
-        val num3: KeyConfig,
-        val num4: KeyConfig,
-        val num5: KeyConfig,
-        val num6: KeyConfig,
-        val num7: KeyConfig,
-        val num8: KeyConfig,
-        val num9: KeyConfig,
-        val num0: KeyConfig,
-        val keyStar: KeyConfig,
-        val keySharp: KeyConfig
+        val num1: KeyConfig = DummyKeyConfig,
+        val num2: KeyConfig = DummyKeyConfig,
+        val num3: KeyConfig = DummyKeyConfig,
+        val num4: KeyConfig = DummyKeyConfig,
+        val num5: KeyConfig = DummyKeyConfig,
+        val num6: KeyConfig = DummyKeyConfig,
+        val num7: KeyConfig = DummyKeyConfig,
+        val num8: KeyConfig = DummyKeyConfig,
+        val num9: KeyConfig = DummyKeyConfig,
+        val num0: KeyConfig = DummyKeyConfig,
+        val keyStar: KeyConfig = DummyKeyConfig,
+        val keySharp: KeyConfig = DummyKeyConfig
 ) {
     private val num2Char = mapOf(
             '0' to num0,

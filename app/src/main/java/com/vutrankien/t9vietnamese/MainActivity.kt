@@ -51,7 +51,7 @@ class MainActivity : Activity() {
             //    val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
             //    if (!trieDB.initialized) {
             //        displayError("The engine is not initialized!")
-            //        trieDB.readFrom(Wordlist.ViVNWordList(this@MainActivity))
+            //        trieDB.readFrom(WordList.ViVNWordList(this@MainActivity))
             //    }
             //    T9Engine(locale, trieDB)
             //}
