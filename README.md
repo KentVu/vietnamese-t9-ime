@@ -11,16 +11,20 @@ The T9 input method
 ===================
 (From [Wikipedia](https://en.wikipedia.org/wiki/T9_(predictive_text)#Design) )
 
-    T9's objective is to make it easier to type text messages. It allows words
-    to be entered by a single keypress for each letter, as opposed to the
-    multi-tap approach used in conventional mobile phone text entry, in which
-    several letters are associated with each key, and selecting one letter often
-    requires multiple keypresses.
+> T9's objective is to make it easier to type text messages. It allows words
+> to be entered by a single keypress for each letter, as opposed to the
+> multi-tap approach used in conventional mobile phone text entry, in which
+> several letters are associated with each key, and selecting one letter often
+> requires multiple keypresses.
 
 Design goals
 ============
 * Mimic the t9 input!
 * Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
+
+Some specs:
+===========
+* Uppercase should only occur at first letter of words.
 
 Things to consider
 ==================
@@ -39,7 +43,7 @@ TODO
 * [ ] [Frecency](https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Frecency_algorithm) algorithm
 
 
-References
+References-Acknowledgement
 ==========
 * Vietnamese wordlist : https://github.com/duyetdev/vietnamese-wordlist
 * https://docs.oracle.com/javase/tutorial/i18n/text/normalizerapi.html

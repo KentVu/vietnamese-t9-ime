@@ -63,3 +63,5 @@ freeline_project_description.json
 .idea/runConfigurations.xml
 .idea/markdown-navigator*
 tags
+/.idea/perl5local.xml
+/_Deparsed_XSubs.pm
