@@ -20,6 +20,6 @@ class ProgressiveReaderTests {
                 this@runBlocking).toList()
         assertEquals(progresses[0], Progress(2, "a"))
         assertEquals(progresses[1], Progress(4, "b"))
-        assertEquals(progresses[2], Progress(5, "c"))
+        assertEquals(progresses[2], Progress(6, "c"))
     }
 }
