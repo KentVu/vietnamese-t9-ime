@@ -15,9 +15,9 @@ class ProgressiveReaderTests {
     fun basicFunction() = runBlocking {
         val content = "a\nb\nc"
         val bytes = content.toByteArray()
-        val progresses = ByteArrayInputStream(bytes).start(
-                bytes.size,
-                this@runBlocking).toList()
+        val progresses = ByteArrayInputStream(bytes).use {
+            it.start(this@runBlocking).toList()
+        }
         assertEquals(progresses[0], Progress(2, "a"))
         assertEquals(progresses[1], Progress(4, "b"))
         assertEquals(progresses[2], Progress(6, "c"))
