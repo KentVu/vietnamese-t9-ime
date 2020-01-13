@@ -7,14 +7,13 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import java.io.InputStream
 
+// TODO: Stop estimating and add a parameter
 const val ESTIMATED_LINEBREAK_SIZE = 1 // assume linux/mac line endings. (\r, \n only)
-/**
- * @param size estimated size of this stream, in bytes.
- */
+
 @ExperimentalCoroutinesApi
-fun InputStream.start(size: Int, scope: CoroutineScope = GlobalScope): ReceiveChannel<Progress> {
+fun InputStream.start(scope: CoroutineScope = GlobalScope): ReceiveChannel<Progress> {
     return scope.produce {
-        val bufferedReader = bufferedReader()
+        val bufferedReader = this@start.bufferedReader()
         bufferedReader.useLines {
             var bytesRead = 0
             it.forEach { line ->
