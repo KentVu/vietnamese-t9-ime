@@ -4,7 +4,6 @@ import com.vutrankien.t9vietnamese.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -47,11 +46,10 @@ class EngineTests {
         }
     }
 
-    val padConfig = PadConfiguration(
-            num1 = KeyConfig(KeyTypes.Normal, linkedSetOf('a')),
-            num2 = KeyConfig(KeyTypes.Normal, linkedSetOf('b')),
-            num3 = KeyConfig(KeyTypes.Normal, linkedSetOf('c'))
-    )
+    val padConfig = PadConfiguration(mapOf(
+            Key.num1 to KeyConfig(KeyTypes.Normal, linkedSetOf('a')),
+            Key.num2 to KeyConfig(KeyTypes.Normal, linkedSetOf('b')),
+            Key.num3 to KeyConfig(KeyTypes.Normal, linkedSetOf('c'))))
 
     @Test
     fun engineInitializing() = runBlocking {
@@ -60,5 +58,13 @@ class EngineTests {
         assertFalse(engine.initialized)
         engine.init().await()
         assertTrue(engine.initialized)
+    }
+
+    @Test
+    fun engineFunction() = runBlocking {
+        val seeds = "a\nb\nc"
+        val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
+        engine.init().await()
+        engine.startInput().input(Key.num1)
     }
 }

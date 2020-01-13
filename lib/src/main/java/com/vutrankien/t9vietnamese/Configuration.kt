@@ -6,26 +6,6 @@ const val LOCALE_VN = "vi-VN"
 const val LOCALE_US = "en-US"
 val DummyKeyConfig = KeyConfig(Normal, linkedSetOf())
 
-val padConfigurations =
-        mapOf<String, PadConfiguration>(
-                LOCALE_VN to PadConfiguration(
-                        num2 = KeyConfig(Normal, linkedSetOf('a', 'ă', 'â', 'b', 'c', '́'
-                                /*sắc*/)),
-                        num3 = KeyConfig(Normal, linkedSetOf('d', 'đ', 'e', 'ê', 'f', '̀'
-                                /*huyền*/)),
-                        num4 = KeyConfig(Normal, linkedSetOf('g', 'h', 'i', '̉' /*hỏi*/)),
-                        num5 = KeyConfig(Normal, linkedSetOf('j', 'k', 'l', '̃' /*ngã*/)),
-                        num6 = KeyConfig(Normal, linkedSetOf('m', 'n', 'o', 'ô', 'ơ', '̣' /*nặng*/)),
-                        num7 = KeyConfig(Normal, linkedSetOf('p', 'q', 'r', 's')),
-                        num8 = KeyConfig(Normal, linkedSetOf('t', 'u', 'ư', 'v')),
-                        num9 = KeyConfig(Normal, linkedSetOf('w', 'x', 'y', 'z')),
-                        num0 = KeyConfig(Space, linkedSetOf(' ')),
-                        num1 = KeyConfig(Symbol, linkedSetOf('.', ',', '?', '!', '-')),
-                        keyStar = KeyConfig(NextCandidate),
-                        keySharp = KeyConfig(ToNum)
-                )
-        )
-
 val wordListFiles = mapOf<String, String>(LOCALE_VN to "morphemes.txt")
 
 fun UNSUPPORTED_MSG(locale: String) = "Locale $locale unsupported"
@@ -41,7 +21,7 @@ interface Configuration {
 object VNConfiguration: Configuration {
     private val locale = LOCALE_VN
 
-    override val pad = padConfigurations[locale] ?:
+    override val pad = //padConfigurations[locale] ?:
             throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
     override val wordListFile = wordListFiles[locale] ?: throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
     override val dbname = mapOf<String, String>(
@@ -49,39 +29,53 @@ object VNConfiguration: Configuration {
     )[locale] ?: throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
 }
 
-enum class KeyTypes {
-    Normal, Symbol, NextCandidate, Space, ToNum
+val VnPad = PadConfiguration(
+        mapOf(
+                Key.num0 to KeyConfig(Space, linkedSetOf(' ')),
+                Key.num1 to KeyConfig(Symbol, linkedSetOf('.', ',', '?', '!', '-')),
+                Key.num2 to KeyConfig(Normal, linkedSetOf('a', 'ă', 'â', 'b', 'c', '́' /*sắc*/)),
+                Key.num3 to KeyConfig(Normal, linkedSetOf('d', 'đ', 'e', 'ê', 'f', '̀' /*huyền*/)),
+                Key.num4 to KeyConfig(Normal, linkedSetOf('g', 'h', 'i', '̉' /*hỏi*/)),
+                Key.num5 to KeyConfig(Normal, linkedSetOf('j', 'k', 'l', '̃' /*ngã*/)),
+                Key.num6 to KeyConfig(Normal, linkedSetOf('m', 'n', 'o', 'ô', 'ơ', '̣' /*nặng*/)),
+                Key.num7 to KeyConfig(Normal, linkedSetOf('p', 'q', 'r', 's')),
+                Key.num8 to KeyConfig(Normal, linkedSetOf('t', 'u', 'ư', 'v')),
+                Key.num9 to KeyConfig(Normal, linkedSetOf('w', 'x', 'y', 'z')),
+                Key.keyStar to KeyConfig(NextCandidate),
+                Key.keySharp to KeyConfig(ToNum))
+)
+
+enum class KeyTypes(val isConfirmationKey: Boolean) {
+    Normal(false), Symbol(false), NextCandidate(false),
+    Space(true), ToNum(false);
 }
-data class KeyConfig(val type: KeyTypes, val chars: Set<Char> = emptySet())
 
-data class PadConfiguration(
-        val num1: KeyConfig = DummyKeyConfig,
-        val num2: KeyConfig = DummyKeyConfig,
-        val num3: KeyConfig = DummyKeyConfig,
-        val num4: KeyConfig = DummyKeyConfig,
-        val num5: KeyConfig = DummyKeyConfig,
-        val num6: KeyConfig = DummyKeyConfig,
-        val num7: KeyConfig = DummyKeyConfig,
-        val num8: KeyConfig = DummyKeyConfig,
-        val num9: KeyConfig = DummyKeyConfig,
-        val num0: KeyConfig = DummyKeyConfig,
-        val keyStar: KeyConfig = DummyKeyConfig,
-        val keySharp: KeyConfig = DummyKeyConfig
-) {
-    private val num2Char = mapOf(
-            '0' to num0,
-            '1' to num1,
-            '2' to num2,
-            '3' to num3,
-            '4' to num4,
-            '5' to num5,
-            '6' to num6,
-            '7' to num7,
-            '8' to num8,
-            '9' to num9,
-            '*' to keyStar,
-            '#' to keySharp
-    )
+data class KeyConfig(val type: KeyTypes, val chars: Set<Char> = emptySet()) {
+}
 
-    operator fun get(c: Char) = num2Char[c] ?: throw UnsupportedOperationException("Unknown KEY '$c'")
+enum class Key(val char: Char) {
+    num0('0'),
+    num1('1'),
+    num2('2'),
+    num3('3'),
+    num4('4'),
+    num5('5'),
+    num6('6'),
+    num7('7'),
+    num8('8'),
+    num9('9'),
+    keyStar('*'),
+    keySharp('#')
+}
+
+class PadConfiguration(private val configMap: Map<Key, KeyConfig>, private val log:Logging = JavaLog("Configuration")) {
+
+    operator fun get(key: Key): KeyConfig {
+        val config = configMap[key]
+        return if (config != null) config else {
+            log.w("No config for key:$key")
+            DummyKeyConfig
+        }
+    }
+
 }

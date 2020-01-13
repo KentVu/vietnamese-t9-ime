@@ -1,15 +1,21 @@
 package com.vutrankien.t9vietnamese
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
 
 interface T9Engine {
+    val pad: PadConfiguration
     var initialized: Boolean
 
-    fun init(): Deferred<Unit>
+
+    fun init(scope: CoroutineScope = GlobalScope): Deferred<Unit>
     fun startInput(): Input
 
     interface Input {
-        fun input(key: Char)
+        val confirmed: Boolean
+
+        fun input(key: Key)
         fun result(): List<String>
     }
 }

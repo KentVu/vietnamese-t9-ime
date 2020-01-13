@@ -14,7 +14,7 @@ constructor(locale: String, val db: DB): Closeable {
     private val configuration: Configuration = configurations[locale] ?:
         throw UnsupportedOperationException(UNSUPPORTED_MSG(locale))
 
-    private val currentNumSeq = mutableListOf<Char>()
+    private val currentNumSeq = mutableListOf<Key>()
     private var _currentCandidates = setOf<String>()
     var currentCandidates: Set<String>
         get() = if (!numOnlyMode)
@@ -36,10 +36,10 @@ constructor(locale: String, val db: DB): Closeable {
 
     private fun <E> MutableList<E>.push(num: E) = add(num)
 
-    fun input(num: Char) {
-        currentNumSeq.push(num)
+    fun input(key: Key) {
+        currentNumSeq.push(key)
         if (!numOnlyMode) {
-            currentCombinations *= (configuration.pad[num].chars)
+            currentCombinations *= (configuration.pad[key].chars)
             // filter combinations
             if (currentNumSeq.size > 1) {
                 // Only start from 2 numbers and beyond
@@ -57,7 +57,7 @@ constructor(locale: String, val db: DB): Closeable {
         } else {
             log.d("NumOnlyMode!")
         }
-        log.d("after pushing [$num${configuration.pad[num].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
+        log.d("after pushing [$key${configuration.pad[key].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
     }
 
     fun flush() {

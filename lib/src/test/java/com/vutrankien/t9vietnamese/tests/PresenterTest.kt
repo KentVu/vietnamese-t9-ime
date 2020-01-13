@@ -1,9 +1,6 @@
 package com.vutrankien.t9vietnamese.tests
 
-import com.vutrankien.t9vietnamese.Event
-import com.vutrankien.t9vietnamese.Presenter
-import com.vutrankien.t9vietnamese.T9Engine
-import com.vutrankien.t9vietnamese.View
+import com.vutrankien.t9vietnamese.*
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -57,13 +54,24 @@ class PresenterTest {
         withTimeout(3000) {
             val input = mockk<T9Engine.Input>()
             every { engine.startInput() } returns input
-            every { input.input(any()) } just Runs
+            val key = slot<Key>()
+            val events = listOf(Event.KEY_PRESS.withData(Key.num4),
+                    Event.KEY_PRESS.withData(Key.num2),
+                    Event.KEY_PRESS.withData(Key.keySharp))
+            var inputted = 0
+            every {
+                input.input(any()/*capture(key)*/)
+            } just Runs
+            every { input.confirmed } answers {
+                inputted++
+                inputted >= events.size
+            }
             val cand = listOf("43")
             every { input.result() } returns cand
             Presenter(engine).attachView(view)
-            view.eventSource.send(Event.KEY_PRESS.withData('4'))
-            view.eventSource.send(Event.KEY_PRESS.withData('2'))
-            view.eventSource.send(Event.KEY_PRESS.withData(' '))
+            for (eventWithData in events) {
+                view.eventSource.send(eventWithData)
+            }
             verify { view.showCandidates(cand) }
         }
     }
