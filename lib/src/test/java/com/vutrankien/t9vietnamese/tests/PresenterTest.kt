@@ -60,7 +60,7 @@ class PresenterTest {
                     Event.KEY_PRESS.withData(Key.keySharp))
             var inputted = 0
             every {
-                input.input(any()/*capture(key)*/)
+                input.push(any()/*capture(key)*/)
             } just Runs
             every { input.confirmed } answers {
                 inputted++

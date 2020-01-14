@@ -1,6 +1,6 @@
 package com.vutrankien.t9vietnamese
 
-import com.vutrankien.t9vietnamese.KeyTypes.*
+import com.vutrankien.t9vietnamese.KeyType.*
 
 const val LOCALE_VN = "vi-VN"
 const val LOCALE_US = "en-US"
@@ -31,7 +31,7 @@ object VNConfiguration: Configuration {
 
 val VnPad = PadConfiguration(
         mapOf(
-                Key.num0 to KeyConfig(Space, linkedSetOf(' ')),
+                Key.num0 to KeyConfig(Confirm, linkedSetOf(' ')),
                 Key.num1 to KeyConfig(Symbol, linkedSetOf('.', ',', '?', '!', '-')),
                 Key.num2 to KeyConfig(Normal, linkedSetOf('a', 'ă', 'â', 'b', 'c', '́' /*sắc*/)),
                 Key.num3 to KeyConfig(Normal, linkedSetOf('d', 'đ', 'e', 'ê', 'f', '̀' /*huyền*/)),
@@ -45,12 +45,12 @@ val VnPad = PadConfiguration(
                 Key.keySharp to KeyConfig(ToNum))
 )
 
-enum class KeyTypes(val isConfirmationKey: Boolean) {
+enum class KeyType(val isConfirmationKey: Boolean) {
     Normal(false), Symbol(false), NextCandidate(false),
-    Space(true), ToNum(false);
+    Confirm(true), ToNum(false);
 }
 
-data class KeyConfig(val type: KeyTypes, val chars: Set<Char> = emptySet()) {
+data class KeyConfig(val type: KeyType, val chars: Set<Char> = emptySet()) {
 }
 
 enum class Key(val char: Char) {

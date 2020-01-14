@@ -15,7 +15,7 @@ interface T9Engine {
     interface Input {
         val confirmed: Boolean
 
-        fun input(key: Key)
+        fun push(key: Key)
         fun result(): List<String>
     }
 }

@@ -56,7 +56,7 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
             val input: T9Engine.Input = engine.startInput()
             override fun keyPress(engine: T9Engine, key: Key) {
                 log.d("keyPress:$key")
-                input.input(key)
+                input.push(key)
                 if (input.confirmed) {
                     presenter.typingState = Confirmed(presenter, input.result())
                 }

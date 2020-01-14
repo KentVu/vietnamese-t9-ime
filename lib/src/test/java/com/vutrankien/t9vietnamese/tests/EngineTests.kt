@@ -22,7 +22,7 @@ class EngineTests {
         val content = "a\nb\nc"
         val bytes = content.toByteArray()
         val inputStream = CheckableInputStream(ByteArrayInputStream(bytes))
-        val progresses = inputStream.start(this@runBlocking).toList()
+        val progresses = inputStream.progressiveRead(this@runBlocking).toList()
         assertTrue(inputStream.closed)
         assertEquals(progresses[0], Progress(2, "a"))
         assertEquals(progresses[1], Progress(4, "b"))
@@ -46,10 +46,14 @@ class EngineTests {
         }
     }
 
-    val padConfig = PadConfiguration(mapOf(
-            Key.num1 to KeyConfig(KeyTypes.Normal, linkedSetOf('a')),
-            Key.num2 to KeyConfig(KeyTypes.Normal, linkedSetOf('b')),
-            Key.num3 to KeyConfig(KeyTypes.Normal, linkedSetOf('c'))))
+    val padConfig = PadConfiguration(
+        mapOf(
+            Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
+            Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
+            Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
+            Key.num0 to KeyConfig(KeyType.Confirm)
+        )
+    )
 
     @Test
     fun engineInitializing() = runBlocking {
@@ -61,10 +65,31 @@ class EngineTests {
     }
 
     @Test
-    fun engineFunction() = runBlocking {
-        val seeds = "a\nb\nc"
+    fun engineFunction1() = runBlocking {
+        engineFunction(
+            "a\nb\nc", padConfig, listOf(Key.num1,
+                    Key.num0), "a"
+        )
+    }
+
+    @Test
+    fun engineFunction2() = runBlocking {
+        engineFunction(
+            "a\nb\nc", padConfig, listOf(Key.num2,
+                    Key.num0), "b"
+        )
+    }
+
+    private suspend fun engineFunction(
+        seeds: String,
+        padConfig: PadConfiguration,
+        sequence: List<Key>,
+        expected: String
+    ) {
         val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
         engine.init().await()
-        engine.startInput().input(Key.num1)
+        val input = engine.startInput()
+        sequence.forEach { input.push(it) }
+        assertEquals(expected, input.result())
     }
 }
