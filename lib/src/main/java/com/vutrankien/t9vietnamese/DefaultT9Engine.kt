@@ -8,16 +8,28 @@ class DefaultT9Engine(
 ) : T9Engine {
     override var initialized: Boolean = false
 
-    override fun init(scope: CoroutineScope): Deferred<Unit> {
+    override suspend fun init() {
         initialized = true
-        return scope.async {
-            //TODO()
-            delay(1000)
-        }
+        //TODO()
+        delay(1000)
     }
 
     override fun startInput(): T9Engine.Input {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Input()
+    }
+
+    class Input : T9Engine.Input {
+        override val confirmed: Boolean
+            get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+        override fun push(key: Key) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun result(): List<String> {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
     }
 
 }

@@ -46,13 +46,13 @@ class EngineTests {
         }
     }
 
-    val padConfig = PadConfiguration(
-        mapOf(
-            Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
-            Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
-            Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
-            Key.num0 to KeyConfig(KeyType.Confirm)
-        )
+    private val padConfig = PadConfiguration(
+            mapOf(
+                Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
+                Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
+                Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
+                Key.num0 to KeyConfig(KeyType.Confirm)
+            )
     )
 
     @Test
@@ -60,14 +60,14 @@ class EngineTests {
         val seeds = "a\nb\nc"
         val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
         assertFalse(engine.initialized)
-        engine.init().await()
+        engine.init()
         assertTrue(engine.initialized)
     }
 
     @Test
     fun engineFunction1() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, listOf(Key.num1,
+            "a\nb\nc", padConfig, arrayOf(Key.num1,
                     Key.num0), "a"
         )
     }
@@ -75,19 +75,19 @@ class EngineTests {
     @Test
     fun engineFunction2() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, listOf(Key.num2,
+            "a\nb\nc", padConfig, arrayOf(Key.num2,
                     Key.num0), "b"
         )
     }
 
     private suspend fun engineFunction(
-        seeds: String,
-        padConfig: PadConfiguration,
-        sequence: List<Key>,
-        expected: String
+            seeds: String,
+            padConfig: PadConfiguration,
+            sequence: Array<Key>,
+            expected: String
     ) {
         val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
-        engine.init().await()
+        engine.init()
         val input = engine.startInput()
         sequence.forEach { input.push(it) }
         assertEquals(expected, input.result())

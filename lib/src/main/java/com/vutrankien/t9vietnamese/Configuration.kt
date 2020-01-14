@@ -68,14 +68,9 @@ enum class Key(val char: Char) {
     keySharp('#')
 }
 
-class PadConfiguration(private val configMap: Map<Key, KeyConfig>, private val log:Logging = JavaLog("Configuration")) {
-
+class PadConfiguration(private val configMap: Map<Key, KeyConfig>) {
     operator fun get(key: Key): KeyConfig {
-        val config = configMap[key]
-        return if (config != null) config else {
-            log.w("No config for key:$key")
-            DummyKeyConfig
-        }
+        return configMap[key] ?: throw IllegalArgumentException("No config for key:$key")
     }
 
 }

@@ -9,7 +9,7 @@ interface T9Engine {
     var initialized: Boolean
 
 
-    fun init(scope: CoroutineScope = GlobalScope): Deferred<Unit>
+    suspend fun init()
     fun startInput(): Input
 
     interface Input {

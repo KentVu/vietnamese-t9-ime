@@ -22,7 +22,7 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
                 when (eventWithData.event) {
                     Event.START -> {
                         view.showProgress()
-                        engine.init().await()
+                        engine.init()
                         view.showKeyboard()
                     }
                     Event.KEY_PRESS -> {
@@ -46,7 +46,7 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
             return javaClass.simpleName
         }
 
-        class Init(val presenter: Presenter) : TypingState() {
+        class Init(private val presenter: Presenter) : TypingState() {
             override fun keyPress(engine: T9Engine, key: Key) {
                 presenter.typingState = Typing(presenter, engine)
             }

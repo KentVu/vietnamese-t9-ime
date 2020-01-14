@@ -18,7 +18,7 @@ class PresenterTest {
         every { view.scope } returns GlobalScope
 
         engine = mockk(relaxUnitFun = true)
-        every { engine.init() } returns GlobalScope.async { }
+        coEvery { engine.init() } just Runs
     }
 
     @Test
@@ -35,17 +35,16 @@ class PresenterTest {
     fun initializeEngineOnStart() = runBlocking {
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        verify { engine.init() }
+        coVerify { engine.init() }
         confirmVerified(engine)
     }
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        val deferred = async { }
-        every { engine.init() } returns deferred
+        coEvery { engine.init() } coAnswers { }
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        deferred.await()
+        //delay(2)
         verify { view.showKeyboard() }
     }
 
@@ -54,14 +53,13 @@ class PresenterTest {
         withTimeout(3000) {
             val input = mockk<T9Engine.Input>()
             every { engine.startInput() } returns input
-            val key = slot<Key>()
             val events = listOf(Event.KEY_PRESS.withData(Key.num4),
                     Event.KEY_PRESS.withData(Key.num2),
                     Event.KEY_PRESS.withData(Key.keySharp))
-            var inputted = 0
             every {
-                input.push(any()/*capture(key)*/)
+                input.push(any())
             } just Runs
+            var inputted = 0
             every { input.confirmed } answers {
                 inputted++
                 inputted >= events.size
@@ -69,8 +67,8 @@ class PresenterTest {
             val cand = listOf("43")
             every { input.result() } returns cand
             Presenter(engine).attachView(view)
-            for (eventWithData in events) {
-                view.eventSource.send(eventWithData)
+            events.forEach {
+                view.eventSource.send(it)
             }
             verify { view.showCandidates(cand) }
         }
