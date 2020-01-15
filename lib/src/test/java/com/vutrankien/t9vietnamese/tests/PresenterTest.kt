@@ -44,8 +44,7 @@ class PresenterTest {
         coEvery { engine.init() } coAnswers { }
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        //delay(2)
-        verify { view.showKeyboard() }
+        verify(timeout = 100) { view.showKeyboard() }
     }
 
     @Test
