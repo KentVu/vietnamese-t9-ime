@@ -16,9 +16,9 @@ enum class Event {
     START,
     KEY_PRESS;
 
-    fun withData(data: Char) = EventWithData(this, data)
+    fun withData(data: Key) = EventWithData(this, data)
 
     fun noData(): EventWithData = EventWithData(this, null)
 }
 
-data class EventWithData(val event: Event, val data: Char?)
+data class EventWithData(val event: Event, val data: Key?)

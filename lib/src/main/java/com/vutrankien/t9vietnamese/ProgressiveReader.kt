@@ -7,13 +7,13 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import java.io.InputStream
 
-// TODO: Stop estimating and add a parameter
+// TODO: Stop estimating and add a parameter (May Android won't change the line ending convention :) )
 const val ESTIMATED_LINEBREAK_SIZE = 1 // assume linux/mac line endings. (\r, \n only)
 
 @ExperimentalCoroutinesApi
-fun InputStream.start(scope: CoroutineScope = GlobalScope): ReceiveChannel<Progress> {
+fun InputStream.progressiveRead(scope: CoroutineScope = GlobalScope): ReceiveChannel<Progress> {
     return scope.produce {
-        val bufferedReader = this@start.bufferedReader()
+        val bufferedReader = this@progressiveRead.bufferedReader()
         bufferedReader.useLines {
             var bytesRead = 0
             it.forEach { line ->

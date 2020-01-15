@@ -25,8 +25,8 @@ class MainActivity : Activity() {
         private val WAKELOCK_TIMEOUT = 60000L
     }
 
-    private lateinit var engine: T9Engine
-    private lateinit var loadEngineDefer: Deferred<T9Engine>
+    //private lateinit var engine: T9Engine
+    //private lateinit var loadEngineDefer: Deferred<T9Engine>
 
     private lateinit var wakelock: PowerManager.WakeLock
 
@@ -47,23 +47,23 @@ class MainActivity : Activity() {
             val locale = "vi-VN"
             displayInfo(R.string.engine_loading)
             wakelock.acquire(WAKELOCK_TIMEOUT)
-            loadEngineDefer = async() {
-                val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
-                if (!trieDB.initialized) {
-                    displayError("The engine is not initialized!")
-                    trieDB.readFrom(Wordlist.ViVNWordList(this@MainActivity))
-                }
-                T9Engine(locale, trieDB)
-            }
-            val pollDefer:PollDefer? =
-                if (defaultSharedPreferences.contains("load_time")) PollDefer(loadEngineDefer,
-                        defaultSharedPreferences.getLong("load_time", -1), find(R.id
-                .text))
-                else null
-            engine = loadEngineDefer.await()
+            //loadEngineDefer = async() {
+            //    val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
+            //    if (!trieDB.initialized) {
+            //        displayError("The engine is not initialized!")
+            //        trieDB.readFrom(WordList.ViVNWordList(this@MainActivity))
+            //    }
+            //    T9Engine(locale, trieDB)
+            //}
+            //val pollDefer:PollDefer? =
+            //    if (defaultSharedPreferences.contains("load_time")) PollDefer(loadEngineDefer,
+            //            defaultSharedPreferences.getLong("load_time", -1), find(R.id
+            //    .text))
+            //    else null
+            //engine = loadEngineDefer.await()
 
             wakelock.run { if(isHeld) release() }
-            pollDefer?.stop()
+            //pollDefer?.stop()
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)
             i("Initialization Completed! loadTime=$loadTime")
@@ -80,12 +80,12 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         d("onDestroy")
         super.onDestroy()
-        try {
-            GlobalScope.launch { run() { engine.close() } }
-        } catch (e: Exception) {
-            w(e)
-            displayError(e)
-        }
+        //try {
+        //    GlobalScope.launch { run() { engine.close() } }
+        //} catch (e: Exception) {
+        //    w(e)
+        //    displayError(e)
+        //}
     }
 
     private fun displayInfo(resId: Int) {
@@ -108,26 +108,26 @@ class MainActivity : Activity() {
     fun onBtnClick(view: View) {
         val text = (view as Button).text
         d("onBtnClick() btn=" + text.substring(0..1))
-        try {
-            engine.input(text[0])
-            val resultWords = engine.currentCandidates.take(10)
-            find<TextView>(R.id.text).text = resultWords.joinToString()
-            find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
-        } catch (e: UninitializedPropertyAccessException) {
-            w(e)
-            displayError(e)
-        }
+        //try {
+        //    engine.input(text[0])
+        //    val resultWords = engine.currentCandidates.take(10)
+        //    find<TextView>(R.id.text).text = resultWords.joinToString()
+        //    find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
+        //} catch (e: UninitializedPropertyAccessException) {
+        //    w(e)
+        //    displayError(e)
+        //}
     }
 
     fun onCandidateClick(view: View) {
         d("onCandidateClick()")
-        engine.flush()
+        //engine.flush()
         (view as TextView).text = ""
     }
 
     fun onBtnStarClick(view: View) {
         d("onBtnStarClick()")
-        engine.flush()
+        //engine.flush()
         (view as TextView).text = ""
     }
 }

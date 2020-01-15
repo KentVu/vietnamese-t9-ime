@@ -15,24 +15,19 @@ import org.junit.runner.RunWith
  * If test fail retry after adb pm clear com.vutrankien.t9vietnamese
  */
 @RunWith(AndroidJUnit4::class)
-class EngineTests {
-//    @Rule
-//    val mActivityRule = ActivityTestRule(MainActivity::class.java)
-    lateinit var context: Context
+class OldEngineTests {
     lateinit var viVnEngine: T9Engine
     init {
 
     }
     @Before
     fun setUp() {
-//        context = mActivityRule.activity
-        context = InstrumentationRegistry.getInstrumentation().targetContext
         val locale = "vi-VN"
         val trieDB = TrieDB(context.getFileStreamPath(VNConfiguration.dbname))
         if (!trieDB.initialized) {
             trieDB.readFrom(Wordlist.ViVNWordList(context))
         }
-        viVnEngine = T9Engine(locale, trieDB)
+        viVnEngine = OldT9Engine(locale, trieDB)
 //        try {
 //            viVnEngine = context.getEngineFor("vi-VN")
 //        } catch(e: EngineUninitializedException) {

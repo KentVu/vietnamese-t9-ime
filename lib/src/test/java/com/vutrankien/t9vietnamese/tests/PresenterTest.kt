@@ -1,9 +1,6 @@
 package com.vutrankien.t9vietnamese.tests
 
-import com.vutrankien.t9vietnamese.Event
-import com.vutrankien.t9vietnamese.Presenter
-import com.vutrankien.t9vietnamese.T9Engine
-import com.vutrankien.t9vietnamese.View
+import com.vutrankien.t9vietnamese.*
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -21,7 +18,7 @@ class PresenterTest {
         every { view.scope } returns GlobalScope
 
         engine = mockk(relaxUnitFun = true)
-        every { engine.init() } returns GlobalScope.async { }
+        coEvery { engine.init() } just Runs
     }
 
     @Test
@@ -38,17 +35,16 @@ class PresenterTest {
     fun initializeEngineOnStart() = runBlocking {
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        verify { engine.init() }
+        coVerify { engine.init() }
         confirmVerified(engine)
     }
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        val deferred = async { }
-        every { engine.init() } returns deferred
+        coEvery { engine.init() } coAnswers { }
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        deferred.await()
+        //delay(2)
         verify { view.showKeyboard() }
     }
 
@@ -57,13 +53,23 @@ class PresenterTest {
         withTimeout(3000) {
             val input = mockk<T9Engine.Input>()
             every { engine.startInput() } returns input
-            every { input.input(any()) } just Runs
+            val events = listOf(Event.KEY_PRESS.withData(Key.num4),
+                    Event.KEY_PRESS.withData(Key.num2),
+                    Event.KEY_PRESS.withData(Key.keySharp))
+            every {
+                input.push(any())
+            } just Runs
+            var inputted = 0
+            every { input.confirmed } answers {
+                inputted++
+                inputted >= events.size
+            }
             val cand = listOf("43")
             every { input.result() } returns cand
             Presenter(engine).attachView(view)
-            view.eventSource.send(Event.KEY_PRESS.withData('4'))
-            view.eventSource.send(Event.KEY_PRESS.withData('2'))
-            view.eventSource.send(Event.KEY_PRESS.withData(' '))
+            events.forEach {
+                view.eventSource.send(it)
+            }
             verify { view.showCandidates(cand) }
         }
     }
