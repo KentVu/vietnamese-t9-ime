@@ -41,7 +41,7 @@ class PresenterTest {
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        coEvery { engine.init() } coAnswers { }
+        coEvery { engine.init() } just Runs
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showKeyboard() }
