@@ -1,16 +1,15 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import io.kotlintest.shouldBe
+import io.kotlintest.specs.AnnotationSpec
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-class EngineTests {
+class EngineTests: AnnotationSpec() {
     @Before
     fun setUp() {
         //mock the wordlist!
@@ -23,10 +22,10 @@ class EngineTests {
         val bytes = content.toByteArray()
         val inputStream = CheckableInputStream(ByteArrayInputStream(bytes))
         val progresses = inputStream.progressiveRead(this@runBlocking).toList()
-        assertTrue(inputStream.closed)
-        assertEquals(progresses[0], Progress(2, "a"))
-        assertEquals(progresses[1], Progress(4, "b"))
-        assertEquals(progresses[2], Progress(6, "c"))
+        inputStream.closed shouldBe true
+        progresses[0] shouldBe Progress(2, "a")
+        progresses[1] shouldBe Progress(4, "b")
+        progresses[2] shouldBe Progress(6, "c")
     }
 
     /**
@@ -59,9 +58,9 @@ class EngineTests {
     fun engineInitializing() = runBlocking {
         val seeds = "a\nb\nc"
         val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
-        assertFalse(engine.initialized)
+        engine.initialized shouldBe false
         engine.init()
-        assertTrue(engine.initialized)
+        engine.initialized shouldBe true
     }
 
     @Test
@@ -81,15 +80,15 @@ class EngineTests {
     }
 
     private suspend fun engineFunction(
-            seeds: String,
-            padConfig: PadConfiguration,
-            sequence: Array<Key>,
-            expected: String
+        seeds: String,
+        padConfig: PadConfiguration,
+        sequence: Array<Key>,
+        expected: String
     ) {
         val engine: T9Engine = DefaultT9Engine(seeds, padConfig)
         engine.init()
         val input = engine.startInput()
         sequence.forEach { input.push(it) }
-        assertEquals(expected, input.result())
+        input.result() shouldBe expected
     }
 }

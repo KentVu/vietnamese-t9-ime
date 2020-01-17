@@ -1,13 +1,12 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import io.kotlintest.specs.AnnotationSpec
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.junit.Before
-import org.junit.Test
 
-class PresenterTest {
+class PresenterTest: AnnotationSpec() {
     lateinit var view: View
     lateinit var engine: T9Engine
 
