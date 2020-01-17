@@ -1,12 +1,15 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import io.kotlintest.IsolationMode
 import io.kotlintest.specs.AnnotationSpec
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 
 class PresenterTest: AnnotationSpec() {
+    override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
+
     lateinit var view: View
     lateinit var engine: T9Engine
 
@@ -34,7 +37,6 @@ class PresenterTest: AnnotationSpec() {
     fun initializeEngineOnStart() = runBlocking {
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        coVerify { engine.init() }
         confirmVerified(engine)
     }
 

@@ -1,17 +1,18 @@
 package com.vutrankien.t9vietnamese
 
+import com.vutrankien.t9vietnamese.trie.Trie
 import kotlinx.coroutines.*
 
 class DefaultT9Engine(
-        seeds: String,
-        override val pad: PadConfiguration
+    trie: Trie,
+    override val pad: PadConfiguration
 ) : T9Engine {
     override var initialized: Boolean = false
 
     override suspend fun init() {
         initialized = true
         //TODO()
-        delay(1000)
+        delay(10)
     }
 
     override fun startInput(): T9Engine.Input {
