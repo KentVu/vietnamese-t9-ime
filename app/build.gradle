@@ -25,6 +25,7 @@ android {
 //        }
 //    }
     lintOptions {
+        textReport = project.property("lint.output.console").toBoolean()
         abortOnError false
     }
     useLibrary 'android.test.runner'
@@ -55,9 +56,9 @@ dependencies {
 }
 
 kotlin {
-    experimental {
-        coroutines "enable"
-    }
+//    experimental {
+//        coroutines "enable"
+//    }
 }
 
 //bintray {

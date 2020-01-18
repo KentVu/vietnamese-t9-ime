@@ -66,3 +66,4 @@ tags
 /.idea/perl5local.xml
 /_Deparsed_XSubs.pm
 .idea/caches/
+.idea/codeStyles/Project.xml
