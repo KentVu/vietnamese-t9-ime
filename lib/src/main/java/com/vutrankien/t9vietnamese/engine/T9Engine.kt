@@ -1,6 +1,7 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.engine
 
-import kotlinx.coroutines.channels.ReceiveChannel
+import com.vutrankien.t9vietnamese.Key
+import com.vutrankien.t9vietnamese.PadConfiguration
 
 interface T9Engine {
     val pad: PadConfiguration
@@ -14,6 +15,6 @@ interface T9Engine {
         val confirmed: Boolean
 
         fun push(key: Key)
-        fun result(): List<String>
+        fun result(): Set<String>
     }
 }

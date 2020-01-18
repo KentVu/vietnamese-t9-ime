@@ -3,6 +3,7 @@ package com.vutrankien.t9vietnamese.tests
 import com.vutrankien.t9vietnamese.trie.Trie
 import com.vutrankien.t9vietnamese.trie.TrieFactory
 import io.kotlintest.TestCase
+import io.kotlintest.assertSoftly
 import io.kotlintest.inspectors.forAll
 import io.kotlintest.milliseconds
 import io.kotlintest.shouldBe
@@ -19,17 +20,17 @@ class TrieTests: StringSpec() {
 
     init {
         "build" {
-            val channel = Channel<Int>(1)
-            val job = GlobalScope.launch {
+            val channel = Channel<Int>()
+            val job = GlobalScope.async {
                 val progress = channel.toList()
-                progress[0] shouldBe 2
-                progress[1] shouldBe 4
-                progress[2] shouldBe 6
+                assertSoftly {
+                    progress[0] shouldBe 2
+                    progress[1] shouldBe 4
+                    progress[2] shouldBe 6
+                }
             }
             trie.build(content.lineSequence(), channel)
-            job.join()
-            //withContext(ctx2){
-            //}
+            job.await()
         }
 
         "contains" {

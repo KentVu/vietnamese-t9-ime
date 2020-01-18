@@ -1,6 +1,8 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import com.vutrankien.t9vietnamese.engine.T9Engine
+import com.vutrankien.t9vietnamese.engine.T9EngineFactory
 import com.vutrankien.t9vietnamese.trie.Trie
 import com.vutrankien.t9vietnamese.trie.TrieFactory
 import io.kotlintest.shouldBe
@@ -62,7 +64,7 @@ class EngineTests: AnnotationSpec() {
     fun engineInitializing() = runBlocking {
         val seeds = "a\nb\nc"
         trie.build(seeds.lineSequence())
-        val engine: T9Engine = DefaultT9Engine(trie, padConfig)
+        val engine: T9Engine = T9EngineFactory.newEngine(trie, padConfig)
         engine.initialized shouldBe false
         engine.init()
         engine.initialized shouldBe true
@@ -91,7 +93,7 @@ class EngineTests: AnnotationSpec() {
         expected: String
     ) {
         trie.build(seeds.lineSequence())
-        val engine: T9Engine = DefaultT9Engine(trie, padConfig)
+        val engine: T9Engine = T9EngineFactory.newEngine(trie, padConfig)
         engine.init()
         val input = engine.startInput()
         sequence.forEach { input.push(it) }

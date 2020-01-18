@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.trie
 
+import com.vutrankien.t9vietnamese.ESTIMATED_LINEBREAK_SIZE
 import kotlinx.coroutines.channels.Channel
 import org.trie4j.patricia.MapPatriciaTrie
 
@@ -16,9 +17,11 @@ private class TakawitterTrie : Trie {
     private val trie: MapPatriciaTrie<Int> = MapPatriciaTrie()
 
     override suspend fun build(seed: Sequence<String>, progressListener: Channel<Int>?) {
+        var count = 0
         seed.forEach {
             trie.insert(it, 0)
-            progressListener?.send(it.size)
+            count += it.size + ESTIMATED_LINEBREAK_SIZE /*the line ending*/
+            progressListener?.send(count)
         }
         progressListener?.close()
     }

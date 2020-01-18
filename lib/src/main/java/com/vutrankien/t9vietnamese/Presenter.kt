@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese
 
+import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
 
 class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Configuration")) {
@@ -64,14 +65,14 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
 
         }
 
-        class Confirmed(presenter: Presenter, result: List<String>) : TypingState() {
+        class Confirmed(presenter: Presenter, result: Set<String>) : TypingState() {
             init {
                 presenter.onTypingConfirmed(result)
             }
         }
     }
 
-    private fun onTypingConfirmed(result: List<String>) {
+    private fun onTypingConfirmed(result: Set<String>) {
         view.showCandidates(result)
     }
 }

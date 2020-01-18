@@ -1,6 +1,7 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import com.vutrankien.t9vietnamese.engine.T9Engine
 import io.kotlintest.IsolationMode
 import io.kotlintest.specs.AnnotationSpec
 import io.mockk.*
@@ -64,7 +65,7 @@ class PresenterTest: AnnotationSpec() {
                 inputted++
                 inputted >= events.size
             }
-            val cand = listOf("43")
+            val cand = setOf("43")
             every { input.result() } returns cand
             Presenter(engine).attachView(view)
             events.forEach {
