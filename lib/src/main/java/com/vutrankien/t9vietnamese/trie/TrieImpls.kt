@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.trie
 
+import kotlinx.coroutines.channels.Channel
 import org.trie4j.patricia.MapPatriciaTrie
 
 object TrieFactory {
@@ -11,10 +12,11 @@ object TrieFactory {
 private class TakawitterTrie : Trie {
     private val trie: MapPatriciaTrie<Int> = MapPatriciaTrie()
 
-    override fun build(seed: Sequence<String>) {
+    override suspend fun build(seed: Sequence<String>, progressListener: Channel<Int>?) {
         seed.forEach {
             trie.insert(it, 0)
         }
+        progressListener?.close()
     }
 
     override fun search(prefix: String): Map<String, Int> {

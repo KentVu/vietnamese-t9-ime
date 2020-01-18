@@ -29,7 +29,7 @@ class EngineTests: AnnotationSpec() {
         inputStream.closed shouldBe true
         progresses[0] shouldBe Progress(2, "a")
         progresses[1] shouldBe Progress(4, "b")
-        progresses[2] shouldBe Progress(6, "c")
+        progresses[2] shouldBe Progress(6, "c") // null terminating?
     }
 
     /**
@@ -90,8 +90,7 @@ class EngineTests: AnnotationSpec() {
         sequence: Array<Key>,
         expected: String
     ) {
-        //val trie = TrieFactory.newTrie()
-        //trie.build(seeds.lineSequence())
+        trie.build(seeds.lineSequence())
         val engine: T9Engine = DefaultT9Engine(trie, padConfig)
         engine.init()
         val input = engine.startInput()

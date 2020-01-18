@@ -1,8 +1,6 @@
 package com.vutrankien.t9vietnamese
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface T9Engine {
     val pad: PadConfiguration
