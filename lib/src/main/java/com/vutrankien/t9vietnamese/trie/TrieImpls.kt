@@ -2,9 +2,16 @@ package com.vutrankien.t9vietnamese.trie
 
 import org.trie4j.patricia.MapPatriciaTrie
 
-class TakawitterTrie(seed: Sequence<String>) : Trie {
+object TrieFactory {
+    fun newTrie(): Trie {
+        return TakawitterTrie()
+    }
+}
+
+private class TakawitterTrie : Trie {
     private val trie: MapPatriciaTrie<Int> = MapPatriciaTrie()
-    init {
+
+    override fun build(seed: Sequence<String>) {
         seed.forEach {
             trie.insert(it, 0)
         }

@@ -37,7 +37,7 @@ class PresenterTest: AnnotationSpec() {
     fun initializeEngineOnStart() = runBlocking {
         Presenter(engine).attachView(view)
         view.eventSource.send(Event.START.noData())
-        confirmVerified(engine)
+        coVerify { engine.init() }
     }
 
     @Test
