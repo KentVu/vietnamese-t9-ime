@@ -22,9 +22,16 @@ dependencies {
 sourceCompatibility = "7"
 targetCompatibility = "7"
 
+//kotlin {
+//    experimental {
+//        coroutines "enable"
+//    }
+//}
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+//        freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
     }
 }
 

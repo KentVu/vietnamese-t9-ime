@@ -3,6 +3,9 @@ package com.vutrankien.t9vietnamese.trie
 import kotlinx.coroutines.channels.Channel
 import org.trie4j.patricia.MapPatriciaTrie
 
+private val String.size: Int
+    get() = toByteArray().size
+
 object TrieFactory {
     fun newTrie(): Trie {
         return TakawitterTrie()
@@ -15,6 +18,7 @@ private class TakawitterTrie : Trie {
     override suspend fun build(seed: Sequence<String>, progressListener: Channel<Int>?) {
         seed.forEach {
             trie.insert(it, 0)
+            progressListener?.send(it.size)
         }
         progressListener?.close()
     }

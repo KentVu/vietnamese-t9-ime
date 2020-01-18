@@ -70,7 +70,7 @@ class PresenterTest: AnnotationSpec() {
             events.forEach {
                 view.eventSource.send(it)
             }
-            verify { view.showCandidates(cand) }
+            verify(timeout = 100) { view.showCandidates(cand) }
         }
     }
 }

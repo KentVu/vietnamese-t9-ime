@@ -4,24 +4,32 @@ import com.vutrankien.t9vietnamese.trie.Trie
 import com.vutrankien.t9vietnamese.trie.TrieFactory
 import io.kotlintest.TestCase
 import io.kotlintest.inspectors.forAll
+import io.kotlintest.milliseconds
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
-import kotlinx.coroutines.runBlocking
 import java.time.Duration
 
+//@UseExperimental(ObsoleteCoroutinesApi::class)
+@ObsoleteCoroutinesApi
 class TrieTests: StringSpec() {
     private lateinit var trie: Trie
 
     init {
-        "build".config(timeout = Duration.ofMillis(100)) {
-            val channel = Channel<Int>()
+        "build" {
+            val channel = Channel<Int>(1)
+            val job = GlobalScope.launch {
+                val progress = channel.toList()
+                progress[0] shouldBe 2
+                progress[1] shouldBe 4
+                progress[2] shouldBe 6
+            }
             trie.build(content.lineSequence(), channel)
-            val progress = channel.toList()
-            progress[0] shouldBe 2
-            progress[1] shouldBe 4
-            progress[2] shouldBe 6
+            job.join()
+            //withContext(ctx2){
+            //}
         }
 
         "contains" {
