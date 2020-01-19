@@ -1,9 +1,12 @@
 package com.vutrankien.t9vietnamese
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
+import com.vutrankien.t9vietnamese.trie.Trie
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
-class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Configuration")) {
+class Presenter(val trie: Trie, val engine: T9Engine, private val log: Logging = JavaLog("Configuration")) {
+    lateinit var input: InputStream
     private lateinit var view: View
     internal var typingState: TypingState = TypingState.Init(this)
         set(value) {
@@ -62,7 +65,6 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
                     presenter.typingState = Confirmed(presenter, input.result())
                 }
             }
-
         }
 
         class Confirmed(presenter: Presenter, result: Set<String>) : TypingState() {

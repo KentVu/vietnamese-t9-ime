@@ -5,13 +5,14 @@ import com.vutrankien.t9vietnamese.trie.TrieFactory
 import io.kotlintest.TestCase
 import io.kotlintest.assertSoftly
 import io.kotlintest.inspectors.forAll
-import io.kotlintest.milliseconds
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.StringSpec
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.toList
-import java.time.Duration
+import kotlinx.coroutines.runBlocking
 
 //@UseExperimental(ObsoleteCoroutinesApi::class)
 @ObsoleteCoroutinesApi

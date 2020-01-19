@@ -5,7 +5,9 @@ import com.vutrankien.t9vietnamese.Key
 import com.vutrankien.t9vietnamese.Logging
 import com.vutrankien.t9vietnamese.PadConfiguration
 import com.vutrankien.t9vietnamese.trie.Trie
+import com.vutrankien.t9vietnamese.trie.TrieFactory
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.text.Normalizer
 
 // TODO Have Dagger inject this
@@ -13,9 +15,9 @@ private val log: Logging = JavaLog("T9Engine")
 
 class T9EngineFactory {
     companion object {
-        fun newEngine(trie: Trie, pad: PadConfiguration): T9Engine {
+        fun newEngine(pad: PadConfiguration): T9Engine {
             //return DefaultT9Engine(trie, pad)
-            return OldT9Engine(trie, pad)
+            return OldT9Engine(pad)
         }
     }
 }
@@ -53,10 +55,12 @@ private class DefaultT9Engine(
 }
 
 private class OldT9Engine(
-        private val trie: Trie,
         override val pad: PadConfiguration
 ) : T9Engine {
-    override var initialized: Boolean = false
+    private val trie: Trie = TrieFactory.newTrie()
+    var initialized: Boolean = false
+    override val eventSource: Channel<T9Engine.Event>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override suspend fun init() {
         initialized = true

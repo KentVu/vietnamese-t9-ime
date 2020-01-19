@@ -5,11 +5,12 @@ import kotlinx.coroutines.channels.Channel
 
 interface View {
     val scope: CoroutineScope
-    val eventSource: Channel<EventWithData>
+    val eventSource: Channel<EventWithData<Event, Key>>
 
     fun showProgress()
     fun showKeyboard()
     fun showCandidates(cand: Set<String>)
+    fun confirmInput()
 }
 
 enum class Event {
@@ -17,8 +18,7 @@ enum class Event {
     KEY_PRESS;
 
     fun withData(data: Key) = EventWithData(this, data)
-
-    fun noData(): EventWithData = EventWithData(this, null)
+    fun noData(): EventWithData<Event, Key> = EventWithData(this, null)
 }
 
-data class EventWithData(val event: Event, val data: Key?)
+data class EventWithData<TEvent, TData>(val event: TEvent, val data: TData?)
