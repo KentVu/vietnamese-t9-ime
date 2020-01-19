@@ -5,7 +5,9 @@ import com.vutrankien.t9vietnamese.Key
 import com.vutrankien.t9vietnamese.Logging
 import com.vutrankien.t9vietnamese.PadConfiguration
 import com.vutrankien.t9vietnamese.trie.Trie
+import com.vutrankien.t9vietnamese.trie.TrieFactory
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.text.Normalizer
 
 // TODO Have Dagger inject this
@@ -13,9 +15,9 @@ private val log: Logging = JavaLog("T9Engine")
 
 class T9EngineFactory {
     companion object {
-        fun newEngine(trie: Trie, pad: PadConfiguration): T9Engine {
+        fun newEngine(pad: PadConfiguration): T9Engine {
             //return DefaultT9Engine(trie, pad)
-            return OldT9Engine(trie, pad)
+            return OldT9Engine(pad)
         }
     }
 }
@@ -24,10 +26,16 @@ private class DefaultT9Engine(
     trie: Trie,
     override val pad: PadConfiguration
 ) : T9Engine {
-    override var initialized: Boolean = false
+    override var initialized: Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        set(value) {}
+    //override var initialized: Boolean = false
+
+    override val eventSource: Channel<T9Engine.Event>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override suspend fun init() {
-        initialized = true
+        //initialized = true
         //TODO()
         delay(10)
     }
@@ -37,26 +45,23 @@ private class DefaultT9Engine(
     }
 
     class Input : T9Engine.Input {
-        override val confirmed: Boolean
+        override val candidates: Set<String>
             get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
         override fun push(key: Key) {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
-
-        override fun result(): Set<String> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
     }
 
 }
 
 private class OldT9Engine(
-        private val trie: Trie,
         override val pad: PadConfiguration
 ) : T9Engine {
+    private val trie: Trie = TrieFactory.newTrie()
     override var initialized: Boolean = false
+    override val eventSource: Channel<T9Engine.Event>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override suspend fun init() {
         initialized = true
@@ -76,7 +81,7 @@ private class OldT9Engine(
          */
         private var numOnlyMode = false
         private var _currentCandidates = setOf<String>()
-        var currentCandidates: Set<String>
+        override var candidates: Set<String>
             get() = if (!numOnlyMode)
                 _currentCandidates.map { it.composeVietnamese() }.toSet()
             else setOf(currentNumSeq.map { it.char }.joinToString(separator = ""))
@@ -84,9 +89,6 @@ private class OldT9Engine(
                 _currentCandidates = value
             }
         private var currentCombinations = setOf<String>()
-
-        override val confirmed: Boolean
-            get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
         override fun push(key: Key) {
             currentNumSeq.push(key)
@@ -109,7 +111,7 @@ private class OldT9Engine(
             } else {
                 log.d("NumOnlyMode!")
             }
-            log.d("after pushing [$key${pad[key].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$currentCandidates")
+            log.d("after pushing [$key${pad[key].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$candidates")
         }
 
         private fun <E> MutableList<E>.push(num: E) = add(num)
@@ -134,10 +136,6 @@ private class OldT9Engine(
 
         private fun String.composeVietnamese() = Normalizer.normalize(this, Normalizer.Form
                 .NFKC)
-
-        override fun result(): Set<String> {
-            return currentCandidates
-        }
 
     }
 
