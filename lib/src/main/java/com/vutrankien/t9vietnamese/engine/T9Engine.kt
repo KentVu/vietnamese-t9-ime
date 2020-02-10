@@ -17,7 +17,7 @@ interface T9Engine {
     }
 
     sealed class Event {
-        class NewCandidates(candidates: Set<String>) : Event()
+        class NewCandidates(val candidates: Set<String>) : Event()
         object Confirm : Event()
     }
 

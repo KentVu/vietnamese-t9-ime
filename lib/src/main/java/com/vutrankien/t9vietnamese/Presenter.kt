@@ -9,7 +9,6 @@ class Presenter(
     private val engine: T9Engine,
     private val log: Logging = JavaLog("Configuration")
 ) {
-    lateinit var input: InputStream
     private lateinit var view: View
     internal var typingState: TypingState = TypingState.Init(this)
         set(value) {
@@ -17,29 +16,45 @@ class Presenter(
             field = value
         }
 
-
-    fun attachView(view: View) {
-        receiveEvents(view)
+    init {
     }
 
-    private fun receiveEvents(view: View) {
-        this.view = view
+    fun attachView(view: View) {
         view.scope.launch {
-            for (eventWithData in view.eventSource) {
-                when (eventWithData.event) {
-                    Event.START -> {
-                        view.showProgress()
-                        engine.init(engineSeed)
-                        view.showKeyboard()
-                    }
-                    Event.KEY_PRESS -> {
-                        if (typingState is TypingState.Init) {
-                            typingState = TypingState.Typing(this@Presenter, engine)
-                        }
-                        typingState.keyPress(engine, eventWithData.data
-                                ?: error("NULL data: $eventWithData"))
-                    }
+            receiveUiEvents(view)
+        }
+        view.scope.launch {
+            receiveEngineEvents()
+        }
+    }
+
+    private suspend fun receiveUiEvents(view: View) {
+        this.view = view
+        for (eventWithData in view.eventSource) {
+            when (eventWithData.event) {
+                Event.START -> {
+                    view.showProgress()
+                    engine.init(engineSeed)
+                    view.showKeyboard()
                 }
+                Event.KEY_PRESS -> {
+                    engine.push(eventWithData.data ?:
+                    throw IllegalStateException("UI KEY_PRESS event with null data!"))
+                    //if (typingState is TypingState.Init) {
+                    //    typingState = TypingState.Typing(this@Presenter, engine)
+                    //}
+                    //typingState.keyPress(engine, eventWithData.data
+                    //    ?: error("NULL data: $eventWithData"))
+                }
+            }
+        }
+    }
+
+    private suspend fun receiveEngineEvents() {
+        for (event in engine.eventSource) {
+            when(event) {
+                is T9Engine.Event.Confirm -> view.confirmInput()
+                is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
             }
         }
     }

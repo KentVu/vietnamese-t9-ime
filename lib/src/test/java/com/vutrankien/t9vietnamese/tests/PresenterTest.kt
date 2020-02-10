@@ -22,23 +22,20 @@ class PresenterTest: AnnotationSpec() {
         every { view.scope } returns GlobalScope
 
         engine = mockk(relaxUnitFun = true)
+        every { engine.eventSource } returns Channel()
     }
 
     @Test
     fun showProgressIndicatorOnStart() = runBlocking {
-        withTimeout(1000) {
-            Presenter(seed, engine).attachView(view)
-            view.eventSource.send(Event.START.noData())
-            verify { view.showProgress() }
-        }
+        Presenter(seed, engine).attachView(view)
+        view.eventSource.send(Event.START.noData())
+        verify(timeout = 100) { view.showProgress() }
     }
 
-    @Suppress("DeferredResultUnused") // just verify init has called
     @Test
     fun initializeEngineOnStart() = runBlocking {
         Presenter(seed, engine).run {
             attachView(view)
-            input = "a\nb\nc".byteInputStream()
         }
         view.eventSource.send(Event.START.noData())
     }
@@ -53,24 +50,49 @@ class PresenterTest: AnnotationSpec() {
     @Test
     fun whenTypeOneNumberThenDisplayResult() = runBlocking {
         val cand = setOf("4")
-        withTimeout(3000) {
-            every {
-                engine.push(any())
-            } coAnswers {
-                when (firstArg<Key>()) {
-                    Key.num0 -> engine.eventSource.send(T9Engine.Event.Confirm)
-                    else -> engine.eventSource.send(T9Engine.Event.NewCandidates(cand))
-                }
+        //engine = MockEngine()
+        every {
+            engine.push(any())
+        } coAnswers {
+            //GlobalScope.launch {
+            when (firstArg<Key>()) {
+                Key.num0 -> engine.eventSource.send(T9Engine.Event.Confirm)
+                else -> engine.eventSource.send(T9Engine.Event.NewCandidates(cand))
             }
-            Presenter(seed, engine).attachView(view)
-
-            view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
-            verify { view.showCandidates(cand) }
-            view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
-            verify { view.showCandidates(cand) }
-            view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
-            verify { view.confirmInput() }
+            //}
         }
+        Presenter(seed, engine).attachView(view)
+
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
+        verify(timeout = 10) { view.showCandidates(cand) }
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
+        verify(timeout = 1000) { view.showCandidates(cand) }
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
+        verify { view.confirmInput() }
+        //withTimeout(3000) {
+        //}
     }
+}
+
+class MockEngine : T9Engine {
+    override var initialized: Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        set(value) {}
+    override val pad: PadConfiguration
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val eventSource: Channel<T9Engine.Event>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override suspend fun init(seed: Sequence<String>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun push(key: Key) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val candidates: Set<String>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
 }
 
