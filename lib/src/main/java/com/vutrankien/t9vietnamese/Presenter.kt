@@ -1,11 +1,14 @@
 package com.vutrankien.t9vietnamese
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.trie.Trie
 import kotlinx.coroutines.launch
 import java.io.InputStream
 
-class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Configuration")) {
+class Presenter(
+    private val engineSeed: Sequence<String>,
+    private val engine: T9Engine,
+    private val log: Logging = JavaLog("Configuration")
+) {
     lateinit var input: InputStream
     private lateinit var view: View
     internal var typingState: TypingState = TypingState.Init(this)
@@ -26,7 +29,7 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
                 when (eventWithData.event) {
                     Event.START -> {
                         view.showProgress()
-                        engine.init()
+                        engine.init(engineSeed)
                         view.showKeyboard()
                     }
                     Event.KEY_PRESS -> {
@@ -57,10 +60,9 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
         }
 
         class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState() {
-            val input: T9Engine.Input = engine.startInput()
             override fun keyPress(engine: T9Engine, key: Key) {
                 log.d("keyPress:$key")
-                input.push(key)
+                engine.push(key)
             }
         }
 

@@ -16,18 +16,12 @@ interface T9Engine {
         CONFIRM
     }
 
-    data class Event(val type: EventType, val data: Any?) {
-        constructor(type: EventType) : this(type, null)
+    sealed class Event {
+        class NewCandidates(candidates: Set<String>) : Event()
+        object Confirm : Event()
     }
 
-    suspend fun init()
-    fun startInput(): Input
-
-    /**
-     * Represent one input session.
-     */
-    interface Input {
-        fun push(key: Key)
-        val candidates: Set<String>
-    }
+    suspend fun init(seed: Sequence<String>)
+    fun push(key: Key)
+    val candidates: Set<String>
 }

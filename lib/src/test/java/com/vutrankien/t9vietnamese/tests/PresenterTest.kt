@@ -2,7 +2,6 @@ package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.trie.Trie
 import io.kotlintest.IsolationMode
 import io.kotlintest.specs.AnnotationSpec
 import io.mockk.*
@@ -12,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 class PresenterTest: AnnotationSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
+    private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     lateinit var view: View
     lateinit var engine: T9Engine
 
@@ -27,7 +27,7 @@ class PresenterTest: AnnotationSpec() {
     @Test
     fun showProgressIndicatorOnStart() = runBlocking {
         withTimeout(1000) {
-            Presenter(engine).attachView(view)
+            Presenter(seed, engine).attachView(view)
             view.eventSource.send(Event.START.noData())
             verify { view.showProgress() }
         }
@@ -36,7 +36,7 @@ class PresenterTest: AnnotationSpec() {
     @Suppress("DeferredResultUnused") // just verify init has called
     @Test
     fun initializeEngineOnStart() = runBlocking {
-        Presenter(engine).run {
+        Presenter(seed, engine).run {
             attachView(view)
             input = "a\nb\nc".byteInputStream()
         }
@@ -45,27 +45,24 @@ class PresenterTest: AnnotationSpec() {
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        Presenter(engine).attachView(view)
+        Presenter(seed, engine).attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showKeyboard() }
     }
 
     @Test
     fun whenTypeOneNumberThenDisplayResult() = runBlocking {
+        val cand = setOf("4")
         withTimeout(3000) {
-            val input = mockk<T9Engine.Input>()
-            every { engine.startInput() } returns input
             every {
-                input.push(any())
+                engine.push(any())
             } coAnswers {
                 when (firstArg<Key>()) {
-                    Key.num0 -> engine.eventSource.send(T9Engine.Event.CONFIRM)
-                    else -> engine.eventSource.send(T9Engine.Event(T9Engine.EventType.NEW_CANDIDATES))
+                    Key.num0 -> engine.eventSource.send(T9Engine.Event.Confirm)
+                    else -> engine.eventSource.send(T9Engine.Event.NewCandidates(cand))
                 }
             }
-            val cand = setOf("4")
-            every { input.candidates } returns cand
-            Presenter(engine).attachView(view)
+            Presenter(seed, engine).attachView(view)
 
             view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
             verify { view.showCandidates(cand) }

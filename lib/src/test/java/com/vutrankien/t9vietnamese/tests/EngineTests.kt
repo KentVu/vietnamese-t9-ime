@@ -62,11 +62,9 @@ class EngineTests: AnnotationSpec() {
 
     @Test
     fun engineInitializing() = runBlocking {
-        val seeds = "a\nb\nc"
-        trie.build(seeds.lineSequence())
         val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
         engine.initialized shouldBe false
-        engine.init()
+        engine.init(emptySequence())
         engine.initialized shouldBe true
     }
 
@@ -92,11 +90,9 @@ class EngineTests: AnnotationSpec() {
         sequence: Array<Key>,
         expected: String
     ) {
-        trie.build(seeds.lineSequence())
         val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
-        engine.init()
-        val input = engine.startInput()
-        sequence.forEach { input.push(it) }
-        input.candidates shouldBe expected
+        engine.init(seeds.lineSequence())
+        sequence.forEach { engine.push(it) }
+        engine.candidates shouldBe expected
     }
 }
