@@ -4,8 +4,8 @@ import com.vutrankien.t9vietnamese.JavaLog
 import com.vutrankien.t9vietnamese.Key
 import com.vutrankien.t9vietnamese.Logging
 import com.vutrankien.t9vietnamese.PadConfiguration
-import com.vutrankien.t9vietnamese.trie.Trie
-import com.vutrankien.t9vietnamese.trie.TrieFactory
+import kentvu.dawgjava.Trie
+import kentvu.dawgjava.TrieFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.text.Normalizer
