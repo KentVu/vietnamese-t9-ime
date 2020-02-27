@@ -1,0 +1,3 @@
+[submodule "dawg-java"]
+	path = dawg-java
+	url = git@github.com:KentVu/dawg-java.git
