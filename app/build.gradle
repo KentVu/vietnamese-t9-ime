@@ -19,11 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-//    externalNativeBuild {
-//        cmake {
-//            path 'src/main/cpp/CMakeLists.txt'
-//        }
-//    }
+    externalNativeBuild {
+        cmake {
+            path "${project(':dawg-jni').projectDir}/src/main/cpp/CMakeLists.txt"
+        }
+    }
     lintOptions {
         textReport = project.property("lint.output.console").toBoolean()
         abortOnError false
