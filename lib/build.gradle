@@ -9,18 +9,6 @@ test {
     }
 }
 
-repositories {
-    maven {
-        //id = "github"
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/kentvu/dawg-java")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
-        }
-    }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //implementation project(':dawg-java')

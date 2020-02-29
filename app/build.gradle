@@ -19,11 +19,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        cmake {
-            path "${project(':dawg-jni').projectDir}/src/main/cpp/CMakeLists.txt"
-        }
-    }
     lintOptions {
         textReport = project.property("lint.output.console").toBoolean()
         abortOnError false
@@ -38,6 +33,7 @@ dependencies {
     // implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(':lib')
+    implementation project(':dawg-android')
     implementation 'com.snappydb:snappydb-lib:0.5.2'
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'

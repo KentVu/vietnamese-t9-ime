@@ -18,12 +18,18 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-//plugins {
-//    id "com.jfrog.bintray" version "1.7.3"
-//}
 allprojects {
     repositories {
         jcenter()
         google()
+        maven {
+            //id = "github"
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/kentvu/dawg-java")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+            }
+        }
     }
 }
