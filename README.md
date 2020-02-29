@@ -49,3 +49,5 @@ References-Acknowledgement
 * Xu ly Tieng Viet wikia: http://xltiengviet.wikia.com/
 * https://docs.oracle.com/javase/tutorial/i18n/text/normalizerapi.html
 * syllables https://gist.github.com/hieuthi/0f5adb7d3f79e7fb67e0e499004bf558
+* spell check dictionary https://saomaicenter.org/en/blog/access-tech/custom-dictionary-for-word
+* https://github.com/yweweler/c-t9

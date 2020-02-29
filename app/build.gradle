@@ -33,7 +33,8 @@ dependencies {
     // implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(':lib')
-    implementation project(':dawg-android')
+    //implementation project(':dawg-android')
+    implementation 'kentvu.dawgjava:dawg-android:0.0.1'
     implementation 'com.snappydb:snappydb-lib:0.5.2'
     implementation 'com.esotericsoftware.kryo:kryo:2.24.0'
     implementation 'com.jakewharton.timber:timber:4.5.1'
