@@ -2,12 +2,15 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 test {
+    systemProperty "java.library.path", file("${project(":dawg-jni").buildDir}/lib/main/debug").absolutePath
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
         exceptionFormat "full"
     }
 }
+
+test.dependsOn ':dawg-jni:linkDebug'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -21,19 +24,9 @@ dependencies {
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
 }
 
-//sourceCompatibility = "7"
-//targetCompatibility = "7"
-
-//kotlin {
-//    experimental {
-//        coroutines "enable"
-//    }
-//}
-
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
-//        freeCompilerArgs += "-Xuse-experimental=kotlin.Experimental"
     }
 }
 
