@@ -10,8 +10,6 @@ test {
     }
 }
 
-assemble.dependsOn ':dawg-jni:linkDebug' // -> executeSwig
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //implementation project(':dawg-java')
@@ -25,6 +23,7 @@ dependencies {
 }
 
 compileKotlin {
+    dependsOn ':dawg-jni:linkDebug' // -> executeSwig
     kotlinOptions {
         jvmTarget = "1.8"
     }
