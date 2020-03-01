@@ -24,7 +24,7 @@ android:
     # The BuildTools version used by your project
     # lookup below for default buildToolsVersion in accordance to AGP version
     # https://developer.android.com/studio/releases/gradle-plugin.html#3-4-0
-    #- build-tools-28.0.3
+    - build-tools-28.0.3
 
     # The SDK version used to compile your project
     - android-28
@@ -56,26 +56,13 @@ addons:
 # clone dawg-java & dawg-java/swig
 before_install:
   - git submodule update --init --recursive --depth=1
-  #- git clone --depth=1 https://github.com/swig/swig.git
-  # Install SDK license so Android Gradle plugin can install deps.
-#  - mkdir "$ANDROID_HOME/licenses" || true
-#  - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-#  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
-#  - echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> "$ANDROID_HOME/licenses/android-sdk-license"
 
 install:
+  # build_swig will skip if swig is found.
   - export PATH=$HOME/swig/bin:$PATH
-  # check if cache available
-  #- if ! [ -d $HOME/swig/bin ]; then
-  -  cd dawg-java
-  -  ./build_swig.sh $HOME/swig
-  #-  mkdir -pv $HOME/swig
-  #-  mv -v swig/dist/* $HOME/swig
-  #- fi
-  - echo y | sdkmanager "ndk-bundle"
-  - echo y | sdkmanager "ndk;21.0.6113669"
-  - echo y | sdkmanager "cmake;3.6.4111459"
-  - echo y | sdkmanager "cmake;3.10.2.4988404"
+  - cd dawg-java
+  - ./build_swig.sh $HOME/swig
+  - cd ..
 
 # Emulator Management: Create, Start and Wait
 #before_script:
