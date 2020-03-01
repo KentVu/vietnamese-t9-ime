@@ -1,2 +1,4 @@
 include ':app', ':lib', ':dawg-jni'
+//include ':dawg-java'
 project(':dawg-jni').projectDir = new File(rootDir, 'dawg-java/dawg-jni')
+//project(':dawg-java').projectDir = new File(rootDir, 'dawg-java/dawg-java')

@@ -3,6 +3,8 @@ package com.vutrankien.t9vietnamese.tests
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.engine.T9EngineFactory
+import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kentvu.dawgjava.Trie
@@ -72,7 +74,7 @@ class EngineTests: AnnotationSpec() {
     fun engineFunction1() = runBlocking {
         engineFunction(
             "a\nb\nc", padConfig, arrayOf(Key.num1,
-                    Key.num0), "a"
+                    Key.num0), setOf("a")
         )
     }
 
@@ -80,19 +82,19 @@ class EngineTests: AnnotationSpec() {
     fun engineFunction2() = runBlocking {
         engineFunction(
             "a\nb\nc", padConfig, arrayOf(Key.num2,
-                    Key.num0), "b"
+                    Key.num0), setOf("b")
         )
     }
 
     private suspend fun engineFunction(
-        seeds: String,
-        padConfig: PadConfiguration,
-        sequence: Array<Key>,
-        expected: String
+            seeds: String,
+            padConfig: PadConfiguration,
+            sequence: Array<Key>,
+            expected: Set<String>
     ) {
         val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
         engine.init(seeds.lineSequence())
         sequence.forEach { engine.push(it) }
-        engine.candidates shouldBe expected
+        engine.candidates.shouldContainExactly(expected.toSet())
     }
 }

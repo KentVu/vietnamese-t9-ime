@@ -33,3 +33,6 @@ allprojects {
         }
     }
 }
+
+//ext.swigDir = 'dawg-java'
+apply from: 'dawg-java/run_swig.gradle'

@@ -10,7 +10,7 @@ test {
     }
 }
 
-test.dependsOn ':dawg-jni:linkDebug'
+assemble.dependsOn ':dawg-jni:linkDebug' // -> executeSwig
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

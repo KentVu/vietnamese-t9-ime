@@ -14,5 +14,6 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dawg-java" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/dawg-java/swig" vcs="Git" />
   </component>
 </project>
