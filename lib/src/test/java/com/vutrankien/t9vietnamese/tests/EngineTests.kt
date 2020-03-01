@@ -3,10 +3,12 @@ package com.vutrankien.t9vietnamese.tests
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.engine.T9EngineFactory
-import com.vutrankien.t9vietnamese.trie.Trie
-import com.vutrankien.t9vietnamese.trie.TrieFactory
+import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
+import kentvu.dawgjava.Trie
+import kentvu.dawgjava.TrieFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.runBlocking
@@ -62,11 +64,9 @@ class EngineTests: AnnotationSpec() {
 
     @Test
     fun engineInitializing() = runBlocking {
-        val seeds = "a\nb\nc"
-        trie.build(seeds.lineSequence())
-        val engine: T9Engine = T9EngineFactory.newEngine(trie, padConfig)
+        val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
         engine.initialized shouldBe false
-        engine.init()
+        engine.init(emptySequence())
         engine.initialized shouldBe true
     }
 
@@ -74,7 +74,7 @@ class EngineTests: AnnotationSpec() {
     fun engineFunction1() = runBlocking {
         engineFunction(
             "a\nb\nc", padConfig, arrayOf(Key.num1,
-                    Key.num0), "a"
+                    Key.num0), setOf("a")
         )
     }
 
@@ -82,21 +82,19 @@ class EngineTests: AnnotationSpec() {
     fun engineFunction2() = runBlocking {
         engineFunction(
             "a\nb\nc", padConfig, arrayOf(Key.num2,
-                    Key.num0), "b"
+                    Key.num0), setOf("b")
         )
     }
 
     private suspend fun engineFunction(
-        seeds: String,
-        padConfig: PadConfiguration,
-        sequence: Array<Key>,
-        expected: String
+            seeds: String,
+            padConfig: PadConfiguration,
+            sequence: Array<Key>,
+            expected: Set<String>
     ) {
-        trie.build(seeds.lineSequence())
-        val engine: T9Engine = T9EngineFactory.newEngine(trie, padConfig)
-        engine.init()
-        val input = engine.startInput()
-        sequence.forEach { input.push(it) }
-        input.result() shouldBe expected
+        val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
+        engine.init(seeds.lineSequence())
+        sequence.forEach { engine.push(it) }
+        engine.candidates.shouldContainExactly(expected.toSet())
     }
 }

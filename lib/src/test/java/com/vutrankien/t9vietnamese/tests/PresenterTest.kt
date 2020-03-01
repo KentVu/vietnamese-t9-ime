@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 class PresenterTest: AnnotationSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
+    private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     lateinit var view: View
     lateinit var engine: T9Engine
 
@@ -21,58 +22,77 @@ class PresenterTest: AnnotationSpec() {
         every { view.scope } returns GlobalScope
 
         engine = mockk(relaxUnitFun = true)
-        coEvery { engine.init() } just Runs
+        every { engine.eventSource } returns Channel()
     }
 
     @Test
     fun showProgressIndicatorOnStart() = runBlocking {
-        withTimeout(1000) {
-            Presenter(engine).attachView(view)
-            view.eventSource.send(Event.START.noData())
-            verify { view.showProgress() }
-        }
+        Presenter(seed, engine).attachView(view)
+        view.eventSource.send(Event.START.noData())
+        verify(timeout = 100) { view.showProgress() }
     }
 
-    @Suppress("DeferredResultUnused") // just verify init has called
     @Test
     fun initializeEngineOnStart() = runBlocking {
-        Presenter(engine).attachView(view)
+        Presenter(seed, engine).run {
+            attachView(view)
+        }
         view.eventSource.send(Event.START.noData())
-        coVerify { engine.init() }
     }
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        coEvery { engine.init() } just Runs
-        Presenter(engine).attachView(view)
+        Presenter(seed, engine).attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showKeyboard() }
     }
 
     @Test
     fun whenTypeOneNumberThenDisplayResult() = runBlocking {
-        withTimeout(3000) {
-            val input = mockk<T9Engine.Input>()
-            every { engine.startInput() } returns input
-            val events = listOf(Event.KEY_PRESS.withData(Key.num4),
-                    Event.KEY_PRESS.withData(Key.num2),
-                    Event.KEY_PRESS.withData(Key.keySharp))
-            every {
-                input.push(any())
-            } just Runs
-            var inputted = 0
-            every { input.confirmed } answers {
-                inputted++
-                inputted >= events.size
+        val cand = setOf("4")
+        //engine = MockEngine()
+        every {
+            engine.push(any())
+        } coAnswers {
+            //GlobalScope.launch {
+            when (firstArg<Key>()) {
+                Key.num0 -> engine.eventSource.send(T9Engine.Event.Confirm)
+                else -> engine.eventSource.send(T9Engine.Event.NewCandidates(cand))
             }
-            val cand = setOf("43")
-            every { input.result() } returns cand
-            Presenter(engine).attachView(view)
-            events.forEach {
-                view.eventSource.send(it)
-            }
-            verify(timeout = 100) { view.showCandidates(cand) }
+            //}
         }
+        Presenter(seed, engine).attachView(view)
+
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
+        verify(timeout = 10) { view.showCandidates(cand) }
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
+        verify(timeout = 1000) { view.showCandidates(cand) }
+        view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
+        verify { view.confirmInput() }
+        //withTimeout(3000) {
+        //}
     }
+}
+
+class MockEngine : T9Engine {
+    override var initialized: Boolean
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        set(value) {}
+    override val pad: PadConfiguration
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val eventSource: Channel<T9Engine.Event>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
+    override suspend fun init(seed: Sequence<String>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun push(key: Key) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override val candidates: Set<String>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
 }
 

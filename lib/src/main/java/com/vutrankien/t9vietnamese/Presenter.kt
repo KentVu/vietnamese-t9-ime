@@ -2,8 +2,13 @@ package com.vutrankien.t9vietnamese
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
-class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Configuration")) {
+class Presenter(
+    private val engineSeed: Sequence<String>,
+    private val engine: T9Engine,
+    private val log: Logging = JavaLog("Configuration")
+) {
     private lateinit var view: View
     internal var typingState: TypingState = TypingState.Init(this)
         set(value) {
@@ -11,29 +16,45 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
             field = value
         }
 
-
-    fun attachView(view: View) {
-        receiveEvents(view)
+    init {
     }
 
-    private fun receiveEvents(view: View) {
-        this.view = view
+    fun attachView(view: View) {
         view.scope.launch {
-            for (eventWithData in view.eventSource) {
-                when (eventWithData.event) {
-                    Event.START -> {
-                        view.showProgress()
-                        engine.init()
-                        view.showKeyboard()
-                    }
-                    Event.KEY_PRESS -> {
-                        if (typingState is TypingState.Init) {
-                            typingState = TypingState.Typing(this@Presenter, engine)
-                        }
-                        typingState.keyPress(engine, eventWithData.data
-                                ?: error("NULL data: $eventWithData"))
-                    }
+            receiveUiEvents(view)
+        }
+        view.scope.launch {
+            receiveEngineEvents()
+        }
+    }
+
+    private suspend fun receiveUiEvents(view: View) {
+        this.view = view
+        for (eventWithData in view.eventSource) {
+            when (eventWithData.event) {
+                Event.START -> {
+                    view.showProgress()
+                    engine.init(engineSeed)
+                    view.showKeyboard()
                 }
+                Event.KEY_PRESS -> {
+                    engine.push(eventWithData.data ?:
+                    throw IllegalStateException("UI KEY_PRESS event with null data!"))
+                    //if (typingState is TypingState.Init) {
+                    //    typingState = TypingState.Typing(this@Presenter, engine)
+                    //}
+                    //typingState.keyPress(engine, eventWithData.data
+                    //    ?: error("NULL data: $eventWithData"))
+                }
+            }
+        }
+    }
+
+    private suspend fun receiveEngineEvents() {
+        for (event in engine.eventSource) {
+            when(event) {
+                is T9Engine.Event.Confirm -> view.confirmInput()
+                is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
             }
         }
     }
@@ -54,15 +75,10 @@ class Presenter(val engine: T9Engine, private val log: Logging = JavaLog("Config
         }
 
         class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState() {
-            val input: T9Engine.Input = engine.startInput()
             override fun keyPress(engine: T9Engine, key: Key) {
                 log.d("keyPress:$key")
-                input.push(key)
-                if (input.confirmed) {
-                    presenter.typingState = Confirmed(presenter, input.result())
-                }
+                engine.push(key)
             }
-
         }
 
         class Confirmed(presenter: Presenter, result: Set<String>) : TypingState() {

@@ -1,0 +1,6 @@
+[submodule "dawg-java"]
+	path = dawg-java
+	url = https://github.com/KentVu/dawg-java.git
+[submodule "swig"]
+	path = swig
+	url = https://github.com/swig/swig.git
