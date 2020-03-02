@@ -9,9 +9,8 @@ import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kentvu.dawgjava.Trie
 import kentvu.dawgjava.TrieFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
-import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
@@ -87,14 +86,20 @@ class EngineTests: AnnotationSpec() {
     }
 
     private suspend fun engineFunction(
-            seeds: String,
-            padConfig: PadConfiguration,
-            sequence: Array<Key>,
-            expected: Set<String>
-    ) {
+        seeds: String,
+        padConfig: PadConfiguration,
+        sequence: Array<Key>,
+        expected: Set<String>
+    ) = withTimeout(100) {
         val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
         engine.init(seeds.lineSequence())
-        sequence.forEach { engine.push(it) }
+        withContext(Dispatchers.Default) {
+            sequence.forEach { engine.push(it) }
+        }
+
+        expected.forEach {
+            it shouldBe engine.eventSource.receive()
+        }
         engine.candidates.shouldContainExactly(expected.toSet())
     }
 }
