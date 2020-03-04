@@ -16,8 +16,8 @@ private val log: Logging = JavaLog("T9Engine")
 class T9EngineFactory {
     companion object {
         fun newEngine(pad: PadConfiguration): T9Engine {
-            //return DefaultT9Engine(trie, pad)
-            return OldT9Engine(pad)
+            return DefaultT9Engine(pad)
+            //return OldT9Engine(pad)
         }
     }
 }

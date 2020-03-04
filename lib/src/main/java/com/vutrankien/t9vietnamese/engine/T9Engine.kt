@@ -7,7 +7,7 @@ import com.vutrankien.t9vietnamese.PadConfiguration
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
-    var initialized: Boolean
+    val initialized: Boolean
     val pad: PadConfiguration
     val eventSource: Channel<Event>
 
@@ -23,5 +23,4 @@ interface T9Engine {
 
     suspend fun init(seed: Sequence<String>)
     fun push(key: Key)
-    val candidates: Set<String>
 }

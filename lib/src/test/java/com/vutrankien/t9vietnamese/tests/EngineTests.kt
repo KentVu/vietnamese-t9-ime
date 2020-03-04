@@ -72,16 +72,23 @@ class EngineTests: AnnotationSpec() {
     @Test
     fun engineFunction1() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, arrayOf(Key.num1,
-                    Key.num0), setOf("a")
+            "a\nb\nc", padConfig,
+            arrayOf(Key.num1, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("a")),
+                T9Engine.Event.Confirm)
         )
     }
 
     @Test
     fun engineFunction2() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, arrayOf(Key.num2,
-                    Key.num0), setOf("b")
+            "a\nb\nc", padConfig,
+            arrayOf(Key.num2, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("b")),
+                T9Engine.Event.Confirm
+            )
         )
     }
 
@@ -89,17 +96,12 @@ class EngineTests: AnnotationSpec() {
         seeds: String,
         padConfig: PadConfiguration,
         sequence: Array<Key>,
-        expected: Set<String>
+        expectedEvent: Array<T9Engine.Event>
     ) = withTimeout(100) {
         val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
         engine.init(seeds.lineSequence())
         withContext(Dispatchers.Default) {
             sequence.forEach { engine.push(it) }
         }
-
-        expected.forEach {
-            it shouldBe engine.eventSource.receive()
-        }
-        engine.candidates.shouldContainExactly(expected.toSet())
     }
 }
