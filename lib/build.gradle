@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
 
 test {
     systemProperty "java.library.path", file("${project(":dawg-jni").buildDir}/lib/main/debug").absolutePath
@@ -13,10 +14,12 @@ test {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //implementation project(':dawg-java')
-    implementation 'kentvu.dawgjava:dawg-java:0.0.2'
+    implementation "kentvu.dawgjava:dawg-java:$dawgjava_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation 'com.github.takawitter:trie4j:0.9.7'
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
     // Required for local unit tests (JUnit 4 framework)
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'

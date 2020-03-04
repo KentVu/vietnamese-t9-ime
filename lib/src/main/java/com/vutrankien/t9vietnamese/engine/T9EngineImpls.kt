@@ -9,6 +9,7 @@ import kentvu.dawgjava.TrieFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.text.Normalizer
+import javax.inject.Inject
 
 // TODO Have Dagger inject this
 private val log: Logging = JavaLog("T9Engine")
@@ -26,7 +27,7 @@ private class DefaultT9Engine(
     override val pad: PadConfiguration
 ) : T9Engine {
     @Inject
-    private lateinit var trie: Trie
+    lateinit var trie: Trie
     override var initialized: Boolean = false
         private set
 

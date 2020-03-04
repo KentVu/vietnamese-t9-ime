@@ -74,25 +74,3 @@ class PresenterTest: AnnotationSpec() {
     }
 }
 
-class MockEngine : T9Engine {
-    override var initialized: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
-    override val pad: PadConfiguration
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    override suspend fun init(seed: Sequence<String>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun push(key: Key) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override val candidates: Set<String>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-}
-
