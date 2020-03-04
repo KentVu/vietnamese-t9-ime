@@ -25,14 +25,12 @@ class T9EngineFactory {
 private class DefaultT9Engine(
     override val pad: PadConfiguration
 ) : T9Engine {
-    override var initialized: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
+    @Inject
+    private lateinit var trie: Trie
+    override var initialized: Boolean = false
+        private set
 
     override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    override val candidates: Set<String>
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun push(key: Key) {
@@ -40,9 +38,9 @@ private class DefaultT9Engine(
     }
 
     override suspend fun init(seed: Sequence<String>) {
+        val channel = Channel<Int>()
+        trie.build(seed, channel)
         //initialized = true
-        //TODO()
-        delay(10)
     }
 }
 
@@ -51,7 +49,7 @@ private class OldT9Engine(
 ) : T9Engine {
     override var initialized: Boolean = false
     override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        = Channel(1)
     private val trie: Trie = TrieFactory.newTrie()
 
     override suspend fun init(seed: Sequence<String>) {
@@ -66,7 +64,7 @@ private class OldT9Engine(
      */
     private var numOnlyMode = false
     private var _currentCandidates = setOf<String>()
-    override var candidates: Set<String>
+    var candidates: Set<String>
         get() = if (!numOnlyMode)
             _currentCandidates.map { it.composeVietnamese() }.toSet()
         else setOf(currentNumSeq.map { it.char }.joinToString(separator = ""))
