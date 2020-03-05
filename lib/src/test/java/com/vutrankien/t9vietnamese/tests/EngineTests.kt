@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.tests
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.engine.T9EngineFactory
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kentvu.dawgjava.Trie
@@ -14,8 +13,6 @@ import java.io.InputStream
 import javax.inject.Inject
 
 class EngineTests: AnnotationSpec() {
-    @Inject
-    private lateinit var trie: Trie
     private lateinit var engine: T9Engine
 
     private val padConfig = PadConfiguration(
@@ -29,7 +26,7 @@ class EngineTests: AnnotationSpec() {
 
     @Before
     fun setUp() {
-        engine = DefaultT9Engine()
+        engine = DaggerEngineComponents.builder().build().engine()
     }
 
     @ExperimentalCoroutinesApi

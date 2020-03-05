@@ -13,7 +13,7 @@ import android.widget.Button;
  */
 public class T9Vietnamese extends InputMethodService {
     // TODO log
-    private Logging log = new JavaLog("T9IMService");
+    private LogGenerator.Log log = new LogGenerator().newLog("T9IMService");
 
     @Override
     public View onCreateInputView() {

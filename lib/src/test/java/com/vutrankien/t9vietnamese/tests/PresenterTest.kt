@@ -14,6 +14,9 @@ class PresenterTest: AnnotationSpec() {
     private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     lateinit var view: View
     lateinit var engine: T9Engine
+    val daggerComponents = DaggerPresenterComponents.builder().build()
+    //val logGenerator = daggerComponents.logGenerator()
+    val presenter = daggerComponents.presenter()
 
     @Before
     fun setUp() {
@@ -27,14 +30,14 @@ class PresenterTest: AnnotationSpec() {
 
     @Test
     fun showProgressIndicatorOnStart() = runBlocking {
-        Presenter(seed, engine).attachView(view)
+        presenter.attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showProgress() }
     }
 
     @Test
     fun initializeEngineOnStart() = runBlocking {
-        Presenter(seed, engine).run {
+        presenter.run {
             attachView(view)
         }
         view.eventSource.send(Event.START.noData())
@@ -42,7 +45,7 @@ class PresenterTest: AnnotationSpec() {
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        Presenter(seed, engine).attachView(view)
+        presenter.attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showKeyboard() }
     }
@@ -61,7 +64,7 @@ class PresenterTest: AnnotationSpec() {
             }
             //}
         }
-        Presenter(seed, engine).attachView(view)
+        presenter.attachView(view)
 
         view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
         verify(timeout = 10) { view.showCandidates(cand) }

@@ -1,30 +1,20 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.JavaLog
-import com.vutrankien.t9vietnamese.Key
-import com.vutrankien.t9vietnamese.Logging
-import com.vutrankien.t9vietnamese.PadConfiguration
+import com.vutrankien.t9vietnamese.*
 import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
-import kentvu.dawgjava.TrieFactory
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.Normalizer
+import javax.inject.Inject
 
-// TODO Have Dagger inject this
-private val log: Logging = JavaLog("T9Engine")
+// TODO
 
-class T9EngineFactory {
-    companion object {
-        fun newEngine(): T9Engine {
-            return DefaultT9Engine()
-            //return OldT9Engine(pad)
-        }
-    }
-}
-
-class DefaultT9Engine() : T9Engine {
+class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
+    private val log = lg.newLog("T9Engine")
     val trie: Trie = DawgTrie()
     override var initialized: Boolean = false
         private set
@@ -55,7 +45,8 @@ class DefaultT9Engine() : T9Engine {
 }
 
 private class OldT9Engine(
-        override var pad: PadConfiguration
+        override var pad: PadConfiguration,
+        private val log: LogGenerator.Log
 ) : T9Engine {
     override var initialized: Boolean = false
 

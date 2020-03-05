@@ -79,7 +79,8 @@ install:
 #  - adb shell input keyevent 82 &
 
 script:
-  - ./gradlew -Plint.output.console=true --info build
+  - ./gradlew -Plint.output.console=true --info :lib:build
+  - ./gradlew -Plint.output.console=true --info :app:build
 #  - ./gradlew -Plint.output.console=true --info connectedAndroidTest
 
 after_failure:
