@@ -4,32 +4,34 @@ import com.vutrankien.t9vietnamese.JavaLog
 import com.vutrankien.t9vietnamese.Key
 import com.vutrankien.t9vietnamese.Logging
 import com.vutrankien.t9vietnamese.PadConfiguration
+import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
 import kentvu.dawgjava.TrieFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.text.Normalizer
-import javax.inject.Inject
 
 // TODO Have Dagger inject this
 private val log: Logging = JavaLog("T9Engine")
 
 class T9EngineFactory {
     companion object {
-        fun newEngine(pad: PadConfiguration): T9Engine {
-            return DefaultT9Engine(pad)
+        fun newEngine(): T9Engine {
+            return DefaultT9Engine()
             //return OldT9Engine(pad)
         }
     }
 }
 
-private class DefaultT9Engine(
-    override val pad: PadConfiguration
-) : T9Engine {
-    @Inject
-    lateinit var trie: Trie
+class DefaultT9Engine() : T9Engine {
+    val trie: Trie = DawgTrie()
     override var initialized: Boolean = false
         private set
+    override lateinit var pad: PadConfiguration
+
+    //override fun setPadConfig(pad: PadConfiguration) {
+    //    this.pad = pad
+    //}
 
     override val eventSource: Channel<T9Engine.Event>
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
@@ -41,17 +43,19 @@ private class DefaultT9Engine(
     override suspend fun init(seed: Sequence<String>) {
         val channel = Channel<Int>()
         trie.build(seed, channel)
-        //initialized = true
+        initialized = true
     }
 }
 
 private class OldT9Engine(
-        override val pad: PadConfiguration
+        override var pad: PadConfiguration
 ) : T9Engine {
     override var initialized: Boolean = false
+
     override val eventSource: Channel<T9Engine.Event>
         = Channel(1)
-    private val trie: Trie = TrieFactory.newTrie()
+
+    private val trie: Trie = DawgTrie()
 
     override suspend fun init(seed: Sequence<String>) {
         initialized = true

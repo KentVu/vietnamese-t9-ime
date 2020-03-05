@@ -8,7 +8,8 @@ import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
     val initialized: Boolean
-    val pad: PadConfiguration
+    var pad: PadConfiguration
+    //fun setPadConfig(pad: PadConfiguration)
     val eventSource: Channel<Event>
 
     enum class EventType {
@@ -19,6 +20,7 @@ interface T9Engine {
     sealed class Event {
         class NewCandidates(val candidates: Set<String>) : Event()
         object Confirm : Event()
+        object Initialized : Event()
     }
 
     suspend fun init(seed: Sequence<String>)
