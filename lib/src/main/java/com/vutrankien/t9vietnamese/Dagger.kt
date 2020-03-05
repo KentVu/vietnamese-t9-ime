@@ -26,12 +26,10 @@ abstract class PresenterComponents {
 @Module
 class PresenterModule(
     private val engineSeed: Sequence<String>,
-    private val engine: T9Engine,
-    private val lg: LogGenerator
+    private val engine: T9Engine
 ) {
     @Provides
     fun presenter(
-        //engineSeed: Sequence<String>,
-        //engine: T9Engine
+        lg: LogGenerator
     ): Presenter = Presenter(engineSeed, engine, lg)
 }
