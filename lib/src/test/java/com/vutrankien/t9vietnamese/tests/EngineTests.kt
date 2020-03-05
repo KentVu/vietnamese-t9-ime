@@ -71,14 +71,14 @@ class EngineTests: AnnotationSpec() {
 
     @Test
     fun engineInitializingWithProgress() = runBlocking {
-        engine.initialized shouldBe false
-        withContext(Dispatchers.Default) {
-            engine.init("a\nb\nc".lineSequence())
-        }
-        withTimeout(100) {
+        //withTimeout(1000) {
+            engine.initialized shouldBe false
+            withContext(Dispatchers.Default) {
+                engine.init("a\nb\nc".lineSequence())
+            }
             engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
-        }
-        engine.initialized shouldBe true
+            engine.initialized shouldBe true
+        //}
     }
 
     @Test
@@ -110,7 +110,9 @@ class EngineTests: AnnotationSpec() {
         sequence: Array<Key>,
         expectedEvent: Array<T9Engine.Event>
     ) = withTimeout(100) {
-        engine.init(seeds.lineSequence())
+        GlobalScope.launch {
+            engine.init(seeds.lineSequence())
+        }
         engine.pad = padConfig
         withContext(Dispatchers.Default) {
             sequence.forEach { engine.push(it) }

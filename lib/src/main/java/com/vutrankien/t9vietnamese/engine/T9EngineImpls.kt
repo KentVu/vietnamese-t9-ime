@@ -9,6 +9,7 @@ import kentvu.dawgjava.Trie
 import kentvu.dawgjava.TrieFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.toList
 import java.text.Normalizer
 
 // TODO Have Dagger inject this
@@ -42,7 +43,13 @@ class DefaultT9Engine() : T9Engine {
 
     override suspend fun init(seed: Sequence<String>) {
         val channel = Channel<Int>()
-        trie.build(seed, channel)
+        GlobalScope.launch(Dispatchers.IO) {
+            trie.build(seed, channel)
+        }
+        // TODO report progress
+        for (i in channel) {
+            log.d("progress: $i")
+        }
         initialized = true
     }
 }
