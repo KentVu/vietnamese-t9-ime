@@ -59,7 +59,7 @@ class PresenterTest: AnnotationSpec() {
     fun whenTypeOneNumberThenDisplayResult() = runBlocking {
         val cand = setOf("4")
         //engine = MockEngine()
-        every {
+        coEvery {
             engine.push(any())
         } coAnswers {
             //GlobalScope.launch {

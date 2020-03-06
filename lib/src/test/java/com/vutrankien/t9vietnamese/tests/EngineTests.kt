@@ -3,6 +3,8 @@ package com.vutrankien.t9vietnamese.tests
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
+import io.kotlintest.IsolationMode
+import io.kotlintest.assertSoftly
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kentvu.dawgjava.Trie
@@ -13,7 +15,9 @@ import java.io.InputStream
 import javax.inject.Inject
 
 class EngineTests: AnnotationSpec() {
+    override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
     private lateinit var engine: T9Engine
+    private lateinit var log: LogGenerator.Log
 
     private val padConfig = PadConfiguration(
             mapOf(
@@ -26,7 +30,9 @@ class EngineTests: AnnotationSpec() {
 
     @Before
     fun setUp() {
-        engine = DaggerEngineComponents.builder().build().engine()
+        val engineComponents = DaggerEngineComponents.builder().build()
+        engine = engineComponents.engine()
+        log = engineComponents.lg.newLog("EngineTests")
     }
 
     @ExperimentalCoroutinesApi
@@ -59,10 +65,13 @@ class EngineTests: AnnotationSpec() {
         }
     }
 
-    @Test
-    fun engineInitializing() = runBlocking {
+    //@Test
+    fun `engineInitializing`() = runBlocking {
         engine.initialized shouldBe false
-        engine.init(emptySequence())
+        launch {
+            engine.init(emptySequence())
+        }
+        engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
         engine.initialized shouldBe true
     }
 
@@ -70,7 +79,7 @@ class EngineTests: AnnotationSpec() {
     fun engineInitializingWithProgress() = runBlocking {
         //withTimeout(1000) {
             engine.initialized shouldBe false
-            withContext(Dispatchers.Default) {
+            launch(Dispatchers.Default) {
                 engine.init("a\nb\nc".lineSequence())
             }
             engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
@@ -111,8 +120,18 @@ class EngineTests: AnnotationSpec() {
             engine.init(seeds.lineSequence())
         }
         engine.pad = padConfig
-        withContext(Dispatchers.Default) {
+        engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+
+        GlobalScope.launch {
             sequence.forEach { engine.push(it) }
+        }
+
+        assertSoftly {
+            expectedEvent.forEach {
+                val event = engine.eventSource.receive()
+                log.d("receive evt: $event")
+                event shouldBe it
+            }
         }
     }
 }

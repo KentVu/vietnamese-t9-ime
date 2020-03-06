@@ -63,7 +63,7 @@ class Presenter constructor(
 
     sealed class TypingState(lg: LogGenerator) {
         protected val log = lg.newLog("TypingState")
-        open fun keyPress(engine: T9Engine, key: Key) {
+        open suspend fun keyPress(engine: T9Engine, key: Key) {
             throw IllegalStateException("${javaClass.name}.keyPress($key)")
         }
 
@@ -72,13 +72,13 @@ class Presenter constructor(
         }
 
         class Init(private val presenter: Presenter) : TypingState(presenter.lg) {
-            override fun keyPress(engine: T9Engine, key: Key) {
+            override suspend fun keyPress(engine: T9Engine, key: Key) {
                 presenter.typingState = Typing(presenter, engine)
             }
         }
 
         class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState(presenter.lg) {
-            override fun keyPress(engine: T9Engine, key: Key) {
+            override suspend fun keyPress(engine: T9Engine, key: Key) {
                 log.d("keyPress:$key")
                 engine.push(key)
             }

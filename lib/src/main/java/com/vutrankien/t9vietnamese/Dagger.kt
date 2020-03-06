@@ -8,6 +8,8 @@ import dagger.Provides
 
 @Component(modules = [EngineModule::class])
 abstract class EngineComponents {
+    abstract val lg: LogGenerator
+
     //abstract fun logGenerator(): LogGenerator
     abstract fun engine(): T9Engine
 }
