@@ -4,6 +4,8 @@ apply plugin: 'kotlin-kapt'
 
 test {
     systemProperty "java.library.path", file("${project(":dawg-jni").buildDir}/lib/main/debug").absolutePath
+    // For TrieTest.kt
+    //systemProperty "word_list_file", "$rootDir/data/vi-DauMoi.dic"
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"
