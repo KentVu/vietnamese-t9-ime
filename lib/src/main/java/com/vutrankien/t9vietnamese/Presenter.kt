@@ -3,12 +3,14 @@ package com.vutrankien.t9vietnamese
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
 import java.io.InputStream
+import javax.inject.Inject
 
-class Presenter(
+class Presenter constructor(
     private val engineSeed: Sequence<String>,
     private val engine: T9Engine,
-    private val log: Logging = JavaLog("Configuration")
+    private val lg: LogGenerator
 ) {
+    private val log = lg.newLog("Presenter")
     private lateinit var view: View
     internal var typingState: TypingState = TypingState.Init(this)
         set(value) {
@@ -59,8 +61,9 @@ class Presenter(
         }
     }
 
-    sealed class TypingState(protected val log: Logging = JavaLog("TypingState")) {
-        open fun keyPress(engine: T9Engine, key: Key) {
+    sealed class TypingState(lg: LogGenerator) {
+        protected val log = lg.newLog("TypingState")
+        open suspend fun keyPress(engine: T9Engine, key: Key) {
             throw IllegalStateException("${javaClass.name}.keyPress($key)")
         }
 
@@ -68,20 +71,20 @@ class Presenter(
             return javaClass.simpleName
         }
 
-        class Init(private val presenter: Presenter) : TypingState() {
-            override fun keyPress(engine: T9Engine, key: Key) {
+        class Init(private val presenter: Presenter) : TypingState(presenter.lg) {
+            override suspend fun keyPress(engine: T9Engine, key: Key) {
                 presenter.typingState = Typing(presenter, engine)
             }
         }
 
-        class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState() {
-            override fun keyPress(engine: T9Engine, key: Key) {
+        class Typing(private val presenter: Presenter, engine: T9Engine) : TypingState(presenter.lg) {
+            override suspend fun keyPress(engine: T9Engine, key: Key) {
                 log.d("keyPress:$key")
                 engine.push(key)
             }
         }
 
-        class Confirmed(presenter: Presenter, result: Set<String>) : TypingState() {
+        class Confirmed(presenter: Presenter, result: Set<String>) : TypingState(presenter.lg) {
             init {
                 presenter.onTypingConfirmed(result)
             }

@@ -1,58 +1,93 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.JavaLog
-import com.vutrankien.t9vietnamese.Key
-import com.vutrankien.t9vietnamese.Logging
-import com.vutrankien.t9vietnamese.PadConfiguration
+import com.vutrankien.t9vietnamese.*
+import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
-import kentvu.dawgjava.TrieFactory
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.Normalizer
 
-// TODO Have Dagger inject this
-private val log: Logging = JavaLog("T9Engine")
+// TODO
 
-class T9EngineFactory {
+class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
+    private val log = lg.newLog("T9Engine")
+    val trie: Trie = DawgTrie()
+    override var initialized: Boolean = false
+        private set
+    override lateinit var pad: PadConfiguration
+
+    override val eventSource: Channel<T9Engine.Event> = Channel()
+
+    private val _currentCandidates = linkedSetOf<String>()
+    private val _currentNumSeq = mutableListOf<Key>()
+
+    override suspend fun init(seed: Sequence<String>) {
+        val channel = Channel<Int>()
+        GlobalScope.launch(Dispatchers.IO) {
+            trie.build(seed, channel)
+        }
+        // TODO report progress
+        for (i in channel) {
+            log.d("progress: $i")
+        }
+        initialized = true
+        eventSource.send(T9Engine.Event.Initialized)
+    }
+
+    override suspend fun push(key: Key) {
+        _currentNumSeq.add(key)
+        if (pad[key].type != KeyType.Confirm)
+            eventSource.send(T9Engine.Event.NewCandidates(findCandidates(trie, pad, _currentNumSeq, 10)))
+        else
+            eventSource.send(T9Engine.Event.Confirm)
+    }
+
     companion object {
-        fun newEngine(pad: PadConfiguration): T9Engine {
-            //return DefaultT9Engine(trie, pad)
-            return OldT9Engine(pad)
+        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int): Set<String> {
+            var allCombinations = mutableListOf<String>()
+            keySeq.forEach { key ->
+                pad[key].chars.forEach { c ->
+                    // for each char of the key
+                    allCombinations = allCombinations.run {
+                        if (isEmpty()) {
+                            // add to the current combination
+                            add((c.toString()))
+                            this
+                        } else {
+                            // add to the current combination
+                            val newCombinations = mutableListOf<String>()
+                            forEach {
+                                newCombinations.add(it + c)
+                            }
+                            newCombinations
+                        }
+                    }
+                }
+            }
+            return allCombinations.toSet()
         }
     }
 }
 
-private class DefaultT9Engine(
-    override val pad: PadConfiguration
-) : T9Engine {
-    override var initialized: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
-
-    override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    override val candidates: Set<String>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    override fun push(key: Key) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override suspend fun init(seed: Sequence<String>) {
-        //initialized = true
-        //TODO()
-        delay(10)
+private fun <E> MutableSet<E>.combine(c: Char) {
+    if (isEmpty()) {
+        return
     }
 }
 
 private class OldT9Engine(
-        override val pad: PadConfiguration
+        override var pad: PadConfiguration,
+        private val log: LogGenerator.Log
 ) : T9Engine {
     override var initialized: Boolean = false
+
     override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    private val trie: Trie = TrieFactory.newTrie()
+        = Channel(1)
+
+    private val trie: Trie = DawgTrie()
 
     override suspend fun init(seed: Sequence<String>) {
         initialized = true
@@ -66,7 +101,7 @@ private class OldT9Engine(
      */
     private var numOnlyMode = false
     private var _currentCandidates = setOf<String>()
-    override var candidates: Set<String>
+    var candidates: Set<String>
         get() = if (!numOnlyMode)
             _currentCandidates.map { it.composeVietnamese() }.toSet()
         else setOf(currentNumSeq.map { it.char }.joinToString(separator = ""))
@@ -75,7 +110,7 @@ private class OldT9Engine(
         }
     private var currentCombinations = setOf<String>()
 
-    override fun push(key: Key) {
+    override suspend fun push(key: Key) {
         currentNumSeq.push(key)
         if (!numOnlyMode) {
             currentCombinations *= (pad[key].chars)

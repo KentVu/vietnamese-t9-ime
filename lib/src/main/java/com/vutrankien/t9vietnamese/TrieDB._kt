@@ -3,17 +3,32 @@ package com.vutrankien.t9vietnamese
 import org.trie4j.patricia.MapPatriciaTrie
 import java.io.*
 import java.text.Normalizer
+import javax.inject.Inject
+
+interface DB : Closeable {
+    fun clear()
+    fun put(key: String, value: Int)
+    fun get(key: String): Int?
+    override fun close()
+    fun haveMagic(): Boolean
+    fun putAll(keys: List<String>, defaultValue: Int = 0)
+    fun existingPrefix(prefixes: Set<String>): Set<String>
+    fun putMagic()
+}
 
 val MAGIC:Int = 0xA11600D
-private val log:Logging = JavaLog("T9Engine")
 
+//class TrieDB @Inject constructor(/*file: File, */logGenerator: LogGenerator) : DB {
 class TrieDB(file: File) : DB {
+    @Inject
+    private lateinit var logGenerator: LogGenerator
+    private val log = logGenerator.newLog("TrieDB")
 
     private val TRIE_FILENAME = "trie"
 //    val trie = MapPatriciaTrie<Int>()
     val trie : MapPatriciaTrie<Int>
 
-    private val trieFile = file
+    private val trieFile = File(TRIE_FILENAME)
 
     init {
         // The java deserialization thing, y'know :|

@@ -1,26 +1,38 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
+import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.engine.T9EngineFactory
-import io.kotlintest.matchers.collections.shouldContainExactly
-import io.kotlintest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotlintest.IsolationMode
+import io.kotlintest.assertSoftly
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kentvu.dawgjava.Trie
-import kentvu.dawgjava.TrieFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
-import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import javax.inject.Inject
 
 class EngineTests: AnnotationSpec() {
-    private lateinit var trie: Trie
+    override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
+    private lateinit var engine: T9Engine
+    private lateinit var log: LogGenerator.Log
+
+    private val padConfig = PadConfiguration(
+            mapOf(
+                    Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
+                    Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
+                    Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
+                    Key.num0 to KeyConfig(KeyType.Confirm)
+            )
+    )
 
     @Before
     fun setUp() {
-        trie = TrieFactory.newTrie()
+        val engineComponents = DaggerEngineComponents.builder().build()
+        engine = engineComponents.engine()
+        log = engineComponents.lg.newLog("EngineTests")
     }
 
     @ExperimentalCoroutinesApi
@@ -53,48 +65,73 @@ class EngineTests: AnnotationSpec() {
         }
     }
 
-    private val padConfig = PadConfiguration(
-            mapOf(
-                Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
-                Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
-                Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
-                Key.num0 to KeyConfig(KeyType.Confirm)
-            )
-    )
+    //@Test
+    fun `engineInitializing`() = runBlocking {
+        engine.initialized shouldBe false
+        launch {
+            engine.init(emptySequence())
+        }
+        engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+        engine.initialized shouldBe true
+    }
 
     @Test
-    fun engineInitializing() = runBlocking {
-        val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
-        engine.initialized shouldBe false
-        engine.init(emptySequence())
-        engine.initialized shouldBe true
+    fun engineInitializingWithProgress() = runBlocking {
+        //withTimeout(1000) {
+            engine.initialized shouldBe false
+            launch(Dispatchers.Default) {
+                engine.init("a\nb\nc".lineSequence())
+            }
+            engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+            engine.initialized shouldBe true
+        //}
     }
 
     @Test
     fun engineFunction1() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, arrayOf(Key.num1,
-                    Key.num0), setOf("a")
+            "a\nb\nc", padConfig,
+            arrayOf(Key.num1, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("a")),
+                T9Engine.Event.Confirm)
         )
     }
 
     @Test
     fun engineFunction2() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig, arrayOf(Key.num2,
-                    Key.num0), setOf("b")
+            "a\nb\nc", padConfig,
+            arrayOf(Key.num2, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("b")),
+                T9Engine.Event.Confirm
+            )
         )
     }
 
     private suspend fun engineFunction(
-            seeds: String,
-            padConfig: PadConfiguration,
-            sequence: Array<Key>,
-            expected: Set<String>
-    ) {
-        val engine: T9Engine = T9EngineFactory.newEngine(padConfig)
-        engine.init(seeds.lineSequence())
-        sequence.forEach { engine.push(it) }
-        engine.candidates.shouldContainExactly(expected.toSet())
+        seeds: String,
+        padConfig: PadConfiguration,
+        sequence: Array<Key>,
+        expectedEvent: Array<T9Engine.Event>
+    ) = withTimeout(100) {
+        GlobalScope.launch {
+            engine.init(seeds.lineSequence())
+        }
+        engine.pad = padConfig
+        engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+
+        GlobalScope.launch {
+            sequence.forEach { engine.push(it) }
+        }
+
+        assertSoftly {
+            expectedEvent.forEach {
+                val event = engine.eventSource.receive()
+                log.d("receive evt: $event")
+                event shouldBe it
+            }
+        }
     }
 }

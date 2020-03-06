@@ -5,6 +5,8 @@ env:
   global:
     - ANDROID_TARGET=android-22
     - ANDROID_ABI=armeabi-v7a
+    # include $HOME/.local/bin for `aws`
+    - PATH=$HOME/.local/bin:$HOME/swig/bin:$PATH
 
 language: android
 
@@ -51,11 +53,13 @@ addons:
     packages:
       - automake
       - bison
+      - python3-pip
 #    - pandoc
 
 # clone dawg-java & dawg-java/swig
 before_install:
   - git submodule update --init --recursive --depth=1
+  - pip3 install awscli --upgrade --user
 
 install:
   # build_swig will skip if swig is found.
@@ -75,12 +79,14 @@ install:
 #  - adb shell input keyevent 82 &
 
 script:
-  - export PATH=$HOME/swig/bin:$PATH
-  - ./gradlew -Plint.output.console=true --info build
+  - ./gradlew -Plint.output.console=true --info :lib:build
+  - ./gradlew -Plint.output.console=true --info :app:build
 #  - ./gradlew -Plint.output.console=true --info connectedAndroidTest
-  # print lint results details
-  #- for f in app/build/reports/lint-results.html; do pandoc $f -t plain; done
-  #- for f in app/build/reports/androidTests/connected/*.html; do pandoc $f -t plain; done
+
+after_failure:
+  - "aws s3 cp --recursive lib/build/reports/tests/test/ s3://t9vietnamese/lib-test/
+      --acl public-read --expires $(date -Iseconds -d '3 months')"
+  - "echo View test result at: https://t9vietnamese.s3-ap-northeast-1.amazonaws.com/lib-test/index.html"
 
 # cache between builds
 cache:
@@ -90,12 +96,12 @@ cache:
     - $HOME/swig
 
 deploy:
-  skip_cleanup: true
-  provider: bintray
-  file: "bintray-descriptor.json"
-  user: "kentvu"
-  key:
-    secure: "hpZPPt/ygLw6fLlkLq64/xQNWf23Z7QDcS+xKvDQ6qX+ULUyrpav4v37KLTRHgtwOcG3HOScOQwkAa06HRBsSlCnTfNKpxS9Vs4rZPdyZaxYanumXHdLc47wvNC2EpzN22S4Juv4rKAtONHgFbZzggmTC9oC3Cb3OAA/+sgF3IdhC7uO+cfCw7PBaD8ZUYupu/8uorOyZcDAFhxyyBxoGGKUAbqcgKVhSMS+XmoVhPAc6wAlRQWWzz09nUK4eAG2m7g+3V192zy6BZb4J1JIIAeiEL5UnmF72u4Ar7fm+E2Uc7kxFnUFISNYbKn5tkruiUgPCzOXPScLhB7T/O0r108VHq9zppJWT/5Husv3udRgoPoY54JFNZmmC2VDbnQiH+GUxYW64jS16vqDAFsicEMdugNd8pc+pPRyv3ZaXT0JhsS+LjhstJlyEb7im4dxwRrYkzh7AHJFtiq4wHwlKcZADpe9LUvpgFXLoDBAOFVnKg0C8UL13tjNiqJJN9zSlRsEd54HHzykr1TwC5l70GlTSSjzToPqDlpCdx+mtiVFyVLmTKPerGZqspVcyZ6i5PlHCEubgc00uVb1BnglfFeZZoUfNdM7WLby78F5HPTTlJTpllNuGDVXBggSot0jwXrCEH0vkrTMbGOBiiMnMxJ2SuJ+trWC6gG0DZe/SIs="
+  - provider: bintray
+    skip_cleanup: true
+    file: "bintray-descriptor.json"
+    user: "kentvu"
+    key:
+      secure: "hpZPPt/ygLw6fLlkLq64/xQNWf23Z7QDcS+xKvDQ6qX+ULUyrpav4v37KLTRHgtwOcG3HOScOQwkAa06HRBsSlCnTfNKpxS9Vs4rZPdyZaxYanumXHdLc47wvNC2EpzN22S4Juv4rKAtONHgFbZzggmTC9oC3Cb3OAA/+sgF3IdhC7uO+cfCw7PBaD8ZUYupu/8uorOyZcDAFhxyyBxoGGKUAbqcgKVhSMS+XmoVhPAc6wAlRQWWzz09nUK4eAG2m7g+3V192zy6BZb4J1JIIAeiEL5UnmF72u4Ar7fm+E2Uc7kxFnUFISNYbKn5tkruiUgPCzOXPScLhB7T/O0r108VHq9zppJWT/5Husv3udRgoPoY54JFNZmmC2VDbnQiH+GUxYW64jS16vqDAFsicEMdugNd8pc+pPRyv3ZaXT0JhsS+LjhstJlyEb7im4dxwRrYkzh7AHJFtiq4wHwlKcZADpe9LUvpgFXLoDBAOFVnKg0C8UL13tjNiqJJN9zSlRsEd54HHzykr1TwC5l70GlTSSjzToPqDlpCdx+mtiVFyVLmTKPerGZqspVcyZ6i5PlHCEubgc00uVb1BnglfFeZZoUfNdM7WLby78F5HPTTlJTpllNuGDVXBggSot0jwXrCEH0vkrTMbGOBiiMnMxJ2SuJ+trWC6gG0DZe/SIs="
 
 #  passphrase: "Optional. In case a passphrase is configured on Bintray and GPG signing is used"
 #  dry-run: "Optional. If true, skips sending requests to Bintray. Useful for testing your configuration"

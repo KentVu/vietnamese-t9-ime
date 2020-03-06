@@ -7,8 +7,9 @@ import com.vutrankien.t9vietnamese.PadConfiguration
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
-    var initialized: Boolean
-    val pad: PadConfiguration
+    val initialized: Boolean
+    var pad: PadConfiguration
+    //fun setPadConfig(pad: PadConfiguration)
     val eventSource: Channel<Event>
 
     enum class EventType {
@@ -17,11 +18,23 @@ interface T9Engine {
     }
 
     sealed class Event {
-        class NewCandidates(val candidates: Set<String>) : Event()
+        class NewCandidates(val candidates: Set<String>) : Event() {
+            override fun equals(other: Any?): Boolean = if (other is NewCandidates) {
+                //return other.candidates.equals(candidates)
+                other.candidates.containsAll(candidates) &&
+                        candidates.containsAll(other.candidates)
+            } else {
+                super.equals(other)
+            }
+
+            override fun toString(): String {
+                return "NewCandidates:$candidates"
+            }
+        }
         object Confirm : Event()
+        object Initialized : Event()
     }
 
     suspend fun init(seed: Sequence<String>)
-    fun push(key: Key)
-    val candidates: Set<String>
+    suspend fun push(key: Key)
 }

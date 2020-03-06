@@ -15,6 +15,14 @@ class PresenterTest: AnnotationSpec() {
     lateinit var view: View
     lateinit var engine: T9Engine
 
+    //val logGenerator = daggerComponents.logGenerator()
+    fun getPresenter(): Presenter {
+        return DaggerPresenterComponents.builder()
+            .presenterModule(PresenterModule(seed, engine))
+            .build()
+            .presenter()
+    }
+
     @Before
     fun setUp() {
         view = mockk(relaxUnitFun = true)
@@ -27,14 +35,14 @@ class PresenterTest: AnnotationSpec() {
 
     @Test
     fun showProgressIndicatorOnStart() = runBlocking {
-        Presenter(seed, engine).attachView(view)
+        getPresenter().attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showProgress() }
     }
 
     @Test
     fun initializeEngineOnStart() = runBlocking {
-        Presenter(seed, engine).run {
+        getPresenter().run {
             attachView(view)
         }
         view.eventSource.send(Event.START.noData())
@@ -42,7 +50,7 @@ class PresenterTest: AnnotationSpec() {
 
     @Test
     fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        Presenter(seed, engine).attachView(view)
+        getPresenter().attachView(view)
         view.eventSource.send(Event.START.noData())
         verify(timeout = 100) { view.showKeyboard() }
     }
@@ -51,7 +59,7 @@ class PresenterTest: AnnotationSpec() {
     fun whenTypeOneNumberThenDisplayResult() = runBlocking {
         val cand = setOf("4")
         //engine = MockEngine()
-        every {
+        coEvery {
             engine.push(any())
         } coAnswers {
             //GlobalScope.launch {
@@ -61,7 +69,7 @@ class PresenterTest: AnnotationSpec() {
             }
             //}
         }
-        Presenter(seed, engine).attachView(view)
+        getPresenter().attachView(view)
 
         view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
         verify(timeout = 10) { view.showCandidates(cand) }
@@ -72,27 +80,5 @@ class PresenterTest: AnnotationSpec() {
         //withTimeout(3000) {
         //}
     }
-}
-
-class MockEngine : T9Engine {
-    override var initialized: Boolean
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-        set(value) {}
-    override val pad: PadConfiguration
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-    override val eventSource: Channel<T9Engine.Event>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
-    override suspend fun init(seed: Sequence<String>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun push(key: Key) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override val candidates: Set<String>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-
 }
 
