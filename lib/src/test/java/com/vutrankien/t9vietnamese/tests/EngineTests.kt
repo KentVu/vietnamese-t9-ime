@@ -65,7 +65,7 @@ class EngineTests: AnnotationSpec() {
         }
     }
 
-    //@Test
+    @Test
     fun `engineInitializing`() = runBlocking {
         engine.initialized shouldBe false
         launch {
@@ -88,7 +88,7 @@ class EngineTests: AnnotationSpec() {
     }
 
     @Test
-    fun engineFunction1() = runBlocking {
+    fun engineFunction_1key_1() = runBlocking {
         engineFunction(
             "a\nb\nc", padConfig,
             arrayOf(Key.num1, Key.num0),
@@ -99,13 +99,35 @@ class EngineTests: AnnotationSpec() {
     }
 
     @Test
-    fun engineFunction2() = runBlocking {
-        engineFunction(
-            "a\nb\nc", padConfig,
-            arrayOf(Key.num2, Key.num0),
+    fun engineFunction_1key_2() = runBlocking {
+        engineFunction("""
+                a
+                ab
+                ac
+                aa""".trimIndent(),
+            padConfig,
+            arrayOf(Key.num1, Key.num0),
             arrayOf(
-                T9Engine.Event.NewCandidates(setOf("b")),
+                T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
                 T9Engine.Event.Confirm
+            )
+        )
+    }
+
+    @Test
+    fun engineFunction_2keys() = runBlocking {
+        engineFunction("""
+                aa
+                ab
+                ac
+                ba
+                """.trimIndent(),
+            padConfig,
+            arrayOf(Key.num1, Key.num1, Key.num0),
+            arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
+                    T9Engine.Event.NewCandidates(setOf("aa")),
+                    T9Engine.Event.Confirm
             )
         )
     }
@@ -116,13 +138,13 @@ class EngineTests: AnnotationSpec() {
         sequence: Array<Key>,
         expectedEvent: Array<T9Engine.Event>
     ) = withTimeout(100) {
-        GlobalScope.launch {
+        launch {
             engine.init(seeds.lineSequence())
         }
         engine.pad = padConfig
         engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
 
-        GlobalScope.launch {
+        launch {
             sequence.forEach { engine.push(it) }
         }
 
