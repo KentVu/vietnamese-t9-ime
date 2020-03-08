@@ -1,18 +1,15 @@
 package com.vutrankien.t9vietnamese.tests
 
 import com.vutrankien.t9vietnamese.*
-import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import io.kotlintest.IsolationMode
 import io.kotlintest.assertSoftly
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
-import kentvu.dawgjava.Trie
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import javax.inject.Inject
 
 class EngineTests: AnnotationSpec() {
     override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
@@ -24,6 +21,14 @@ class EngineTests: AnnotationSpec() {
                     Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
                     Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
                     Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
+                    Key.num0 to KeyConfig(KeyType.Confirm)
+            )
+    )
+    private val padConfigStd = PadConfiguration(
+            mapOf(
+                    Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a', 'b', 'c')),
+                    Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('d', 'e', 'f')),
+                    Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('g', 'h', 'i')),
                     Key.num0 to KeyConfig(KeyType.Confirm)
             )
     )
@@ -90,57 +95,78 @@ class EngineTests: AnnotationSpec() {
     @Test
     fun engineFunction_1key_1() = runBlocking {
         engineFunction(
-            "a\nb\nc", padConfig,
-            arrayOf(Key.num1, Key.num0),
-            arrayOf(
-                T9Engine.Event.NewCandidates(setOf("a")),
-                T9Engine.Event.Confirm)
+                "a\nb\nc".lineSequence(), padConfig,
+                arrayOf(Key.num1, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("a")),
+                    T9Engine.Event.Confirm)
         )
     }
 
     @Test
     fun engineFunction_1key_2() = runBlocking {
         engineFunction("""
-                a
-                aa
-                ab
-                ac
-                """.trimIndent(),
-            padConfig,
-            arrayOf(Key.num1, Key.num0),
-            arrayOf(
-                T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
-                T9Engine.Event.Confirm
-            )
+                        a
+                        aa
+                        ab
+                        ac
+                        """.trimIndent().lineSequence(),
+                padConfig,
+                arrayOf(Key.num1, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
+                    T9Engine.Event.Confirm
+                )
         )
     }
 
     @Test
     fun engineFunction_2keys() = runBlocking {
         engineFunction("""
-                aa
-                ab
-                ac
-                ba
-                """.trimIndent(),
-            padConfig,
-            arrayOf(Key.num1, Key.num1, Key.num0),
-            arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
-                    T9Engine.Event.NewCandidates(setOf("aa")),
-                    T9Engine.Event.Confirm
-            )
+                        aa
+                        ab
+                        ac
+                        ba
+                        """.trimIndent().lineSequence(),
+                padConfig,
+                arrayOf(Key.num1, Key.num1, Key.num0),
+                arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
+                        T9Engine.Event.NewCandidates(setOf("aa")),
+                        T9Engine.Event.Confirm
+                )
+        )
+    }
+
+    @Test
+    fun engineFunction_stdconfig_2keys() = runBlocking {
+        engineFunction("""
+                        aa
+                        ab
+                        ac
+                        ad
+                        bd
+                        ce
+                        cf
+                        """.trimIndent().lineSequence(),
+                padConfigStd,
+                arrayOf(Key.num1, Key.num2, Key.num0),
+                arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
+                        T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
+                        T9Engine.Event.Confirm
+                )
         )
     }
 
     private suspend fun engineFunction(
-        seeds: String,
-        padConfig: PadConfiguration,
-        sequence: Array<Key>,
-        expectedEvent: Array<T9Engine.Event>
-    ) = withTimeout(100) {
+            seeds: Sequence<String>,
+            padConfig: PadConfiguration,
+            sequence: Array<Key>,
+            expectedEvent: Array<T9Engine.Event>
+    ) = withTimeout(100000) {
         launch {
-            engine.init(seeds.lineSequence())
+            engine.init(seeds)
         }
         engine.pad = padConfig
         engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
