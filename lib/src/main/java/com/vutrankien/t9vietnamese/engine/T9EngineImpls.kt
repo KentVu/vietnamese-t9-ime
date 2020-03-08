@@ -48,26 +48,14 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
     companion object {
         private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int): Set<String> {
             var allCombinations = mutableListOf<String>()
+            val accumulator = StringBuilder()
+            val result = sortedSetOf<String>()
             keySeq.forEach { key ->
-                pad[key].chars.forEach { c ->
-                    // for each char of the key
-                    allCombinations = allCombinations.run {
-                        if (isEmpty()) {
-                            // add to the current combination
-                            add((c.toString()))
-                            this
-                        } else {
-                            // add to the current combination
-                            val newCombinations = mutableListOf<String>()
-                            forEach {
-                                newCombinations.add(it + c)
-                            }
-                            newCombinations
-                        }
-                    }
-                }
+                accumulator.append(pad[key].chars.first())
             }
-            return allCombinations.toSet()
+            return trie.search(accumulator.toString()).keys
+//            accumulator.forEach {}
+//            return allCombinations.toSet()
         }
     }
 }

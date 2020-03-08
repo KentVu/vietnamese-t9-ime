@@ -102,9 +102,10 @@ class EngineTests: AnnotationSpec() {
     fun engineFunction_1key_2() = runBlocking {
         engineFunction("""
                 a
+                aa
                 ab
                 ac
-                aa""".trimIndent(),
+                """.trimIndent(),
             padConfig,
             arrayOf(Key.num1, Key.num0),
             arrayOf(
