@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
@@ -10,7 +10,8 @@ class Presenter constructor(
 ) {
     private val log = lg.newLog("Presenter")
     private lateinit var view: View
-    internal var typingState: TypingState = TypingState.Init(this)
+    internal var typingState: TypingState =
+        TypingState.Init(this)
         set(value) {
             log.i("Presenter:TypingState:change: $field -> $value")
             field = value
@@ -71,7 +72,11 @@ class Presenter constructor(
 
         class Init(private val presenter: Presenter) : TypingState(presenter.lg) {
             override suspend fun keyPress(engine: T9Engine, key: Key) {
-                presenter.typingState = Typing(presenter, engine)
+                presenter.typingState =
+                    Typing(
+                        presenter,
+                        engine
+                    )
             }
         }
 

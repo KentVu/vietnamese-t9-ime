@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android
 
 import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
@@ -15,7 +15,11 @@ class WordListAdapter(private val words: List<String>) : RecyclerView.Adapter<Wo
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-            ViewHolder(TextView(parent.context))
+        ViewHolder(
+            TextView(
+                parent.context
+            )
+        )
 
     class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 }

@@ -1,9 +1,10 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android
 
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.vutrankien.t9vietnamese.lib.LogFactory
 import javax.inject.Inject
 
 /**

@@ -6,7 +6,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId "com.vutrankien.t9vietnamese"
+        applicationId "com.vutrankien.t9vietnamese.android"
         targetSdkVersion 28
         minSdkVersion 15
         versionCode 1

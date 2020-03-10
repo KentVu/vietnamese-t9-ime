@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
 interface LogFactory {
     interface Log {
@@ -13,10 +13,12 @@ interface LogFactory {
  * Created by vutrankien on 17/07/21.
  */
 class JavaLogFactory: LogFactory {
-    override fun newLog(tag: String): LogFactory.Log = JavaLog(tag)
+    override fun newLog(tag: String): LogFactory.Log =
+        JavaLog(tag)
 }
 
-private class JavaLog(private val tag: String) : LogFactory.Log {
+private class JavaLog(private val tag: String) :
+    LogFactory.Log {
     override fun d(msg: String) {
         println(FORMAT.format("D", tag, msg))
     }

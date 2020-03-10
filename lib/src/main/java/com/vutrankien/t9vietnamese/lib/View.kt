@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -17,8 +17,10 @@ enum class Event {
     START,
     KEY_PRESS;
 
-    fun withData(data: Key) = EventWithData(this, data)
-    fun noData(): EventWithData<Event, Key> = EventWithData(this, null)
+    fun withData(data: Key) =
+        EventWithData(this, data)
+    fun noData(): EventWithData<Event, Key> =
+        EventWithData(this, null)
 }
 
 data class EventWithData<TEvent, TData>(val event: TEvent, val data: TData?)

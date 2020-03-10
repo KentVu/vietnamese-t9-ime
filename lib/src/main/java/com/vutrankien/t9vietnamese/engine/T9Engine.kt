@@ -1,7 +1,7 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.Key
-import com.vutrankien.t9vietnamese.PadConfiguration
+import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {

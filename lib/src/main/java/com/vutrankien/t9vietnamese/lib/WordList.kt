@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
 import java.io.Closeable
 import java.io.InputStream
@@ -10,7 +10,8 @@ interface WordList: Closeable {
 /**
  * Created by KentVu on 2018/01/21.
  */
-class DefaultWordList(val stream: InputStream) : WordList {
+class DefaultWordList(val stream: InputStream) :
+    WordList {
 
     private val bufferedReader = stream.bufferedReader()
 

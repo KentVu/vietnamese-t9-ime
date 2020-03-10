@@ -1,7 +1,8 @@
-package com.vutrankien.t9vietnamese.tests
+package com.vutrankien.t9vietnamese.lib.tests
 
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
+import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.IsolationMode
 import io.kotlintest.specs.AnnotationSpec
 import io.mockk.*
@@ -18,7 +19,12 @@ class PresenterTest: AnnotationSpec() {
     //val logGenerator = daggerComponents.logGenerator()
     fun getPresenter(): Presenter {
         return DaggerPresenterComponents.builder()
-            .presenterModule(PresenterModule(seed, engine))
+            .presenterModule(
+                PresenterModule(
+                    seed,
+                    engine
+                )
+            )
             .build()
             .presenter()
     }

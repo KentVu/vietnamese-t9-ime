@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
 import android.content.Context
@@ -6,20 +6,22 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.PowerManager
 import android.os.SystemClock
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
-import android.view.WindowManager
-import android.widget.Button
-import android.widget.TextView
+import com.vutrankien.t9vietnamese.lib.LogFactory
 import kotlinx.coroutines.*
 import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.find
-import timber.log.Timber.*
-import java.util.concurrent.ForkJoinPool
+import javax.inject.Inject
 
 class MainActivity : Activity() {
+    @Inject
+    lateinit var logFactory: LogFactory
+    private lateinit var log: LogFactory.Log
 
     companion object {
         private val WAKELOCK_TIMEOUT = 60000L
@@ -33,7 +35,8 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        (application as T9Application).appComponent.inject(this)
+        log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -43,7 +46,7 @@ class MainActivity : Activity() {
                 BuildConfig.APPLICATION_ID)
 
         scope.launch {
-            i("Start initializing")
+            log.i("Start initializing")
             val startTime = SystemClock.elapsedRealtime()
             val locale = "vi-VN"
             displayInfo(R.string.engine_loading)
@@ -53,7 +56,7 @@ class MainActivity : Activity() {
             wakelock.run { if(isHeld) release() }
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)
-            i("Initialization Completed! loadTime=$loadTime")
+            log.i("Initialization Completed! loadTime=$loadTime")
             displayInfo(R.string.notify_initialized)
             defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
         }
@@ -61,11 +64,11 @@ class MainActivity : Activity() {
 
     override fun onStop() {
         super.onStop()
-        d("onStop")
+        log.d("onStop")
     }
 
     override fun onDestroy() {
-        d("onDestroy")
+        log.d("onDestroy")
         super.onDestroy()
         //try {
         //    GlobalScope.launch { run() { engine.close() } }
@@ -94,7 +97,7 @@ class MainActivity : Activity() {
 
     fun onBtnClick(view: View) {
         val text = (view as Button).text
-        d("onBtnClick() btn=" + text.substring(0..1))
+        log.d("onBtnClick() btn=" + text.substring(0..1))
         //try {
         //    engine.input(text[0])
         //    val resultWords = engine.currentCandidates.take(10)
@@ -107,19 +110,20 @@ class MainActivity : Activity() {
     }
 
     fun onCandidateClick(view: View) {
-        d("onCandidateClick()")
+        log.d("onCandidateClick()")
         //engine.flush()
         (view as TextView).text = ""
     }
 
     fun onBtnStarClick(view: View) {
-        d("onBtnStarClick()")
+        log.d("onBtnStarClick()")
         //engine.flush()
         (view as TextView).text = ""
     }
 }
 
 class PollDefer(private val defer: Deferred<*>, private val time: Long, private val textView: TextView) {
+    private lateinit var log: LogFactory.Log
 
     companion object {
         private val POLL_INTERVAL = 1000L
@@ -129,16 +133,16 @@ class PollDefer(private val defer: Deferred<*>, private val time: Long, private 
     init {
         mTimer = object : CountDownTimer(time, POLL_INTERVAL) {
             override fun onFinish() {
-                d("onFinish")
+                log.d("onFinish")
                 if (!defer.isCompleted) {
-                    w("engine still loading after $time ms")
+                    log.w("engine still loading after $time ms")
                     textView.text = "engine still loading after $time ms"
                 }
             }
 
             override fun onTick(millisUntilFinish: Long) {
                 val percentDone = if (defer.isCompleted) 100 else (time - millisUntilFinish) * 100 / time
-                d("onTick:$millisUntilFinish:$percentDone% done")
+                log.d("onTick:$millisUntilFinish:$percentDone% done")
                 if (defer.isCompleted) cancel() else
                     textView.text = "loading $percentDone%"
             }

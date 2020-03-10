@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android.tests
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -7,6 +7,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import com.vutrankien.t9vietnamese.android.MainActivity
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -18,7 +19,8 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
-    @get:Rule val mActivityRule = ActivityTestRule<MainActivity>(MainActivity::class.java)
+    @get:Rule val mActivityRule = ActivityTestRule<MainActivity>(
+        MainActivity::class.java)
 
     @Before
     fun unlockScreen() = mActivityRule.activity.unlockScreen()

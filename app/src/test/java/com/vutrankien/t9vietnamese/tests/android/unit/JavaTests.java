@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese.tests;
+package com.vutrankien.t9vietnamese.tests.android.unit;
 
 import android.annotation.SuppressLint;
 import android.os.Build;

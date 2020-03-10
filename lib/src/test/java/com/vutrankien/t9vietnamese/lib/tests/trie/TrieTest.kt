@@ -1,6 +1,6 @@
-package com.vutrankien.t9vietnamese.trie
+package com.vutrankien.t9vietnamese.lib.tests.trie
 
-import com.vutrankien.t9vietnamese.LogFactory
+import com.vutrankien.t9vietnamese.lib.LogFactory
 import io.kotlintest.matchers.maps.shouldContainKeys
 import io.kotlintest.specs.StringSpec
 import kentvu.dawgjava.DawgTrie

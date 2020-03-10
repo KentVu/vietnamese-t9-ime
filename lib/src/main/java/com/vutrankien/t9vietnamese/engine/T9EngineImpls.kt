@@ -1,6 +1,9 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.*
+import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.KeyType
+import com.vutrankien.t9vietnamese.lib.LogFactory
+import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
 import kotlinx.coroutines.Dispatchers
@@ -77,8 +80,8 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
 //}
 
 private class OldT9Engine(
-        override var pad: PadConfiguration,
-        private val log: LogFactory.Log
+    override var pad: PadConfiguration,
+    private val log: LogFactory.Log
 ) : T9Engine {
     override var initialized: Boolean = false
 

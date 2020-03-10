@@ -1,7 +1,8 @@
-package com.vutrankien.t9vietnamese.tests
+package com.vutrankien.t9vietnamese.lib.tests
 
 import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
+import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.IsolationMode
 import io.kotlintest.assertSoftly
 import io.kotlintest.shouldBe
@@ -17,20 +18,42 @@ class EngineTests: AnnotationSpec() {
     private lateinit var log: LogFactory.Log
 
     private val padConfig = PadConfiguration(
-            mapOf(
-                    Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a')),
-                    Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('b')),
-                    Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('c')),
-                    Key.num0 to KeyConfig(KeyType.Confirm)
+        mapOf(
+            Key.num1 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('a')
+            ),
+            Key.num2 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('b')
+            ),
+            Key.num3 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('c')
+            ),
+            Key.num0 to KeyConfig(
+                KeyType.Confirm
             )
+        )
     )
     private val padConfigStd = PadConfiguration(
-            mapOf(
-                    Key.num1 to KeyConfig(KeyType.Normal, linkedSetOf('a', 'b', 'c')),
-                    Key.num2 to KeyConfig(KeyType.Normal, linkedSetOf('d', 'e', 'f')),
-                    Key.num3 to KeyConfig(KeyType.Normal, linkedSetOf('g', 'h', 'i')),
-                    Key.num0 to KeyConfig(KeyType.Confirm)
+        mapOf(
+            Key.num1 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('a', 'b', 'c')
+            ),
+            Key.num2 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('d', 'e', 'f')
+            ),
+            Key.num3 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('g', 'h', 'i')
+            ),
+            Key.num0 to KeyConfig(
+                KeyType.Confirm
             )
+        )
     )
 
     @Before
@@ -45,12 +68,18 @@ class EngineTests: AnnotationSpec() {
     fun progressiveReaderTest() = runBlocking {
         val content = "a\nb\nc"
         val bytes = content.toByteArray()
-        val inputStream = CheckableInputStream(ByteArrayInputStream(bytes))
+        val inputStream =
+            CheckableInputStream(
+                ByteArrayInputStream(bytes)
+            )
         val progresses = inputStream.progressiveRead(this@runBlocking).toList()
         inputStream.closed shouldBe true
         progresses[0] shouldBe Progress(2, "a")
         progresses[1] shouldBe Progress(4, "b")
-        progresses[2] shouldBe Progress(6, "c") // null terminating?
+        progresses[2] shouldBe Progress(
+            6,
+            "c"
+        ) // null terminating?
     }
 
     /**
@@ -160,10 +189,10 @@ class EngineTests: AnnotationSpec() {
     }
 
     private suspend fun engineFunction(
-            seeds: Sequence<String>,
-            padConfig: PadConfiguration,
-            sequence: Array<Key>,
-            expectedEvent: Array<T9Engine.Event>
+        seeds: Sequence<String>,
+        padConfig: PadConfiguration,
+        sequence: Array<Key>,
+        expectedEvent: Array<T9Engine.Event>
     ) = withTimeout(100000) {
         launch {
             engine.init(seeds)

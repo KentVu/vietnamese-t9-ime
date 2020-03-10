@@ -1,10 +1,8 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android
 
 import android.app.Application
 import timber.log.Timber
 import timber.log.Timber.DebugTree
-
-
 
 /**
  * Created by vutrankien on 17/08/14.

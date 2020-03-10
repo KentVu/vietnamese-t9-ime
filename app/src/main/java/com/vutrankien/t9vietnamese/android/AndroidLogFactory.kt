@@ -1,7 +1,7 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android
 
 import android.util.Log
-import timber.log.Timber
+import com.vutrankien.t9vietnamese.lib.LogFactory
 
 class AndroidLogFactory: LogFactory {
     override fun newLog(tag: String): LogFactory.Log {
