@@ -46,37 +46,35 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
     }
 
     companion object {
-        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int): Set<String> {
-            var allCombinations = mutableListOf<String>()
+        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int/*TODO*/): Set<String> {
+            var accumulator = mutableSetOf<String>()
+            // TODO: use generateSequence!
             keySeq.forEach { key ->
-                pad[key].chars.forEach { c ->
-                    // for each char of the key
-                    allCombinations = allCombinations.run {
-                        if (isEmpty()) {
-                            // add to the current combination
-                            add((c.toString()))
-                            this
-                        } else {
-                            // add to the current combination
-                            val newCombinations = mutableListOf<String>()
-                            forEach {
-                                newCombinations.add(it + c)
-                            }
-                            newCombinations
-                        }
+                if (accumulator.isEmpty()) {
+                    accumulator.addAll(pad[key].chars.map { it.toString() })
+                } else {
+                    // combine chars of current key to current set of combinations
+                    val newAcc = mutableSetOf<String>()
+                    pad[key].chars.forEach { c ->
+                        newAcc.addAll(accumulator.map{ it + c })
                     }
+                    accumulator = newAcc
                 }
             }
-            return allCombinations.toSet()
+            return accumulator.fold(sortedSetOf()) { acc, s ->
+                acc.apply {
+                    addAll(trie.search(s).keys)
+                }
+            }
         }
     }
 }
 
-private fun <E> MutableSet<E>.combine(c: Char) {
-    if (isEmpty()) {
-        return
-    }
-}
+//private fun Set<String>.combine(c: Char): Set<String> {
+//    if (isEmpty()) {
+//        return
+//    }
+//}
 
 private class OldT9Engine(
         override var pad: PadConfiguration,

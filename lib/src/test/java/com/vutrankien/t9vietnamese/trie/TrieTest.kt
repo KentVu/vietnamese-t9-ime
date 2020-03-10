@@ -9,8 +9,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
-private const val REPORT_PROGRESS_INTERVAL = 10
-
 @ExperimentalCoroutinesApi
 class TrieTest: StringSpec ({
     val log = LogGenerator().newLog("TrieTest")
@@ -53,4 +51,8 @@ class TrieTest: StringSpec ({
             }
         }
     }
-})
+}) {
+    companion object {
+        private const val REPORT_PROGRESS_INTERVAL = 10
+    }
+}

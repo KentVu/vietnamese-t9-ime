@@ -22,9 +22,10 @@ Design goals
 * Mimic the t9 input!
 * Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
 
-Some specs:
+Some specs (Stories):
 ===========
-* Uppercase should only occur at first letter of words.
+1. Uppercase should only occur at first letter of words.
+2. User should be able to select from a set of displayed candidates.
 
 Things to consider
 ==================
@@ -32,15 +33,19 @@ Things to consider
   * http://www.unicode.org/reports/tr15/tr15-23.html#Decomposition
 * [x] Follows the English T9 convention of key assignment
 
+### Why I chose dawg for implemetation of trie?
+Because it's the only implemetation that support persisting (serializing), and fast!
+
 TODO
 ====
 * [x] ~~Decompose accented character~~.
 * [x] Implement number-to-word based on wordlist (saved in database).
+* [ ] Implement select candidate key.
 * [ ] Support suggestion
 * [ ] Flexibility via settings (accents right after character/accent at end of word)
 * [ ] Support add new word to dictionary
 * [ ] Flick input mode (for registering new word)
-* [ ] [Frecency](https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Frecency_algorithm) algorithm
+* [ ] [Frecency](https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Frecency_algorithm) algorithm?
 
 
 References-Acknowledgement
