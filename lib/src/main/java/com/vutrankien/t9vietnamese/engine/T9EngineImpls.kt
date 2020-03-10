@@ -34,7 +34,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
         }
         // TODO report progress
         for (i in channel) {
-            log.d("progress: $i")
+            //log.d("progress: $i")
         }
         initialized = true
         eventSource.send(T9Engine.Event.Initialized)

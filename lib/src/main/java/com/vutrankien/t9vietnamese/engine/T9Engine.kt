@@ -6,6 +6,9 @@ import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
     val initialized: Boolean
+    /**
+     * This NEED to be set before pushing anything to the engine!
+     */
     var pad: PadConfiguration
     val eventSource: Channel<Event>
 

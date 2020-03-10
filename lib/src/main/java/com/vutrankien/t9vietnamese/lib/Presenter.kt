@@ -34,9 +34,14 @@ class Presenter constructor(
         for (eventWithData in view.eventSource) {
             when (eventWithData.event) {
                 Event.START -> {
+                    log.i("Start initializing")
+                    val startTime = System.currentTimeMillis()
                     view.showProgress()
                     engine.init(engineSeed)
                     view.showKeyboard()
+                    val loadTime = (System.currentTimeMillis()
+                            - startTime)
+                    log.i("Initialization Completed! loadTime=$loadTime")
                 }
                 Event.KEY_PRESS -> {
                     engine.push(eventWithData.data ?:

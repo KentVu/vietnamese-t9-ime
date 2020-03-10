@@ -11,7 +11,7 @@ val wordListFiles = mapOf<String, String>(LOCALE_VN to "morphemes.txt")
 
 fun UNSUPPORTED_MSG(locale: String) = "Locale $locale unsupported"
 
-val configurations = mapOf(LOCALE_VN to VNConfiguration)
+//val configurations = mapOf(LOCALE_VN to VNConfiguration)
 
 interface Configuration {
     val pad: PadConfiguration
@@ -109,7 +109,19 @@ enum class Key(val char: Char) {
     num8('8'),
     num9('9'),
     keyStar('*'),
-    keySharp('#')
+    keySharp('#');
+
+    companion object {
+        fun fromNum(num: Char): Key {
+            return values().first { it.char == num }
+            //values().forEach {
+            //    if (it.char == num) {
+            //        return it
+            //    }
+            //}
+            //throw IllegalArgumentException("Key(char=${key.char})")
+        }
+    }
 }
 
 class PadConfiguration(private val configMap: Map<Key, KeyConfig>) {

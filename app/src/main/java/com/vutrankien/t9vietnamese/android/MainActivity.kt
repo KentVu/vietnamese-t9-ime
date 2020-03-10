@@ -5,28 +5,63 @@ import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.PowerManager
-import android.os.SystemClock
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.vutrankien.t9vietnamese.lib.LogFactory
+import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.defaultSharedPreferences
+import kotlinx.coroutines.channels.Channel
 import org.jetbrains.anko.find
 import javax.inject.Inject
+import com.vutrankien.t9vietnamese.lib.View as MVPView
 
-class MainActivity : Activity() {
+class MainActivity : Activity(), MVPView {
     @Inject
     lateinit var logFactory: LogFactory
     private lateinit var log: LogFactory.Log
+    @Inject
+    lateinit var presenter: Presenter
 
     companion object {
-        private val WAKELOCK_TIMEOUT = 60000L
+        private const val WAKELOCK_TIMEOUT = 60000L
     }
-    private val scope = CoroutineScope(Dispatchers.Main + Job())
+    override val scope = CoroutineScope(Dispatchers.Main + Job())
+
+    override val eventSource: Channel<EventWithData<Event, Key>> =
+        Channel()
+
+    override fun showProgress() {
+        displayInfo(R.string.engine_loading)
+    }
+
+    override fun showKeyboard() {
+        log.w("View: TODO: showKeyboard")
+        wakelock.run { if(isHeld) release() }
+        displayInfo(R.string.notify_initialized)
+        //defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
+    }
+
+    override fun showCandidates(cand: Set<String>) {
+        log.d("View: showCandidates:$cand")
+        find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(cand.toList())
+        //try {
+        //    engine.input(text[0])
+        //    val resultWords = engine.currentCandidates.take(10)
+        //    find<TextView>(R.id.text).text = resultWords.joinToString()
+        //    find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
+        //} catch (e: UninitializedPropertyAccessException) {
+        //    w(e)
+        //    displayError(e)
+        //}
+    }
+
+    override fun confirmInput() {
+        log.d("View: confirmInput")
+
+    }
 
     //private lateinit var engine: T9Engine
     //private lateinit var loadEngineDefer: Deferred<T9Engine>
@@ -38,27 +73,17 @@ class MainActivity : Activity() {
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
+        presenter.attachView(this)
         val recyclerView = find<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
-                PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
-                BuildConfig.APPLICATION_ID)
+                PowerManager.SCREEN_DIM_WAKE_LOCK,
+                "${BuildConfig.APPLICATION_ID}:MainActivity")
 
+        wakelock.acquire(WAKELOCK_TIMEOUT)
         scope.launch {
-            log.i("Start initializing")
-            val startTime = SystemClock.elapsedRealtime()
-            val locale = "vi-VN"
-            displayInfo(R.string.engine_loading)
-            wakelock.acquire(WAKELOCK_TIMEOUT)
-
-
-            wakelock.run { if(isHeld) release() }
-            val loadTime = (SystemClock.elapsedRealtime()
-                    - startTime)
-            log.i("Initialization Completed! loadTime=$loadTime")
-            displayInfo(R.string.notify_initialized)
-            defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
+            eventSource.send(Event.START.noData())
         }
     }
 
@@ -97,16 +122,11 @@ class MainActivity : Activity() {
 
     fun onBtnClick(view: View) {
         val text = (view as Button).text
-        log.d("onBtnClick() btn=" + text.substring(0..1))
-        //try {
-        //    engine.input(text[0])
-        //    val resultWords = engine.currentCandidates.take(10)
-        //    find<TextView>(R.id.text).text = resultWords.joinToString()
-        //    find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
-        //} catch (e: UninitializedPropertyAccessException) {
-        //    w(e)
-        //    displayError(e)
-        //}
+        val key = text[0]
+        log.d("onBtnClick() btn=$key")
+        scope.launch {
+            eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+        }
     }
 
     fun onCandidateClick(view: View) {
@@ -117,8 +137,6 @@ class MainActivity : Activity() {
 
     fun onBtnStarClick(view: View) {
         log.d("onBtnStarClick()")
-        //engine.flush()
-        (view as TextView).text = ""
     }
 }
 
