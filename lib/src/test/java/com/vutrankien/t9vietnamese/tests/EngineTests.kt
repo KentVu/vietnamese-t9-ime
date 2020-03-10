@@ -4,6 +4,7 @@ import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import io.kotlintest.IsolationMode
 import io.kotlintest.assertSoftly
+import io.kotlintest.matchers.collections.shouldContainAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kotlinx.coroutines.*
@@ -179,7 +180,11 @@ class EngineTests: AnnotationSpec() {
             expectedEvent.forEach {
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
-                event shouldBe it
+                if (event is T9Engine.Event.NewCandidates) {
+                    event.candidates shouldContainAll (it as T9Engine.Event.NewCandidates).candidates
+                } else {
+                    event shouldBe it
+                }
             }
         }
     }

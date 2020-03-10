@@ -19,13 +19,14 @@ interface T9Engine {
 
     sealed class Event {
         class NewCandidates(val candidates: Set<String>) : Event() {
-            override fun equals(other: Any?): Boolean = if (other is NewCandidates) {
-                //return other.candidates.equals(candidates)
-                other.candidates.containsAll(candidates) &&
-                        candidates.containsAll(other.candidates)
-            } else {
-                super.equals(other)
-            }
+            override fun equals(other: Any?): Boolean =
+                if (other is NewCandidates) {
+                    //return other.candidates.equals(candidates)
+                    other.candidates.containsAll(candidates) &&
+                            candidates.containsAll(other.candidates)
+                } else {
+                    super.equals(other)
+                }
 
             override fun toString(): String {
                 return "NewCandidates:$candidates"
