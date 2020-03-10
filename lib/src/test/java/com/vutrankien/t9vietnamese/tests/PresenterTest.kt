@@ -12,8 +12,8 @@ class PresenterTest: AnnotationSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
     private val seed: Sequence<String> = "a\nb\nc".lineSequence()
-    lateinit var view: View
-    lateinit var engine: T9Engine
+    private lateinit var view: View
+    private lateinit var engine: T9Engine
 
     //val logGenerator = daggerComponents.logGenerator()
     fun getPresenter(): Presenter {

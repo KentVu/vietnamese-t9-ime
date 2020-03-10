@@ -12,7 +12,7 @@ import java.text.Normalizer
 
 // TODO
 
-class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
+class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
     private val log = lg.newLog("T9Engine")
     val trie: Trie = DawgTrie()
     override var initialized: Boolean = false
@@ -78,7 +78,7 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
 
 private class OldT9Engine(
         override var pad: PadConfiguration,
-        private val log: LogGenerator.Log
+        private val log: LogFactory.Log
 ) : T9Engine {
     override var initialized: Boolean = false
 

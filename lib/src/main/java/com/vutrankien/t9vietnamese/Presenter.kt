@@ -2,13 +2,11 @@ package com.vutrankien.t9vietnamese
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
-import java.io.InputStream
-import javax.inject.Inject
 
 class Presenter constructor(
     private val engineSeed: Sequence<String>,
     private val engine: T9Engine,
-    private val lg: LogGenerator
+    private val lg: LogFactory
 ) {
     private val log = lg.newLog("Presenter")
     private lateinit var view: View
@@ -61,7 +59,7 @@ class Presenter constructor(
         }
     }
 
-    sealed class TypingState(lg: LogGenerator) {
+    sealed class TypingState(lg: LogFactory) {
         protected val log = lg.newLog("TypingState")
         open suspend fun keyPress(engine: T9Engine, key: Key) {
             throw IllegalStateException("${javaClass.name}.keyPress($key)")

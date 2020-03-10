@@ -4,7 +4,6 @@ import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import io.kotlintest.IsolationMode
 import io.kotlintest.assertSoftly
-import io.kotlintest.matchers.collections.shouldContainAll
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.AnnotationSpec
 import kotlinx.coroutines.*
@@ -15,7 +14,7 @@ import java.io.InputStream
 class EngineTests: AnnotationSpec() {
     override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
     private lateinit var engine: T9Engine
-    private lateinit var log: LogGenerator.Log
+    private lateinit var log: LogFactory.Log
 
     private val padConfig = PadConfiguration(
             mapOf(

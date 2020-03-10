@@ -24,6 +24,7 @@ class MainActivity : Activity() {
     companion object {
         private val WAKELOCK_TIMEOUT = 60000L
     }
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     //private lateinit var engine: T9Engine
     //private lateinit var loadEngineDefer: Deferred<T9Engine>
@@ -41,29 +42,15 @@ class MainActivity : Activity() {
                 PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE,
                 BuildConfig.APPLICATION_ID)
 
-        GlobalScope.launch(Dispatchers.Main) {
+        scope.launch {
             i("Start initializing")
             val startTime = SystemClock.elapsedRealtime()
             val locale = "vi-VN"
             displayInfo(R.string.engine_loading)
             wakelock.acquire(WAKELOCK_TIMEOUT)
-            //loadEngineDefer = async() {
-            //    val trieDB = TrieDB(getFileStreamPath(VNConfiguration.dbname))
-            //    if (!trieDB.initialized) {
-            //        displayError("The engine is not initialized!")
-            //        trieDB.readFrom(WordList.ViVNWordList(this@MainActivity))
-            //    }
-            //    T9Engine(locale, trieDB)
-            //}
-            //val pollDefer:PollDefer? =
-            //    if (defaultSharedPreferences.contains("load_time")) PollDefer(loadEngineDefer,
-            //            defaultSharedPreferences.getLong("load_time", -1), find(R.id
-            //    .text))
-            //    else null
-            //engine = loadEngineDefer.await()
+
 
             wakelock.run { if(isHeld) release() }
-            //pollDefer?.stop()
             val loadTime = (SystemClock.elapsedRealtime()
                     - startTime)
             i("Initialization Completed! loadTime=$loadTime")

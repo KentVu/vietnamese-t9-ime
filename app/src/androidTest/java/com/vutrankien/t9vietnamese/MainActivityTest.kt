@@ -5,8 +5,8 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +22,9 @@ class MainActivityTest {
 
     @Before
     fun unlockScreen() = mActivityRule.activity.unlockScreen()
+
+    @Before
+    fun setup() {}
 
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
