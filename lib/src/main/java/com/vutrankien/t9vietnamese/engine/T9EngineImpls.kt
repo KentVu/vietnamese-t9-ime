@@ -46,9 +46,10 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
     }
 
     companion object {
-        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int): Set<String> {
+        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int/*TODO*/): Set<String> {
             var accumulator = mutableSetOf<String>()
-            keySeq.forEachIndexed { keyi, key ->
+            // TODO: use generateSequence!
+            keySeq.forEach { key ->
                 if (accumulator.isEmpty()) {
                     accumulator.addAll(pad[key].chars.map { it.toString() })
                 } else {
@@ -65,8 +66,6 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
                     addAll(trie.search(s).keys)
                 }
             }
-//            accumulator.forEach {}
-//            return allCombinations.toSet()
         }
     }
 }

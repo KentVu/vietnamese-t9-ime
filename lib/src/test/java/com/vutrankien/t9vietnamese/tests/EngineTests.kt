@@ -181,7 +181,7 @@ class EngineTests: AnnotationSpec() {
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
-                    event.candidates shouldContainAll (it as T9Engine.Event.NewCandidates).candidates
+                    event.contains(it as T9Engine.Event.NewCandidates) shouldBe true
                 } else {
                     event shouldBe it
                 }
