@@ -1,6 +1,9 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.*
+import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.KeyType
+import com.vutrankien.t9vietnamese.lib.LogFactory
+import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +15,7 @@ import java.text.Normalizer
 
 // TODO
 
-class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
+class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
     private val log = lg.newLog("T9Engine")
     val trie: Trie = DawgTrie()
     override var initialized: Boolean = false
@@ -21,7 +24,7 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
 
     override val eventSource: Channel<T9Engine.Event> = Channel()
 
-    private val _currentCandidates = linkedSetOf<String>()
+    private val _currentCandidates = mutableSetOf<String>()
     private val _currentNumSeq = mutableListOf<Key>()
 
     override suspend fun init(seed: Sequence<String>) {
@@ -31,18 +34,27 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
         }
         // TODO report progress
         for (i in channel) {
-            log.d("progress: $i")
+            log.v("progress: $i")
         }
         initialized = true
         eventSource.send(T9Engine.Event.Initialized)
     }
 
+
     override suspend fun push(key: Key) {
         _currentNumSeq.add(key)
-        if (pad[key].type != KeyType.Confirm)
-            eventSource.send(T9Engine.Event.NewCandidates(findCandidates(trie, pad, _currentNumSeq, 10)))
-        else
-            eventSource.send(T9Engine.Event.Confirm)
+        if (pad[key].type != KeyType.Confirm) {
+            val candidates = findCandidates(trie, pad, _currentNumSeq, 10)
+            eventSource.send(T9Engine.Event.NewCandidates(candidates))
+            _currentCandidates.clear()
+            _currentCandidates.addAll(candidates)
+            // not using _currentCandidates directly due to a strange behavior of coroutine??
+        } else {
+            // TODO implement selecting feature
+            eventSource.send(T9Engine.Event.Confirm(_currentCandidates.first()))
+            _currentCandidates.clear()
+            _currentNumSeq.clear()
+        }
     }
 
     companion object {
@@ -77,8 +89,8 @@ class DefaultT9Engine constructor(lg: LogGenerator) : T9Engine {
 //}
 
 private class OldT9Engine(
-        override var pad: PadConfiguration,
-        private val log: LogGenerator.Log
+    override var pad: PadConfiguration,
+    private val log: LogFactory.Log
 ) : T9Engine {
     override var initialized: Boolean = false
 

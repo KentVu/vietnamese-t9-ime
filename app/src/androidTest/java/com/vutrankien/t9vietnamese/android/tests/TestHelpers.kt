@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.android.tests
 
 import android.app.Activity
 import android.view.WindowManager

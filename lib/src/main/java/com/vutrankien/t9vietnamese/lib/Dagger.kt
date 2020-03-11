@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
@@ -6,21 +6,26 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 
-@Component(modules = [EngineModule::class])
+@Component(modules = [EngineModule::class, LogModule::class])
 abstract class EngineComponents {
-    abstract val lg: LogGenerator
-
-    //abstract fun logGenerator(): LogGenerator
+    abstract val lg: LogFactory
     abstract fun engine(): T9Engine
+}
+
+@Module
+class LogModule {
+    @Provides
+    fun logFactory(): LogFactory =
+        JavaLogFactory()
 }
 
 @Module
 class EngineModule {
     @Provides
-    fun engine(lg: LogGenerator): T9Engine = DefaultT9Engine(lg)
+    fun engine(lg: LogFactory): T9Engine = DefaultT9Engine(lg)
 }
 
-@Component(modules = [PresenterModule::class])
+@Component(modules = [PresenterModule::class, LogModule::class])
 abstract class PresenterComponents {
     abstract fun presenter(): Presenter
 }
@@ -32,6 +37,7 @@ class PresenterModule(
 ) {
     @Provides
     fun presenter(
-        lg: LogGenerator
-    ): Presenter = Presenter(engineSeed, engine, lg)
+        lg: LogFactory
+    ): Presenter =
+        Presenter(engineSeed, engine, lg)
 }

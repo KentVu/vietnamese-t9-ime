@@ -1,21 +1,29 @@
-package com.vutrankien.t9vietnamese
+package com.vutrankien.t9vietnamese.lib
 
-import javax.inject.Inject
-
-/**
- * Created by vutrankien on 17/07/21.
- */
-class LogGenerator @Inject constructor() {
-    fun newLog(tag: String): Log = JavaLog(tag)
-
+interface LogFactory {
     interface Log {
         fun d(msg: String)
         fun i(msg: String)
         fun w(msg: String)
+        fun v(msg: String)
     }
+
+    fun newLog(tag: String): Log
+}
+/**
+ * Created by vutrankien on 17/07/21.
+ */
+class JavaLogFactory: LogFactory {
+    override fun newLog(tag: String): LogFactory.Log =
+        JavaLog(tag)
 }
 
-private class JavaLog(private val tag: String) : LogGenerator.Log {
+private class JavaLog(private val tag: String) :
+    LogFactory.Log {
+    override fun v(msg: String) {
+        println(FORMAT.format("V", tag, msg))
+    }
+
     override fun d(msg: String) {
         println(FORMAT.format("D", tag, msg))
     }

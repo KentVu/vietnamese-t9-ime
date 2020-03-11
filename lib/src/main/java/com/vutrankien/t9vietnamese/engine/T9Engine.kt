@@ -1,18 +1,16 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.Key
-import com.vutrankien.t9vietnamese.PadConfiguration
+import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
     val initialized: Boolean
+    /**
+     * This NEED to be set before pushing anything to the engine!
+     */
     var pad: PadConfiguration
     val eventSource: Channel<Event>
-
-    enum class EventType {
-        NEW_CANDIDATES,
-        CONFIRM
-    }
 
     sealed class Event {
         class NewCandidates(val candidates: Set<String>) : Event() {
@@ -23,7 +21,14 @@ interface T9Engine {
                 return "NewCandidates:$candidates"
             }
         }
-        object Confirm : Event()
+        class Confirm(val word: String) : Event() {
+            override fun equals(other: Any?): Boolean =
+                if (other is Confirm)
+                    other.word == word
+                else super.equals(other)
+
+            override fun hashCode(): Int = word.hashCode()
+        }
         object Initialized : Event()
     }
 

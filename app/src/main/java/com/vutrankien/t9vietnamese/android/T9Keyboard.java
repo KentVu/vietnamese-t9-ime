@@ -1,4 +1,4 @@
-package com.vutrankien.t9vietnamese;
+package com.vutrankien.t9vietnamese.android;
 
 import android.content.Context;
 import android.inputmethodservice.Keyboard;

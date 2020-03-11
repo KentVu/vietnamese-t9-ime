@@ -17,15 +17,29 @@ The T9 input method
 > several letters are associated with each key, and selecting one letter often
 > requires multiple keypresses.
 
-Design goals
-============
-* Mimic the t9 input!
-* Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
-
-Some specs (Stories):
+Specifications (Stories):
 ===========
-1. Uppercase should only occur at first letter of words.
-2. User should be able to select from a set of displayed candidates.
+### Definitions:
+* Program states: These are the program states:
+  1. Inputting
+  1. Confirmed
+
+### Specs:
+[ ] 1. User should interact with the keypad only.
+        * Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
+[ ] 2. Uppercase should only occur at first letter of words.
+[ ] 3. User should be able to select from a set of displayed candidates.
+[x] 4. When inputting, the possible candidates should be displayed.
+[ ] 5. When confirm button is pressed, the selected candidate should be outputted.
+  [ ] 5.1 If no candidate is being selected then the first candidate will be used.
+
+Basic Design:
+===========
+The UI will follow the MVP design pattern:
+* Make the Activity implement the [View interface](lib/src/main/java/com/vutrankien/t9vietnamese/lib/View.kt)
+* [Presenter](lib/src/main/java/com/vutrankien/t9vietnamese/lib/Presenter.kt): Receive UI event, manipulate
+the UI(View)
+* Model? - Everything else?
 
 Things to consider
 ==================
@@ -33,8 +47,8 @@ Things to consider
   * http://www.unicode.org/reports/tr15/tr15-23.html#Decomposition
 * [x] Follows the English T9 convention of key assignment
 
-### Why I chose dawg for implemetation of trie?
-Because it's the only implemetation that support persisting (serializing), and fast!
+### Why I chose dawg for implementation of trie?
+Because it's the only implementation that support persisting (serializing), and fast!
 
 TODO
 ====
