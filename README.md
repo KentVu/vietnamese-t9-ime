@@ -25,13 +25,13 @@ Specifications (Stories):
   1. Confirmed
 
 ### Specs:
-[ ] 1. User should interact with the keypad only.
-        * Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad).
-[ ] 2. Uppercase should only occur at first letter of words.
-[ ] 3. User should be able to select from a set of displayed candidates.
-[x] 4. When inputting, the possible candidates should be displayed.
-[ ] 5. When confirm button is pressed, the selected candidate should be outputted.
-  [ ] 5.1 If no candidate is being selected then the first candidate will be used.
+1. [ ] User should interact mainly with the keypad (other means of interacting is optionally supported).
+        (Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad)).
+2. [ ] Uppercase should only occur at first letter of words.
+3. [ ] User should be able to select from a set of displayed candidates.
+4. [x] When inputting, the possible candidates should be displayed.
+5. [ ] When confirm button is pressed, the selected candidate should be outputted.  
+    1. [ ] If no candidate is being selected then the first candidate will be used.
 
 Basic Design:
 ===========

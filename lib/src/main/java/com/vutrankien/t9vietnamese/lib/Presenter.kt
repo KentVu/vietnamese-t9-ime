@@ -4,7 +4,7 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
 
 class Presenter constructor(
-    private val engineSeed: Sequence<String>,
+    private val engineSeed: Lazy<Sequence<String>>,
     private val engine: T9Engine,
     private val lg: LogFactory
 ) {
@@ -37,7 +37,7 @@ class Presenter constructor(
                     log.i("Start initializing")
                     val startTime = System.currentTimeMillis()
                     view.showProgress()
-                    engine.init(engineSeed)
+                    engine.init(engineSeed.value)
                     view.showKeyboard()
                     val loadTime = (System.currentTimeMillis()
                             - startTime)

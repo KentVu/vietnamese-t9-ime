@@ -69,14 +69,14 @@ install:
   - cd ..
 
 # Emulator Management: Create, Start and Wait
-#before_script:
-#  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-#  - emulator -avd test -no-audio -no-window &
-#  - android-wait-for-emulator
-#  - adb shell settings put global window_animation_scale 0 &
-#  - adb shell settings put global transition_animation_scale 0 &
-#  - adb shell settings put global animator_duration_scale 0 &
-#  - adb shell input keyevent 82 &
+before_script:
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
+  - adb shell input keyevent 82 &
 
 script:
   - |
@@ -93,7 +93,9 @@ script:
   - fold_start app.build "gradle :app:build"
   - ./gradlew -Plint.output.console=true --info :app:build
   - fold_end app.build
-#  - ./gradlew -Plint.output.console=true --info connectedAndroidTest
+  - fold_start app.cAT "gradle :app:connectedAndroidTest"
+  - ./gradlew -Plint.output.console=true --info connectedAndroidTest
+  - fold_end app.cAT
 
 after_failure:
   - export s3key="lib-test/$(git rev-parse --short HEAD)"

@@ -39,5 +39,5 @@ class PresenterModule(
     fun presenter(
         lg: LogFactory
     ): Presenter =
-        Presenter(engineSeed, engine, lg)
+        Presenter(lazy { engineSeed }, engine, lg)
 }

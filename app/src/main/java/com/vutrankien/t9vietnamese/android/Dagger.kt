@@ -20,24 +20,25 @@ interface ActivityComponent {
 @Module
 class PresenterModule {
     @Provides
-    fun getSeed(): Sequence<String> {
-        val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
-        javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
-            it.forEach { line ->
-                sortedWords.add(line)
+    fun getSeed(): Lazy<Sequence<String>> {
+        return lazy {
+            val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
+            javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
+                it.forEach { line ->
+                    sortedWords.add(line)
+                }
             }
+            sortedWords.asSequence()
         }
-        return sortedWords.asSequence()
     }
 
     @Provides
     fun presenter(
-        seed: Sequence<String>,
         engine: T9Engine,
         lg: LogFactory
     ): Presenter {
         engine.pad = VnPad
-        return Presenter(seed, engine, lg)
+        return Presenter(getSeed(), engine, lg)
     }
 }
 
