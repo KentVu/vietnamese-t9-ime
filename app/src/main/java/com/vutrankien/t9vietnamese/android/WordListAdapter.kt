@@ -7,7 +7,9 @@ import android.widget.TextView
 /**
  * Created by user on 2018/03/21.
  */
-class WordListAdapter(private val words: List<String>) : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
+class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
+    val words = mutableListOf<String>()
+
     override fun getItemCount(): Int = words.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -20,6 +22,17 @@ class WordListAdapter(private val words: List<String>) : RecyclerView.Adapter<Wo
                 parent.context
             )
         )
+
+    fun clear() {
+        words.clear()
+        notifyDataSetChanged()
+    }
+
+    fun update(cand: Set<String>) {
+        words.clear()
+        words.addAll(cand)
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
 }

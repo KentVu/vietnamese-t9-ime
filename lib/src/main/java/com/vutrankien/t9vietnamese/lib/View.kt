@@ -10,7 +10,7 @@ interface View {
     fun showProgress()
     fun showKeyboard()
     fun showCandidates(cand: Set<String>)
-    fun confirmInput()
+    fun confirmInput(word: String)
 }
 
 enum class Event {

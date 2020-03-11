@@ -46,11 +46,6 @@ class Presenter constructor(
                 Event.KEY_PRESS -> {
                     engine.push(eventWithData.data ?:
                     throw IllegalStateException("UI KEY_PRESS event with null data!"))
-                    //if (typingState is TypingState.Init) {
-                    //    typingState = TypingState.Typing(this@Presenter, engine)
-                    //}
-                    //typingState.keyPress(engine, eventWithData.data
-                    //    ?: error("NULL data: $eventWithData"))
                 }
             }
         }
@@ -59,7 +54,7 @@ class Presenter constructor(
     private suspend fun receiveEngineEvents() {
         for (event in engine.eventSource) {
             when(event) {
-                is T9Engine.Event.Confirm -> view.confirmInput()
+                is T9Engine.Event.Confirm -> view.confirmInput(event.word)
                 is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
             }
         }

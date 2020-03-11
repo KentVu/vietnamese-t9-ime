@@ -5,6 +5,7 @@ interface LogFactory {
         fun d(msg: String)
         fun i(msg: String)
         fun w(msg: String)
+        fun v(msg: String)
     }
 
     fun newLog(tag: String): Log
@@ -19,6 +20,10 @@ class JavaLogFactory: LogFactory {
 
 private class JavaLog(private val tag: String) :
     LogFactory.Log {
+    override fun v(msg: String) {
+        println(FORMAT.format("V", tag, msg))
+    }
+
     override fun d(msg: String) {
         println(FORMAT.format("D", tag, msg))
     }

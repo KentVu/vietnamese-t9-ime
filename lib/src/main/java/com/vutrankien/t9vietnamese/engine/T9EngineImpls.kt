@@ -24,7 +24,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
 
     override val eventSource: Channel<T9Engine.Event> = Channel()
 
-    private val _currentCandidates = linkedSetOf<String>()
+    private val _currentCandidates = mutableSetOf<String>()
     private val _currentNumSeq = mutableListOf<Key>()
 
     override suspend fun init(seed: Sequence<String>) {
@@ -34,18 +34,27 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
         }
         // TODO report progress
         for (i in channel) {
-            //log.d("progress: $i")
+            log.v("progress: $i")
         }
         initialized = true
         eventSource.send(T9Engine.Event.Initialized)
     }
 
+
     override suspend fun push(key: Key) {
         _currentNumSeq.add(key)
-        if (pad[key].type != KeyType.Confirm)
-            eventSource.send(T9Engine.Event.NewCandidates(findCandidates(trie, pad, _currentNumSeq, 10)))
-        else
-            eventSource.send(T9Engine.Event.Confirm)
+        if (pad[key].type != KeyType.Confirm) {
+            val candidates = findCandidates(trie, pad, _currentNumSeq, 10)
+            eventSource.send(T9Engine.Event.NewCandidates(candidates))
+            _currentCandidates.clear()
+            _currentCandidates.addAll(candidates)
+            // not using _currentCandidates directly due to a strange behavior of coroutine??
+        } else {
+            // TODO implement selecting feature
+            eventSource.send(T9Engine.Event.Confirm(_currentCandidates.first()))
+            _currentCandidates.clear()
+            _currentNumSeq.clear()
+        }
     }
 
     companion object {

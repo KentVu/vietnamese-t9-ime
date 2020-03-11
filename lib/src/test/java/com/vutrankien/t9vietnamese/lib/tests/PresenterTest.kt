@@ -1,15 +1,18 @@
 package com.vutrankien.t9vietnamese.lib.tests
 
-import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.IsolationMode
-import io.kotlintest.specs.AnnotationSpec
-import io.mockk.*
-import kotlinx.coroutines.*
+import io.kotlintest.TestCase
+import io.kotlintest.specs.FunSpec
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 
-class PresenterTest: AnnotationSpec() {
+class PresenterTest: FunSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
     private val seed: Sequence<String> = "a\nb\nc".lineSequence()
@@ -29,8 +32,7 @@ class PresenterTest: AnnotationSpec() {
             .presenter()
     }
 
-    @Before
-    fun setUp() {
+    override fun beforeTest(testCase: TestCase) {
         view = mockk(relaxUnitFun = true)
         every { view.eventSource } returns Channel()
         every { view.scope } returns GlobalScope
@@ -39,52 +41,59 @@ class PresenterTest: AnnotationSpec() {
         every { engine.eventSource } returns Channel()
     }
 
-    @Test
-    fun showProgressIndicatorOnStart() = runBlocking {
-        getPresenter().attachView(view)
-        view.eventSource.send(Event.START.noData())
-        verify(timeout = 100) { view.showProgress() }
-    }
-
-    @Test
-    fun initializeEngineOnStart() = runBlocking {
-        getPresenter().run {
-            attachView(view)
+    init {
+        test("showProgressIndicatorOnStart") {
+            getPresenter().attachView(view)
+            view.eventSource.send(Event.START.noData())
+            verify(timeout = 100) { view.showProgress() }
         }
-        view.eventSource.send(Event.START.noData())
+
+        test("initializeEngineOnStart") {
+            getPresenter().run {
+                attachView(view)
+            }
+            view.eventSource.send(Event.START.noData())
+        }
+
+        test("showKeyboardWhenEngineLoadCompleted") {
+            getPresenter().attachView(view)
+            view.eventSource.send(Event.START.noData())
+            verify(timeout = 100) { view.showKeyboard() }
+        }
+
+        test("whenTypeOneNumberThenDisplayResult") {
+            getPresenter().attachView(view)
+            val cand = setOf("4")
+            setupEngine(mapOf(Key.num0 to T9Engine.Event.Confirm("4"))) {T9Engine.Event.NewCandidates(cand)}
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
+            verify(timeout = 10) { view.showCandidates(cand) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
+            verify(timeout = 1000) { view.showCandidates(cand) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
+            verify { view.confirmInput("4") }
+        }
+
+        test("Confirm input") {
+            getPresenter().attachView(view)
+            val candidates = setOf("5")
+            setupEngine(mapOf(Key.num0 to T9Engine.Event.Confirm("5")),
+                {T9Engine.Event.NewCandidates(candidates)})
+
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
+            verify(timeout = 10) { view.showCandidates(candidates) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
+            verify(timeout = 1000) { view.showCandidates(candidates) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
+            verify { view.confirmInput("5") }
+        }
     }
 
-    @Test
-    fun showKeyboardWhenEngineLoadCompleted() = runBlocking {
-        getPresenter().attachView(view)
-        view.eventSource.send(Event.START.noData())
-        verify(timeout = 100) { view.showKeyboard() }
-    }
-
-    @Test
-    fun whenTypeOneNumberThenDisplayResult() = runBlocking {
-        val cand = setOf("4")
-        //engine = MockEngine()
+    private fun setupEngine(config: Map<Key, T9Engine.Event>, fallback: () -> T9Engine.Event) {
         coEvery {
             engine.push(any())
         } coAnswers {
-            //GlobalScope.launch {
-            when (firstArg<Key>()) {
-                Key.num0 -> engine.eventSource.send(T9Engine.Event.Confirm)
-                else -> engine.eventSource.send(T9Engine.Event.NewCandidates(cand))
-            }
-            //}
+            engine.eventSource.send(config[firstArg()] ?: fallback())
         }
-        getPresenter().attachView(view)
-
-        view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
-        verify(timeout = 10) { view.showCandidates(cand) }
-        view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
-        verify(timeout = 1000) { view.showCandidates(cand) }
-        view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
-        verify { view.confirmInput() }
-        //withTimeout(3000) {
-        //}
     }
 }
 

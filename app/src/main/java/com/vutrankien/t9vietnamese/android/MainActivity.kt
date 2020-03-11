@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.os.PowerManager
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.jetbrains.anko.find
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
@@ -46,21 +46,14 @@ class MainActivity : Activity(), MVPView {
 
     override fun showCandidates(cand: Set<String>) {
         log.d("View: showCandidates:$cand")
-        find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(cand.toList())
-        //try {
-        //    engine.input(text[0])
-        //    val resultWords = engine.currentCandidates.take(10)
-        //    find<TextView>(R.id.text).text = resultWords.joinToString()
-        //    find<RecyclerView>(R.id.recycler_view).adapter = WordListAdapter(engine.currentCandidates.toList())
-        //} catch (e: UninitializedPropertyAccessException) {
-        //    w(e)
-        //    displayError(e)
-        //}
+        wordListAdapter.update(cand)
     }
 
-    override fun confirmInput() {
+    override fun confirmInput(word: String) {
         log.d("View: confirmInput")
-
+        // XXX Is inserting a space here a right place?
+        findViewById<EditText>(R.id.editText).append(" $word")
+        wordListAdapter.clear()
     }
 
     //private lateinit var engine: T9Engine
@@ -68,14 +61,17 @@ class MainActivity : Activity(), MVPView {
 
     private lateinit var wakelock: PowerManager.WakeLock
 
+    private val wordListAdapter = WordListAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         presenter.attachView(this)
-        val recyclerView = find<RecyclerView>(R.id.recycler_view)
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = wordListAdapter
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK,
@@ -104,7 +100,7 @@ class MainActivity : Activity(), MVPView {
     }
 
     private fun displayInfo(resId: Int) {
-        val textView = find<TextView>(R.id.text)
+        val textView = findViewById<TextView>(R.id.text)
         textView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
         textView.text = getString(resId)
     }

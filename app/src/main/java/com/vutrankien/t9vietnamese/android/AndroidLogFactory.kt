@@ -6,6 +6,10 @@ import com.vutrankien.t9vietnamese.lib.LogFactory
 class AndroidLogFactory: LogFactory {
     override fun newLog(tag: String): LogFactory.Log {
         return object : LogFactory.Log {
+            override fun v(msg: String) {
+                Log.v(tag, msg)
+            }
+
             override fun d(msg: String) {
                 Log.d(tag, msg)
             }

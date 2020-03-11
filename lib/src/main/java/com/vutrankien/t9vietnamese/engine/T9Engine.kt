@@ -12,11 +12,6 @@ interface T9Engine {
     var pad: PadConfiguration
     val eventSource: Channel<Event>
 
-    enum class EventType {
-        NEW_CANDIDATES,
-        CONFIRM
-    }
-
     sealed class Event {
         class NewCandidates(val candidates: Set<String>) : Event() {
             fun contains(other: NewCandidates): Boolean =
@@ -26,7 +21,14 @@ interface T9Engine {
                 return "NewCandidates:$candidates"
             }
         }
-        object Confirm : Event()
+        class Confirm(val word: String) : Event() {
+            override fun equals(other: Any?): Boolean =
+                if (other is Confirm)
+                    other.word == word
+                else super.equals(other)
+
+            override fun hashCode(): Int = word.hashCode()
+        }
         object Initialized : Event()
     }
 

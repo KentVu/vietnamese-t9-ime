@@ -1,10 +1,14 @@
 package com.vutrankien.t9vietnamese.android
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.lib.*
+import com.vutrankien.t9vietnamese.lib.EngineModule
+import com.vutrankien.t9vietnamese.lib.LogFactory
+import com.vutrankien.t9vietnamese.lib.Presenter
+import com.vutrankien.t9vietnamese.lib.VnPad
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+
 
 @Component(modules = [PresenterModule::class, EngineModule::class, AndroidLogModule::class])
 interface ActivityComponent {
@@ -15,20 +19,20 @@ interface ActivityComponent {
 
 @Module
 class PresenterModule {
-    private val seed: Sequence<String>
-        get() {
-            val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
-            javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
-                it.forEach { line ->
-                    //log.d(line)
-                    sortedWords.add(line)
-                }
+    @Provides
+    fun getSeed(): Sequence<String> {
+        val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
+        javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
+            it.forEach { line ->
+                sortedWords.add(line)
             }
-            return sortedWords.asSequence()
         }
+        return sortedWords.asSequence()
+    }
 
     @Provides
     fun presenter(
+        seed: Sequence<String>,
         engine: T9Engine,
         lg: LogFactory
     ): Presenter {
