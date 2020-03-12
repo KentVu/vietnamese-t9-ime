@@ -45,7 +45,7 @@ class PresenterTest: FunSpec() {
         test("showProgressIndicatorOnStart") {
             getPresenter().attachView(view)
             view.eventSource.send(Event.START.noData())
-            verify(timeout = 100) { view.showProgress() }
+            verify(timeout = 100) { view.showProgress(any()) }
         }
 
         test("initializeEngineOnStart") {
