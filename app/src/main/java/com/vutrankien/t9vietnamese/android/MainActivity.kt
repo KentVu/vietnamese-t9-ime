@@ -33,8 +33,8 @@ class MainActivity : Activity(), MVPView {
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
 
-    override fun showProgress() {
-        displayInfo(R.string.engine_loading)
+    override fun showProgress(bytes: Int) {
+        displayInfo(R.string.engine_loading, bytes)
     }
 
     override fun showKeyboard() {
@@ -55,9 +55,6 @@ class MainActivity : Activity(), MVPView {
         findViewById<EditText>(R.id.editText).append(" $word")
         wordListAdapter.clear()
     }
-
-    //private lateinit var engine: T9Engine
-    //private lateinit var loadEngineDefer: Deferred<T9Engine>
 
     private lateinit var wakelock: PowerManager.WakeLock
 
@@ -83,6 +80,12 @@ class MainActivity : Activity(), MVPView {
         }
     }
 
+    private fun displayInfo(resId: Int, vararg formatArgs: Any) {
+        val textView = findViewById<TextView>(R.id.text)
+        textView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
+        textView.text = getString(resId, *formatArgs)
+    }
+
     override fun onStop() {
         super.onStop()
         log.d("onStop")
@@ -91,18 +94,6 @@ class MainActivity : Activity(), MVPView {
     override fun onDestroy() {
         log.d("onDestroy")
         super.onDestroy()
-        //try {
-        //    GlobalScope.launch { run() { engine.close() } }
-        //} catch (e: Exception) {
-        //    w(e)
-        //    displayError(e)
-        //}
-    }
-
-    private fun displayInfo(resId: Int) {
-        val textView = findViewById<TextView>(R.id.text)
-        textView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
-        textView.text = getString(resId)
     }
 
     private fun displayError(msg: String) {
@@ -133,37 +124,5 @@ class MainActivity : Activity(), MVPView {
 
     fun onBtnStarClick(view: View) {
         log.d("onBtnStarClick()")
-    }
-}
-
-class PollDefer(private val defer: Deferred<*>, private val time: Long, private val textView: TextView) {
-    private lateinit var log: LogFactory.Log
-
-    companion object {
-        private val POLL_INTERVAL = 1000L
-    }
-
-    private val mTimer : CountDownTimer
-    init {
-        mTimer = object : CountDownTimer(time, POLL_INTERVAL) {
-            override fun onFinish() {
-                log.d("onFinish")
-                if (!defer.isCompleted) {
-                    log.w("engine still loading after $time ms")
-                    textView.text = "engine still loading after $time ms"
-                }
-            }
-
-            override fun onTick(millisUntilFinish: Long) {
-                val percentDone = if (defer.isCompleted) 100 else (time - millisUntilFinish) * 100 / time
-                log.d("onTick:$millisUntilFinish:$percentDone% done")
-                if (defer.isCompleted) cancel() else
-                    textView.text = "loading $percentDone%"
-            }
-        }
-        mTimer.start()
-    }
-    fun stop() {
-        mTimer.cancel()
     }
 }

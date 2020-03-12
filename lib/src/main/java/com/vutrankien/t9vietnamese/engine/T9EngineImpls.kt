@@ -32,7 +32,6 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
         GlobalScope.launch(Dispatchers.IO) {
             trie.build(seed, channel)
         }
-        // TODO report progress
         for (i in channel) {
             eventSource.send(T9Engine.Event.LoadProgress(i))
         }

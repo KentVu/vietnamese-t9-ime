@@ -7,7 +7,7 @@ interface View {
     val scope: CoroutineScope
     val eventSource: Channel<EventWithData<Event, Key>>
 
-    fun showProgress()
+    fun showProgress(bytes: Int)
     fun showKeyboard()
     fun showCandidates(cand: Set<String>)
     fun confirmInput(word: String)
