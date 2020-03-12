@@ -18,7 +18,7 @@ interface T9Engine {
                 candidates.containsAll(other.candidates)
 
             override fun toString(): String {
-                return "NewCandidates:$candidates"
+                return "T9Event.NewCandidates:$candidates"
             }
         }
         class Confirm(val word: String) : Event() {
@@ -28,6 +28,7 @@ interface T9Engine {
                 else super.equals(other)
 
             override fun hashCode(): Int = word.hashCode()
+            override fun toString(): String = "T9Event.Confirm:$word"
         }
         class LoadProgress(val bytes: Int) : Event()
         object Initialized : Event()

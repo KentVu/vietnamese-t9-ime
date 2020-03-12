@@ -47,10 +47,18 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
             eventSource.send(T9Engine.Event.NewCandidates(candidates))
             _currentCandidates.clear()
             _currentCandidates.addAll(candidates)
-            // WARNING: _currentCandidates is being used on multiple threads
+            // XXX: don't use _currentCandidates directly because it is being used on multiple threads
         } else {
             // TODO implement selecting feature
-            eventSource.send(T9Engine.Event.Confirm(_currentCandidates.first()))
+            val selected = if (_currentCandidates.isEmpty()) {
+                // Return the number sequence if no match found.
+                _currentNumSeq
+                    .dropLast(1) // Drop the "confirm" key
+                    .joinNum()
+            } else {
+                _currentCandidates.first()
+            }
+            eventSource.send(T9Engine.Event.Confirm(selected))
             _currentCandidates.clear()
             _currentNumSeq.clear()
         }
@@ -78,14 +86,14 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
                 }
             }
         }
+
+        private fun Iterable<Key>.joinNum(): String = buildString {
+            this@joinNum.forEach {
+                append(it.char)
+            }
+        }
     }
 }
-
-//private fun Set<String>.combine(c: Char): Set<String> {
-//    if (isEmpty()) {
-//        return
-//    }
-//}
 
 private class OldT9Engine(
     override var pad: PadConfiguration,

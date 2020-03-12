@@ -23,6 +23,8 @@ Specifications (Stories):
 * Program states: These are the program states:
   1. Inputting
   1. Confirmed
+* Candidates: ...
+* numSeq: number sequence: the sequence of input keys' digit/char(?). (What should we call the Star/Sharp key?)
 
 ### Specs:
 1. [ ] User should interact mainly with the keypad (other means of interacting is optionally supported).
@@ -32,6 +34,7 @@ Specifications (Stories):
 4. [x] When inputting, the possible candidates should be displayed.
 5. [ ] When confirm button is pressed, the selected candidate should be outputted.  
     1. [ ] If no candidate is being selected then the first candidate will be used.
+    2. [ ] If no candidates found, return the entered numSeq.
 
 Basic Design:
 ===========

@@ -51,7 +51,8 @@ class MainActivityTest {
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
         val initializedStr = mActivityRule.activity.getString(R.string.notify_initialized)
-        onView(anyOf(withText(containsString(engineLoadStr))))
+        // Drop the progress string
+        onView(anyOf(withText(containsString(engineLoadStr.dropLast(10)))))
                 .check(matches(isDisplayed()))
         onView((withText(containsString(initializedStr))))
                 .check(matches(isDisplayed()))

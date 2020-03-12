@@ -173,6 +173,19 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        test("5.2.engineFunction_noCandidates").config(timeout = Duration.ofSeconds(180)) {
+            engineFunction(
+                emptySequence(),
+                padConfig,
+                arrayOf(Key.num1, Key.num2, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(emptySet()),
+                    T9Engine.Event.NewCandidates(emptySet()),
+                    T9Engine.Event.Confirm("12")
+                )
+            )
+        }
     }
 
     private suspend fun seedEngine(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
