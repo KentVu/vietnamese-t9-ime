@@ -29,9 +29,11 @@ interface T9Engine {
 
             override fun hashCode(): Int = word.hashCode()
         }
-        object Initialized : Event()
+        class LoadProgress(val bytes: Int) : Event()
     }
 
-    suspend fun init(seed: Sequence<String>)
+    class EngineSeed(seq: Sequence<String>, val estBytes: Int): Sequence<String> by seq
+
+    suspend fun init(seed: EngineSeed)
     suspend fun push(key: Key)
 }

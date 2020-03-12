@@ -27,17 +27,17 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
     private val _currentCandidates = mutableSetOf<String>()
     private val _currentNumSeq = mutableListOf<Key>()
 
-    override suspend fun init(seed: Sequence<String>) {
+    override suspend fun init(seed: T9Engine.EngineSeed) {
         val channel = Channel<Int>()
         GlobalScope.launch(Dispatchers.IO) {
             trie.build(seed, channel)
         }
         // TODO report progress
         for (i in channel) {
-            log.v("progress: $i")
+            eventSource.send(T9Engine.Event.LoadProgress(i))
         }
+        eventSource.send(T9Engine.Event.LoadProgress(seed.estBytes))
         initialized = true
-        eventSource.send(T9Engine.Event.Initialized)
     }
 
 

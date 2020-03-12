@@ -105,7 +105,10 @@ class EngineTests: FunSpec() {
             launch {
                 engine.init(emptySequence())
             }
-            engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+            for (event in engine.eventSource)
+                if (event is T9Engine.Event.LoadProgress)
+                    log.v("Engine.loadProgress $")
+                else break
             engine.initialized shouldBe true
         }
 
@@ -115,7 +118,6 @@ class EngineTests: FunSpec() {
             launch(Dispatchers.Default) {
                 engine.init("a\nb\nc".lineSequence())
             }
-            engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
             engine.initialized shouldBe true
             //}
         }
