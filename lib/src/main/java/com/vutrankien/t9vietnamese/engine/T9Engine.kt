@@ -29,6 +29,7 @@ interface T9Engine {
 
             override fun hashCode(): Int = word.hashCode()
         }
+        class LoadProgress(val bytes: Int) : Event()
         object Initialized : Event()
     }
 

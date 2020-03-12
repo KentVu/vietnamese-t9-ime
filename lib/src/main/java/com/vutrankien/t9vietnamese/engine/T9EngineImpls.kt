@@ -34,7 +34,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
         }
         // TODO report progress
         for (i in channel) {
-            log.v("progress: $i")
+            eventSource.send(T9Engine.Event.LoadProgress(i))
         }
         initialized = true
         eventSource.send(T9Engine.Event.Initialized)
@@ -48,7 +48,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
             eventSource.send(T9Engine.Event.NewCandidates(candidates))
             _currentCandidates.clear()
             _currentCandidates.addAll(candidates)
-            // not using _currentCandidates directly due to a strange behavior of coroutine??
+            // WARNING: _currentCandidates is being used on multiple threads
         } else {
             // TODO implement selecting feature
             eventSource.send(T9Engine.Event.Confirm(_currentCandidates.first()))
