@@ -36,7 +36,12 @@ class Presenter(
                     log.i("Start initializing")
                     view.showProgress(0)
                     val loadTime = measureTimeMillis {
-                        engine.init(engineSeed.value)
+                        if (!engine.canReuseDb()) {
+                            engine.init(engineSeed.value)
+                        } else {
+                            engine.initFromDb()
+                            view.showProgress(100)
+                        }
                     }
                     log.i("Initialization Completed! loadTime=$loadTime")
                     view.showKeyboard()

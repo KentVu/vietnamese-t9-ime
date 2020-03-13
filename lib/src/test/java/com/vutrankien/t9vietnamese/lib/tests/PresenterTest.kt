@@ -61,7 +61,7 @@ class PresenterTest: FunSpec() {
             every { engine.canReuseDb() } returns true
             getPresenter().attachView(view)
             view.eventSource.send(Event.START.noData())
-            coVerify { engine.initFromDb(any()) }
+            coVerify { engine.initFromDb() }
         }
 
         test("showKeyboardWhenEngineLoadCompleted") {

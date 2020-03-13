@@ -27,7 +27,7 @@ private class OldT9Engine(
         delay(10)
     }
 
-    override fun initFromDb(dbFile: String) {
+    override fun initFromDb() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

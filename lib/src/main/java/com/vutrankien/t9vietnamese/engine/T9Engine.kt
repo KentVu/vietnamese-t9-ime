@@ -38,7 +38,7 @@ interface T9Engine {
     /**
      * Init from built db.
      */
-    fun initFromDb(dbFile: String)
+    fun initFromDb()
     suspend fun push(key: Key)
     fun canReuseDb(): Boolean
 }

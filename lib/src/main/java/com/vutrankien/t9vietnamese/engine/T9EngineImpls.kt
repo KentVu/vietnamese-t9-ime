@@ -30,6 +30,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
     override suspend fun init(
         seed: Sequence<String>
     ) = coroutineScope {
+        log.d("init: fromSeed")
         val channel = Channel<Int>()
         launch(Dispatchers.IO) {
             trie = DawgTrie.build(dawgFile, seed, channel)
@@ -48,11 +49,16 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
     }
 
     override fun canReuseDb(): Boolean {
-        return File(dawgFile).exists()
+        // TODO This check always fails on Android!!
+        File(dawgFile).exists().let {
+            log.d("canReuseDb: $it")
+            return it
+        }
     }
 
-    override fun initFromDb(dbFile: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun initFromDb() {
+        log.d("initFromDb")
+        trie = DawgTrie.load(dawgFile)
     }
 
     override suspend fun push(key: Key) {
