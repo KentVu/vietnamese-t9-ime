@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese.lib
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 class Presenter constructor(
     private val engineSeed: Lazy<Sequence<String>>,
@@ -35,13 +36,12 @@ class Presenter constructor(
             when (eventWithData.event) {
                 Event.START -> {
                     log.i("Start initializing")
-                    val startTime = System.currentTimeMillis()
-                    view.showProgress()
-                    engine.init(engineSeed.value)
-                    view.showKeyboard()
-                    val loadTime = (System.currentTimeMillis()
-                            - startTime)
+                    view.showProgress(0)
+                    val loadTime = measureTimeMillis {
+                        engine.init(engineSeed.value)
+                    }
                     log.i("Initialization Completed! loadTime=$loadTime")
+                    view.showKeyboard()
                 }
                 Event.KEY_PRESS -> {
                     engine.push(eventWithData.data ?:
@@ -54,6 +54,7 @@ class Presenter constructor(
     private suspend fun receiveEngineEvents() {
         for (event in engine.eventSource) {
             when(event) {
+                is T9Engine.Event.LoadProgress -> view.showProgress(event.bytes)
                 is T9Engine.Event.Confirm -> view.confirmInput(event.word)
                 is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
             }

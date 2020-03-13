@@ -97,7 +97,12 @@ enum class KeyType(val isConfirmationKey: Boolean) {
 data class KeyConfig(val type: KeyType, val chars: Set<Char> = emptySet()) {
 }
 
-enum class Key(val char: Char) {
+enum class Key(
+    /**
+     * The character that represents this [Key], usually a digit.
+     */
+    val char: Char
+) {
     num0('0'),
     num1('1'),
     num2('2'),

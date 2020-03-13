@@ -1,13 +1,8 @@
 package com.vutrankien.t9vietnamese.lib.tests
 
-import com.vutrankien.t9vietnamese.*
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
-import io.kotlintest.IsolationMode
-import io.kotlintest.TestCase
-import io.kotlintest.assertSoftly
-import io.kotlintest.shouldBe
-import io.kotlintest.specs.AnnotationSpec
+import io.kotlintest.*
 import io.kotlintest.specs.FunSpec
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
@@ -102,22 +97,14 @@ class EngineTests: FunSpec() {
 
         test("engineInitializing") {
             engine.initialized shouldBe false
-            launch {
-                engine.init(emptySequence())
-            }
-            engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+            seedEngine()
             engine.initialized shouldBe true
         }
 
         test("engineInitializingWithProgress") {
-            //withTimeout(1000) {
             engine.initialized shouldBe false
-            launch(Dispatchers.Default) {
-                engine.init("a\nb\nc".lineSequence())
-            }
-            engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
+            seedEngine("a\nb\nc".lineSequence())
             engine.initialized shouldBe true
-            //}
         }
 
         test("engineFunction_1key_1") {
@@ -134,11 +121,11 @@ class EngineTests: FunSpec() {
         test("engineFunction_1key_2") {
             engineFunction(
                 """
-                        a
-                        aa
-                        ab
-                        ac
-                        """.trimIndent().lineSequence(),
+                                a
+                                aa
+                                ab
+                                ac
+                                """.trimIndent().lineSequence(),
                 padConfig,
                 arrayOf(Key.num1, Key.num0),
                 arrayOf(
@@ -151,11 +138,11 @@ class EngineTests: FunSpec() {
         test("engineFunction_2keys") {
             engineFunction(
                 """
-                        aa
-                        ab
-                        ac
-                        ba
-                        """.trimIndent().lineSequence(),
+                                aa
+                                ab
+                                ac
+                                ba
+                                """.trimIndent().lineSequence(),
                 padConfig,
                 arrayOf(Key.num1, Key.num1, Key.num0),
                 arrayOf(
@@ -169,14 +156,14 @@ class EngineTests: FunSpec() {
         test("engineFunction_stdconfig_2keys").config(timeout = Duration.ofSeconds(180)) {
             engineFunction(
                 """
-                        aa
-                        ab
-                        ac
-                        ad
-                        bd
-                        ce
-                        cf
-                        """.trimIndent().lineSequence(),
+                                aa
+                                ab
+                                ac
+                                ad
+                                bd
+                                ce
+                                cf
+                                """.trimIndent().lineSequence(),
                 padConfigStd,
                 arrayOf(Key.num1, Key.num2, Key.num0),
                 arrayOf(
@@ -186,43 +173,55 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        test("5.2.engineFunction_noCandidates").config(timeout = Duration.ofSeconds(180)) {
+            engineFunction(
+                emptySequence(),
+                padConfig,
+                arrayOf(Key.num1, Key.num2, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(emptySet()),
+                    T9Engine.Event.NewCandidates(emptySet()),
+                    T9Engine.Event.Confirm("12")
+                )
+            )
+        }
     }
+
+    private suspend fun seedEngine(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
+        launch {
+            engine.init(sequence)
+        }
+        for (event in engine.eventSource)
+            if (event is T9Engine.Event.LoadProgress)
+                log.v("Engine.LoadProgress ${event.bytes}")
+            else if (event is T9Engine.Event.Initialized) {
+                log.v("Engine.Initialized!")
+                break
+            }
+    }
+
     private suspend fun engineFunction(
         seeds: Sequence<String>,
         padConfig: PadConfiguration,
         sequence: Array<Key>,
         expectedEvent: Array<T9Engine.Event>
-    ) {
+    ):Unit = coroutineScope {
         engine.pad = padConfig
-        GlobalScope.launch/*(Dispatchers.IO)*/ {
-            engine.init(seeds)
-        }
-        engine.eventSource.receive() shouldBe T9Engine.Event.Initialized
-
-        GlobalScope.launch {
+        seedEngine(seeds)
+        launch {
             sequence.forEach { engine.push(it) }
         }
-
         assertSoftly {
-            expectedEvent.forEach {
+            expectedEvent.forEach { expectedEvt ->
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
-                    event.contains(it as T9Engine.Event.NewCandidates) shouldBe true
+                    event.contains(expectedEvt as T9Engine.Event.NewCandidates) shouldBe true
                 } else {
-                    event shouldBe it
+                    event shouldBe expectedEvt
                 }
             }
         }
-        //var i = 0
-        //for (event in engine.eventSource) {
-        //    log.d("receive evt: $event")
-        //    if (event is T9Engine.Event.NewCandidates) {
-        //        event.contains(expectedEvent[i] as T9Engine.Event.NewCandidates) shouldBe true
-        //    } else {
-        //        event shouldBe expectedEvent[i]
-        //    }
-        //    i++
-        //}
     }
 }
