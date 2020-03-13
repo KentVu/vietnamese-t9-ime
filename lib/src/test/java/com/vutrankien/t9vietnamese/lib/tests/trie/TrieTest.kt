@@ -21,17 +21,14 @@ class TrieTest: StringSpec ({
         var size = 0
         TrieTest::class.java.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
             it.forEach { line ->
-                //log.v(line)
+                log.v(line)
                 sortedWords.add(line)
                 size += line.toByteArray().size + 1
             }
         }
-        DawgTrie("vi-DauMoi.dawg").run {
-            val progresses = Channel<Int>()
-            launch {
-                build(sortedWords.asSequence(), progresses)
-            }
-            var countBytes = 0
+        val progresses = Channel<Int>()
+        launch { // setup receive head first
+            //var countBytes = 0
             var markPos = 0
             progresses.consumeEach { progress ->
                 //countBytes+=progress
@@ -42,6 +39,9 @@ class TrieTest: StringSpec ({
                     markPos = count
                 }
             }
+        }
+        val dawg = DawgTrie.build("vi-DauMoi.dawg", sortedWords.asSequence(), progresses)
+        dawg.run {
             search("an").let {
                 it.shouldContainKeys(
                     "an",

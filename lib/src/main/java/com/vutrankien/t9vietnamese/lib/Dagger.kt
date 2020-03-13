@@ -33,11 +33,12 @@ abstract class PresenterComponents {
 @Module
 class PresenterModule(
     private val engineSeed: Sequence<String>,
-    private val engine: T9Engine
+    private val engine: T9Engine,
+    val env: Env
 ) {
     @Provides
     fun presenter(
         lg: LogFactory
     ): Presenter =
-        Presenter(lazy { engineSeed }, engine, lg)
+        Presenter(lazy { engineSeed }, engine, env, lg)
 }

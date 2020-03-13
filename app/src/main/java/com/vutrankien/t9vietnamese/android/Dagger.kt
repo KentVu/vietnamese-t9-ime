@@ -38,7 +38,7 @@ class PresenterModule {
         lg: LogFactory
     ): Presenter {
         engine.pad = VnPad
-        return Presenter(getSeed(), engine, lg)
+        return Presenter(getSeed(), engine, AndroidEnv(), lg)
     }
 }
 

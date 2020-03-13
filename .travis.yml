@@ -84,25 +84,25 @@ script:
   # from https://github.com/travis-ci/travis-rubies/blob/9f7962a881c55d32da7c76baefc58b89e3941d91/build.sh#L38-L44
   - fold_start lib.build "gradle :lib:build"
   - ./gradlew -Plint.output.console=true --info :lib:build
+  - export s3key="lib-test/$(git rev-parse --short ${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT:-HEAD}})"
+  - "aws s3 cp --recursive lib/build/reports/tests/test/ s3://t9vietnamese/$s3key/
+      --acl public-read --expires $(date -Iseconds -d '1 months')"
   - fold_end lib.build
+  - "echo  View test result at: \033[33;1mhttps://t9vietnamese.s3-ap-northeast-1.amazonaws.com/$s3key/index.html\033[0m"
   - fold_start app.build "gradle :app:build"
   - ./gradlew -Plint.output.console=true --info :app:build
   - fold_end app.build
-  - fold_start app.cAT "gradle :app:connectedAndroidTest"
   - |
     android-wait-for-emulator
     adb shell settings put global window_animation_scale 0 &
     adb shell settings put global transition_animation_scale 0 &
     adb shell settings put global animator_duration_scale 0 &
     adb shell input keyevent KEYCODE_MENU &
+  - fold_start app.cAT "gradle :app:connectedAndroidTest"
   - ./gradlew -Plint.output.console=true --info connectedAndroidTest
   - fold_end app.cAT
 
-after_failure:
-  - export s3key="lib-test/$(git rev-parse --short HEAD)"
-  - "aws s3 cp --recursive lib/build/reports/tests/test/ s3://t9vietnamese/$s3key/
-      --acl public-read --expires $(date -Iseconds -d '3 months')"
-  - "echo View test result at: https://t9vietnamese.s3-ap-northeast-1.amazonaws.com/$s3key/index.html"
+#after_failure:
 
 # cache between builds
 cache:

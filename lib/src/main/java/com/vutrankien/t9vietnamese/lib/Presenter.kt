@@ -4,9 +4,10 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
 import kotlin.system.measureTimeMillis
 
-class Presenter constructor(
+class Presenter(
     private val engineSeed: Lazy<Sequence<String>>,
     private val engine: T9Engine,
+    private val env: Env,
     private val lg: LogFactory
 ) {
     private val log = lg.newLog("Presenter")
@@ -17,9 +18,6 @@ class Presenter constructor(
             log.i("Presenter:TypingState:change: $field -> $value")
             field = value
         }
-
-    init {
-    }
 
     fun attachView(view: View) {
         view.scope.launch {

@@ -5,10 +5,7 @@ import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.IsolationMode
 import io.kotlintest.TestCase
 import io.kotlintest.specs.FunSpec
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 
@@ -18,27 +15,33 @@ class PresenterTest: FunSpec() {
     private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     private lateinit var view: View
     private lateinit var engine: T9Engine
-
-    //val logGenerator = daggerComponents.logGenerator()
-    fun getPresenter(): Presenter {
-        return DaggerPresenterComponents.builder()
-            .presenterModule(
-                PresenterModule(
-                    seed,
-                    engine
-                )
-            )
-            .build()
-            .presenter()
-    }
+    private lateinit var env: Env
 
     override fun beforeTest(testCase: TestCase) {
         view = mockk(relaxUnitFun = true)
         every { view.eventSource } returns Channel()
         every { view.scope } returns GlobalScope
 
+        env = mockk()
+        //every { env.... } returns ...
+
         engine = mockk(relaxUnitFun = true)
         every { engine.eventSource } returns Channel()
+        every { engine.canReuseDb() } returns false
+    }
+
+    //val logGenerator = daggerComponents.logGenerator()
+    private fun getPresenter(): Presenter {
+        return DaggerPresenterComponents.builder()
+            .presenterModule(
+                PresenterModule(
+                    seed,
+                    engine,
+                    env
+                )
+            )
+            .build()
+            .presenter()
     }
 
     init {
@@ -49,10 +52,16 @@ class PresenterTest: FunSpec() {
         }
 
         test("initializeEngineOnStart") {
-            getPresenter().run {
-                attachView(view)
-            }
+            getPresenter().attachView(view)
             view.eventSource.send(Event.START.noData())
+            coVerify { engine.init(seed) }
+        }
+
+        test("6.ReuseBuiltDawg") {
+            every { engine.canReuseDb() } returns true
+            getPresenter().attachView(view)
+            view.eventSource.send(Event.START.noData())
+            coVerify { engine.initFromDb(any()) }
         }
 
         test("showKeyboardWhenEngineLoadCompleted") {

@@ -35,14 +35,18 @@ Specifications (Stories):
 5. [ ] When confirm button is pressed, the selected candidate should be outputted.  
     1. [ ] If no candidate is being selected then the first candidate will be used.
     2. [ ] If no candidates found, return the entered numSeq.
+6. [ ] If dawg has been built, use that dawg to minimize app start time.
 
 Basic Design:
 ===========
 The UI will follow the MVP design pattern:
 * Make the Activity implement the [View interface](lib/src/main/java/com/vutrankien/t9vietnamese/lib/View.kt)
-* [Presenter](lib/src/main/java/com/vutrankien/t9vietnamese/lib/Presenter.kt): Receive UI event, manipulate
-the UI(View)
+* [Presenter](lib/src/main/java/com/vutrankien/t9vietnamese/lib/Presenter.kt): Receive UI event,
+ wiring action with the UI(View)
 * Model? - Everything else?
+
+### Design philosophy:
+This project *honor* [7 virtues of good object](https://www.yegor256.com/2014/11/20/seven-virtues-of-good-object.html) by yegor256.
 
 Things to consider
 ==================
