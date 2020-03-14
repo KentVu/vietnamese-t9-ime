@@ -1,9 +1,6 @@
 package com.vutrankien.t9vietnamese.engine
 
-import com.vutrankien.t9vietnamese.lib.Key
-import com.vutrankien.t9vietnamese.lib.KeyType
-import com.vutrankien.t9vietnamese.lib.LogFactory
-import com.vutrankien.t9vietnamese.lib.PadConfiguration
+import com.vutrankien.t9vietnamese.lib.*
 import kentvu.dawgjava.DawgTrie
 import kentvu.dawgjava.Trie
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +11,10 @@ import java.io.File
 
 // TODO
 
-class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
+class DefaultT9Engine constructor(
+        lg: LogFactory,
+        private val env: Env
+) : T9Engine {
     private val dawgFile = "T9Engine.dawg"
     private val log = lg.newLog("T9Engine")
     private lateinit var trie: Trie
@@ -50,7 +50,7 @@ class DefaultT9Engine constructor(lg: LogFactory) : T9Engine {
 
     override fun canReuseDb(): Boolean {
         // TODO This check always fails on Android!!
-        File(dawgFile).exists().let {
+        env.fileExists(dawgFile).let {
             log.d("canReuseDb: $it")
             return it
         }

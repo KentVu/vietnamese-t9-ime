@@ -92,12 +92,15 @@ script:
   - fold_start app.build "gradle :app:build"
   - ./gradlew -Plint.output.console=true --info :app:build
   - fold_end app.build
+  - "aws s3 cp --recursive app/build/outputs/apk/ s3://t9vietnamese/$s3key/
+      --acl public-read --expires $(date -Iseconds -d '1 months')"
+  - "echo -e \"View test result at: \033[33;1mhttps://t9vietnamese.s3-ap-northeast-1.amazonaws.com/$s3key/index.html\033[0m\""
   - |
     android-wait-for-emulator
     adb shell settings put global window_animation_scale 0 &
     adb shell settings put global transition_animation_scale 0 &
     adb shell settings put global animator_duration_scale 0 &
-    adb shell input keyevent KEYCODE_MENU &
+    #adb shell input keyevent KEYCODE_MENU &
   - fold_start app.cAT "gradle :app:connectedAndroidTest"
   - ./gradlew -Plint.output.console=true --info connectedAndroidTest
   - fold_end app.cAT
