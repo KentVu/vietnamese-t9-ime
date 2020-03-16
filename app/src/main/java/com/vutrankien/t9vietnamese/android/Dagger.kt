@@ -1,16 +1,14 @@
 package com.vutrankien.t9vietnamese.android
 
+import android.content.Context
 import com.vutrankien.t9vietnamese.engine.T9Engine
-import com.vutrankien.t9vietnamese.lib.EngineModule
-import com.vutrankien.t9vietnamese.lib.LogFactory
-import com.vutrankien.t9vietnamese.lib.Presenter
-import com.vutrankien.t9vietnamese.lib.VnPad
+import com.vutrankien.t9vietnamese.lib.*
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 
 
-@Component(modules = [PresenterModule::class, EngineModule::class, AndroidLogModule::class])
+@Component(modules = [PresenterModule::class, EngineModule::class, AndroidLogModule::class, EnvModule::class])
 interface ActivityComponent {
     fun inject(service: T9Vietnamese)
     fun inject(activity: MainActivity)
@@ -18,7 +16,7 @@ interface ActivityComponent {
 }
 
 @Module
-class PresenterModule {
+class PresenterModule() {
     @Provides
     fun getSeed(): Lazy<Sequence<String>> {
         return lazy {
@@ -35,11 +33,19 @@ class PresenterModule {
     @Provides
     fun presenter(
         engine: T9Engine,
-        lg: LogFactory
+        lg: LogFactory,
+        env: Env
     ): Presenter {
         engine.pad = VnPad
-        return Presenter(getSeed(), engine, AndroidEnv(), lg)
+        return Presenter(getSeed(), engine, env, lg)
     }
+}
+
+@Module
+class EnvModule(private val context: Context) {
+    @Provides
+    fun env(): Env =
+        AndroidEnv(context)
 }
 
 @Module

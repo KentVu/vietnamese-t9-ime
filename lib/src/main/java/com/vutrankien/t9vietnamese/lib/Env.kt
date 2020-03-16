@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.lib
 
 interface Env {
-    fun fileExists(file: String): Boolean
+    fun fileExists(path: String): Boolean
+    val workingDir: String
 }

@@ -21,9 +21,12 @@ class LogModule {
 }
 
 @Module
-class EngineModule(private val env: Env) {
+class EngineModule() {
     @Provides
-    fun engine(lg: LogFactory): T9Engine = DefaultT9Engine(lg, env)
+    fun engine(
+        lg: LogFactory,
+        env: Env
+    ): T9Engine = DefaultT9Engine(lg, env)
 }
 
 @Component(modules = [PresenterModule::class, LogModule::class])
@@ -49,7 +52,10 @@ class EnvModule() {
     @Provides
     fun env(): Env =
             object : Env {
-                override fun fileExists(file: String): Boolean =
-                        File(file).exists()
+                override fun fileExists(path: String): Boolean =
+                        File(path).exists()
+
+                override val workingDir: String
+                    get() = "."
             }
 }

@@ -9,13 +9,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-// TODO
-
 class DefaultT9Engine constructor(
         lg: LogFactory,
-        private val env: Env
+        private val env: Env,
+        dawgFile: String = "T9Engine.dawg"
 ) : T9Engine {
-    private val dawgFile = "T9Engine.dawg"
+    private val dawgPath = "${env.workingDir}/$dawgFile"
     private val log = lg.newLog("T9Engine")
     private lateinit var trie: Trie
     override var initialized: Boolean = false
@@ -33,7 +32,7 @@ class DefaultT9Engine constructor(
         log.d("init: fromSeed")
         val channel = Channel<Int>()
         launch(Dispatchers.IO) {
-            trie = DawgTrie.build(dawgFile, seed, channel)
+            trie = DawgTrie.build(dawgPath, seed, channel)
         }
         var markPos = 0
         var count = 0
@@ -50,7 +49,7 @@ class DefaultT9Engine constructor(
 
     override fun canReuseDb(): Boolean {
         // TODO This check always fails on Android!!
-        env.fileExists(dawgFile).let {
+        env.fileExists(dawgPath).let {
             log.d("canReuseDb: $it")
             return it
         }
@@ -58,7 +57,7 @@ class DefaultT9Engine constructor(
 
     override fun initFromDb() {
         log.d("initFromDb")
-        trie = DawgTrie.load(dawgFile)
+        trie = DawgTrie.load(dawgPath)
     }
 
     override suspend fun push(key: Key) {
