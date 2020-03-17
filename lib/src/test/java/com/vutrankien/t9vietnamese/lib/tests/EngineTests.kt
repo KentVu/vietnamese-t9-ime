@@ -3,9 +3,11 @@ package com.vutrankien.t9vietnamese.lib.tests
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.*
+import io.kotlintest.matchers.containsInOrder
 import io.kotlintest.specs.FunSpec
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
+import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.time.Duration
@@ -186,6 +188,23 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        test("5.2.engineFunction_noCandidates_2keys") {
+            engineFunction(
+                """
+                                aa
+                                ab
+                                ba
+                                """.trimIndent().lineSequence(),
+                padConfig,
+                arrayOf(Key.num1, Key.num3, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa","ab")),
+                    T9Engine.Event.NewCandidates(setOf("13")),
+                    T9Engine.Event.Confirm("13")
+                )
+            )
+        }
     }
 
     private suspend fun seedEngine(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
@@ -217,7 +236,8 @@ class EngineTests: FunSpec() {
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
-                    event.contains(expectedEvt as T9Engine.Event.NewCandidates) shouldBe true
+                    //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
+                    assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
                 } else {
                     event shouldBe expectedEvt
                 }

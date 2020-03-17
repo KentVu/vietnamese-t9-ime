@@ -64,7 +64,11 @@ class DefaultT9Engine constructor(
         _currentNumSeq.add(key)
         if (pad[key].type != KeyType.Confirm) {
             val candidates = findCandidates(trie, pad, _currentNumSeq, 10)
-            eventSource.send(T9Engine.Event.NewCandidates(candidates))
+            if (candidates.isNotEmpty()) {
+                eventSource.send(T9Engine.Event.NewCandidates(candidates))
+            } else {
+                eventSource.send(T9Engine.Event.NewCandidates(setOf(_currentNumSeq.joinNum())))
+            }
             _currentCandidates.clear()
             _currentCandidates.addAll(candidates)
             // XXX: don't use _currentCandidates directly because it is being used on multiple threads
