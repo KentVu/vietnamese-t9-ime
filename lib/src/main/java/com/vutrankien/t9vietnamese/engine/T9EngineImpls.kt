@@ -63,12 +63,9 @@ class DefaultT9Engine constructor(
     override suspend fun push(key: Key) {
         _currentNumSeq.add(key)
         if (pad[key].type != KeyType.Confirm) {
-            val candidates = findCandidates(trie, pad, _currentNumSeq, 10)
-            if (candidates.isNotEmpty()) {
-                eventSource.send(T9Engine.Event.NewCandidates(candidates))
-            } else {
-                eventSource.send(T9Engine.Event.NewCandidates(setOf(_currentNumSeq.joinNum())))
-            }
+            val candidates = findCandidates(trie, pad, _currentNumSeq, 10).toMutableList()
+            candidates.add(_currentNumSeq.joinNum())
+            eventSource.send(T9Engine.Event.NewCandidates(candidates))
             _currentCandidates.clear()
             _currentCandidates.addAll(candidates)
             // XXX: don't use _currentCandidates directly because it is being used on multiple threads

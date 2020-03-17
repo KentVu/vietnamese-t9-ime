@@ -35,6 +35,7 @@ Specifications (Stories):
 5. [ ] When confirm button is pressed, the selected candidate should be outputted.  
     1. [ ] If no candidate is being selected then the first candidate will be used.
     2. [ ] If no candidates found, return the entered numSeq.
+    3. [ ] The numSeq should be one of the candidates.
 6. [ ] If dawg has been built, use that dawg to minimize app start time.
 
 Basic Design:

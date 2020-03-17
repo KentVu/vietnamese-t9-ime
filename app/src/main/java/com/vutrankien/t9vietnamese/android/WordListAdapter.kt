@@ -28,7 +28,7 @@ class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 
-    fun update(cand: Set<String>) {
+    fun update(cand: Collection<String>) {
         words.clear()
         words.addAll(cand)
         notifyDataSetChanged()

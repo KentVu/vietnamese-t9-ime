@@ -189,7 +189,7 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("5.2.engineFunction_noCandidates_2keys") {
+        test("5.3.engineFunction_noCandidates_2keys") {
             engineFunction(
                 """
                                 aa
@@ -199,7 +199,7 @@ class EngineTests: FunSpec() {
                 padConfig,
                 arrayOf(Key.num1, Key.num3, Key.num0),
                 arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("aa","ab")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("13")),
                     T9Engine.Event.Confirm("13")
                 )

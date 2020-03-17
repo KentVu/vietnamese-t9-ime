@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.android
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.PowerManager
 import android.view.View
 import android.widget.Button
@@ -44,7 +43,7 @@ class MainActivity : Activity(), MVPView {
         //defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
     }
 
-    override fun showCandidates(cand: Set<String>) {
+    override fun showCandidates(cand: Collection<String>) {
         log.d("View: showCandidates:$cand")
         wordListAdapter.update(cand)
     }
