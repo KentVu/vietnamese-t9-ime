@@ -1,15 +1,17 @@
 package com.vutrankien.t9vietnamese.tests.android.unit;
 
 import android.annotation.SuppressLint;
-import android.os.Build;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
 
 import java.text.Normalizer;
 
 /**
  * Created by vutrankien on 17/06/03.
  */
+@RunWith(BlockJUnit4ClassRunner.class)
 public class JavaTests {
 
     @SuppressLint("NewApi")
