@@ -13,7 +13,7 @@ interface T9Engine {
     val eventSource: Channel<Event>
 
     sealed class Event {
-        class NewCandidates(val candidates: Set<String>) : Event() {
+        class NewCandidates(val candidates: Collection<String>) : Event() {
             fun contains(other: NewCandidates): Boolean =
                 candidates.containsAll(other.candidates)
 
@@ -35,5 +35,10 @@ interface T9Engine {
     }
 
     suspend fun init(seed: Sequence<String>)
+    /**
+     * Init from built db.
+     */
+    fun initFromDb()
     suspend fun push(key: Key)
+    fun canReuseDb(): Boolean
 }

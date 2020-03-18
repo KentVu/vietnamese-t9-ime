@@ -4,9 +4,10 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.launch
 import kotlin.system.measureTimeMillis
 
-class Presenter constructor(
+class Presenter(
     private val engineSeed: Lazy<Sequence<String>>,
     private val engine: T9Engine,
+    private val env: Env,
     private val lg: LogFactory
 ) {
     private val log = lg.newLog("Presenter")
@@ -17,9 +18,6 @@ class Presenter constructor(
             log.i("Presenter:TypingState:change: $field -> $value")
             field = value
         }
-
-    init {
-    }
 
     fun attachView(view: View) {
         view.scope.launch {
@@ -38,7 +36,12 @@ class Presenter constructor(
                     log.i("Start initializing")
                     view.showProgress(0)
                     val loadTime = measureTimeMillis {
-                        engine.init(engineSeed.value)
+                        if (!engine.canReuseDb()) {
+                            engine.init(engineSeed.value)
+                        } else {
+                            engine.initFromDb()
+                            view.showProgress(100)
+                        }
                     }
                     log.i("Initialization Completed! loadTime=$loadTime")
                     view.showKeyboard()
