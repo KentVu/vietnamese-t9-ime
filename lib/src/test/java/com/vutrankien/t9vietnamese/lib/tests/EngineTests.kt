@@ -205,14 +205,15 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("f:engineFunction_Vietnamese") {
+        test("engineFunction_Vietnamese") {
             engineFunction(
                 """
-                                ác
-                                ắc
-                                ách
-                                bá
-                                """.trimIndent().lineSequence(),
+                                aa
+                                ác
+                                ắc
+                                ách
+                                bá
+                                """.trimIndent().sortedSequence(),
                 vnPad,
                 arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
                 arrayOf(
@@ -282,4 +283,8 @@ class EngineTests: FunSpec() {
             }
         }
     }
+}
+
+private fun String.sortedSequence(): Sequence<String> {
+    return lineSequence().toSortedSet().asSequence()
 }
