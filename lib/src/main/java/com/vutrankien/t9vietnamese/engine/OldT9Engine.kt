@@ -93,10 +93,4 @@ private class OldT9Engine(
     private fun MutableSet<String>.addAll(chars: Set<Char>) {
         chars.forEach { add(it.toString()) }
     }
-
-    private fun String.composeVietnamese() = Normalizer.normalize(
-        this,
-        Normalizer.Form.NFKC
-    )
-
 }
