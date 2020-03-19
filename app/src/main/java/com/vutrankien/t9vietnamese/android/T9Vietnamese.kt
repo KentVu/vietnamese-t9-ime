@@ -19,15 +19,17 @@ class T9Vietnamese : InputMethodService() {
         super.onCreate()
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("T9IMService")
+        log.d("onCreate")
     }
 
     override fun onCreateInputView(): View {
-        //T9KeyboardView inputView = (T9KeyboardView) getLayoutInflater().inflate(
-//        R.layout.input, null);
-//inputView.setKeyboard(new T9Keyboard(this, R.xml.t9));
-        return layoutInflater.inflate(
-            R.layout.dialpad_table, null
-        ) as ConstraintLayout
+        val inputView = layoutInflater.inflate(
+            R.layout.input, null) as (T9KeyboardView)
+        inputView.keyboard = T9Keyboard(this, R.xml.t9);
+        return inputView
+        //return layoutInflater.inflate(
+        //    R.layout.dialpad_table_old, null
+        //) as ConstraintLayout
     }
 
     fun onBtnClick(view: View) {

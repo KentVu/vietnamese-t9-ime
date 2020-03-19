@@ -68,3 +68,7 @@ tags
 .idea/caches/
 .idea/codeStyles/Project.xml
 app/.cxx/
+.project
+.settings/
+.vscode/
+.classpath
