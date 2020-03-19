@@ -25,6 +25,7 @@ Specifications (Stories):
   1. Confirmed
 * Candidates: ...
 * numSeq: number sequence: the sequence of input keys' digit/char(?). (What should we call the Star/Sharp key?)
+* combination character: 
 
 ### Specs:
 1. [ ] User should interact mainly with the keypad (other means of interacting is optionally supported).
@@ -37,6 +38,8 @@ Specifications (Stories):
     2. [ ] If no candidates found, return the entered numSeq.
     3. [ ] The numSeq should be one of the candidates.
 6. [ ] If dawg has been built, use that dawg to minimize app start time.
+7. For Vietnamese:
+    7.1 [ ] The output should NOT contain combining character, it should be rigid unicode character.
 
 Basic Design:
 ===========

@@ -59,7 +59,7 @@ class MainActivityTest {
     }
 
     @Test fun basicTyping() {
-        "242360".forEach { onView(withText(startsWith("$it"))).perform(click()) }
+        "24236".forEach { onView(withText(startsWith("$it"))).perform(click()) }
         onView(withText("chào")).check(matches(isDisplayed()))
     }
 }

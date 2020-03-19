@@ -8,6 +8,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.Normalizer
+
+
+internal fun String.composeVietnamese() = Normalizer.normalize(
+    this,
+    Normalizer.Form.NFKC
+)
 
 class DefaultT9Engine constructor(
         lg: LogFactory,
@@ -90,7 +97,6 @@ class DefaultT9Engine constructor(
 
         private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int/*TODO*/): Set<String> {
             var accumulator = mutableSetOf<String>()
-            // TODO: use generateSequence!
             keySeq.forEach { key ->
                 if (accumulator.isEmpty()) {
                     accumulator.addAll(pad[key].chars.map { it.toString() })
@@ -105,7 +111,8 @@ class DefaultT9Engine constructor(
             }
             return accumulator.fold(sortedSetOf()) { acc, s ->
                 acc.apply {
-                    addAll(trie.search(s).keys)
+                    // TODO: optimize this: For ex: if 'a' not found then 'aa' 'ab' 'ac' will also not exist!
+                    addAll(trie.search(s).keys.map { it.composeVietnamese() })
                 }
             }
         }

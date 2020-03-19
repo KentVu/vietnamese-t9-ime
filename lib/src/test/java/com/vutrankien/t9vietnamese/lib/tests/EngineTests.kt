@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.lib.tests
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotlintest.*
-import io.kotlintest.matchers.containsInOrder
 import io.kotlintest.specs.FunSpec
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.toList
@@ -205,7 +204,47 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        test("engineFunction_Vietnamese") {
+            engineFunction(
+                """
+                                aa
+                                ác
+                                ắc
+                                ách
+                                bá
+                                """.trimIndent().sortedSequence(),
+                vnPad,
+                arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "1")),
+                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "11")),
+                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "113")),
+                    T9Engine.Event.Confirm("ác")
+                )
+            )
+        }
     }
+
+    private val vnPad = PadConfiguration(
+        mapOf(
+            Key.num1 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('a', '́')
+            ),
+            Key.num2 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('b', 'ă')
+            ),
+            Key.num3 to KeyConfig(
+                KeyType.Normal,
+                linkedSetOf('c')
+            ),
+            Key.num0 to KeyConfig(
+                KeyType.Confirm
+            )
+        )
+    )
 
     private suspend fun seedEngine(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
         launch {
@@ -244,4 +283,8 @@ class EngineTests: FunSpec() {
             }
         }
     }
+}
+
+private fun String.sortedSequence(): Sequence<String> {
+    return lineSequence().toSortedSet().asSequence()
 }
