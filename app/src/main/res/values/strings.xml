@@ -21,7 +21,7 @@
     <string name="btn_9">9 wxyz</string>
     <string name="btn_star">*</string>
     <string name="btn_0">0</string>
-    <string name="btn_pound">#</string>
+    <string name="btn_sharp">#</string>
     <string name="btn_right"><![CDATA[>]]></string>
     <string name="test_hint">test here</string>
     <string name="notify_initialized">Engine initialized!</string>

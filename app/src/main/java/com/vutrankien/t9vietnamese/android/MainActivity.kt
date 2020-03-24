@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
 import android.content.Context
+import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.view.View
@@ -64,7 +65,9 @@ class MainActivity : Activity(), MVPView {
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
-        presenter.attachView(this)
+        val kbView = findViewById<KeyboardView>(R.id.dialpad)
+        kbView.keyboard = T9Keyboard(this, R.xml.t9)
+        kbView.setOnKeyboardActionListener(KeyboardActionListener(logFactory,scope,eventSource))
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = wordListAdapter
@@ -74,6 +77,8 @@ class MainActivity : Activity(), MVPView {
                 "${BuildConfig.APPLICATION_ID}:MainActivity")
 
         wakelock.acquire(WAKELOCK_TIMEOUT)
+
+        presenter.attachView(this)
         scope.launch {
             eventSource.send(Event.START.noData())
         }
@@ -106,6 +111,55 @@ class MainActivity : Activity(), MVPView {
         displayError(e.message ?: "")
     }
 
+    fun onCandidateClick(view: View) {
+        log.d("onCandidateClick()")
+        //engine.flush()
+        (view as TextView).text = ""
+    }
+
+    private class KeyboardActionListener(
+        logFactory: LogFactory,
+        val scope: CoroutineScope,
+        val eventSource: Channel<EventWithData<Event, Key>>
+    ) : KeyboardView.OnKeyboardActionListener {
+        private val log: LogFactory.Log = logFactory.newLog("KeyboardActionListener")
+        override fun swipeRight() {
+            log.d("swipeRight")
+        }
+
+        override fun onPress(primaryCode: Int) {
+            log.d("onPress")
+        }
+
+        override fun onRelease(primaryCode: Int) {
+            log.d("onRelease")
+        }
+
+        override fun swipeLeft() {
+            log.d("swipeLeft")
+        }
+
+        override fun swipeUp() {
+            log.d("swipeUp")
+        }
+
+        override fun swipeDown() {
+            log.d("swipeDown")
+        }
+
+        override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
+            log.d("onKey:$primaryCode,${keyCodes?.joinToString()}")
+        }
+
+        override fun onText(text: CharSequence?) {
+            log.d("onText:$text")
+            if(text == null) return
+            scope.launch {
+                eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(text[0])))
+            }
+        }
+    }
+
     fun onBtnClick(view: View) {
         val text = (view as Button).text
         val key = text[0]
@@ -113,12 +167,6 @@ class MainActivity : Activity(), MVPView {
         scope.launch {
             eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
         }
-    }
-
-    fun onCandidateClick(view: View) {
-        log.d("onCandidateClick()")
-        //engine.flush()
-        (view as TextView).text = ""
     }
 
     fun onBtnStarClick(view: View) {

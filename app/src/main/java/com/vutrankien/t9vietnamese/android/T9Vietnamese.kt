@@ -25,7 +25,7 @@ class T9Vietnamese : InputMethodService() {
     override fun onCreateInputView(): View {
         val inputView = layoutInflater.inflate(
             R.layout.input, null) as (T9KeyboardView)
-        inputView.keyboard = T9Keyboard(this, R.xml.t9);
+        inputView.keyboard = T9Keyboard(this, R.xml.t9)
         return inputView
         //return layoutInflater.inflate(
         //    R.layout.dialpad_table_old, null
