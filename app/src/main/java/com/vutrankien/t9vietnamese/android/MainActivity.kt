@@ -71,7 +71,7 @@ class MainActivity : Activity(), MVPView {
                 eventSource
             )
         )
-        logic.initializeCandidatesView(findViewById(R.id.recycler_view))
+        logic.initializeCandidatesView(findViewById(R.id.candidates_view))
         //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         //recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         //recyclerView.adapter = wordListAdapter
