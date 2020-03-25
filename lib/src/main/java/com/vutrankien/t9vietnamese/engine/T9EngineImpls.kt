@@ -109,10 +109,15 @@ class DefaultT9Engine constructor(
                     accumulator = newAcc
                 }
             }
+            val emptyPrefixes = mutableSetOf<String>()
             return accumulator.fold(sortedSetOf()) { acc, s ->
                 acc.apply {
                     // TODO: optimize this: For ex: if 'a' not found then 'aa' 'ab' 'ac' will also not exist!
-                    addAll(trie.search(s).keys.map { it.composeVietnamese() })
+                    if (emptyPrefixes.contains(s)) return@apply
+
+                    val searchResult = trie.search(s).keys
+                    if (searchResult.isEmpty()) emptyPrefixes.add(s)
+                    addAll(searchResult.map { it.composeVietnamese() })
                 }
             }
         }
