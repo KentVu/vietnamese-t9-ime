@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 
 internal class KeyboardActionListener(
     logFactory: LogFactory,
-    val scope: CoroutineScope,
-    val eventSource: Channel<EventWithData<Event, Key>>
+    private val scope: CoroutineScope,
+    private val eventSource: Channel<EventWithData<Event, Key>>
 ) : KeyboardView.OnKeyboardActionListener {
     private val log: LogFactory.Log = logFactory.newLog("KeyboardActionListener")
     override fun swipeRight() {
@@ -45,7 +45,10 @@ internal class KeyboardActionListener(
 
     override fun onText(text: CharSequence?) {
         log.d("onText:$text")
-        if(text == null) return
+        if(text == null) {
+            log.w("onText:text is null!!")
+            return
+        }
         scope.launch {
             eventSource.send(
                 Event.KEY_PRESS.withData(

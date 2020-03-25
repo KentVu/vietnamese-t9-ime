@@ -10,8 +10,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -24,6 +22,7 @@ class MainActivity : Activity(), MVPView {
     private lateinit var log: LogFactory.Log
     @Inject
     lateinit var presenter: Presenter
+    private val logic: UiLogic = UiLogic.DefaultUiLogic()
 
     companion object {
         private const val WAKELOCK_TIMEOUT = 60000L
@@ -44,21 +43,19 @@ class MainActivity : Activity(), MVPView {
         //defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
     }
 
-    override fun showCandidates(cand: Collection<String>) {
-        log.d("View: showCandidates:$cand")
-        wordListAdapter.update(cand)
+    override fun showCandidates(candidates: Collection<String>) {
+        log.d("View: showCandidates:$candidates")
+        logic.updateCandidates(candidates)
     }
 
     override fun confirmInput(word: String) {
         log.d("View: confirmInput")
         // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).append(" $word")
-        wordListAdapter.clear()
+        logic.clearCandidates()
     }
 
     private lateinit var wakelock: PowerManager.WakeLock
-
-    private val wordListAdapter = WordListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +71,10 @@ class MainActivity : Activity(), MVPView {
                 eventSource
             )
         )
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = wordListAdapter
+        logic.initializeCandidatesView(findViewById(R.id.recycler_view))
+        //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        //recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        //recyclerView.adapter = wordListAdapter
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK,

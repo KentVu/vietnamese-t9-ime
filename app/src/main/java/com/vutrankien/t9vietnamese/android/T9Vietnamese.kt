@@ -3,6 +3,7 @@ package com.vutrankien.t9vietnamese.android
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.widget.Button
+import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,8 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override val scope = CoroutineScope(Dispatchers.Main + Job())
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
+    private val logic: UiLogic = UiLogic.DefaultUiLogic()
+    //private val wordListAdapter = WordListAdapter()
 
     override fun onCreate() {
         super.onCreate()
@@ -53,6 +56,16 @@ class T9Vietnamese : InputMethodService(), MVPView {
         //) as ConstraintLayout
     }
 
+    override fun onCreateCandidatesView(): View {
+        return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).also {
+            log.d("onCreateCandidatesView:$it")
+            logic.initializeCandidatesView(it)
+        }
+        //return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).apply {
+        //    layoutManager = LinearLayoutManager(this@T9Vietnamese, RecyclerView.HORIZONTAL, false)
+        //}
+    }
+
     override fun showProgress(bytes: Int) {
         //log.w("TODO: showProgress")
         //displayInfo(R.string.engine_loading, bytes)
@@ -63,8 +76,10 @@ class T9Vietnamese : InputMethodService(), MVPView {
         //displayInfo(R.string.notify_initialized)
     }
 
-    override fun showCandidates(cand: Collection<String>) {
-        log.d("View: TODO: showCandidates:$cand")
+    override fun showCandidates(candidates: Collection<String>) {
+        log.d("View: TODO: showCandidates:$candidates")
+        logic.updateCandidates(candidates)
+        setCandidatesViewShown(true)
         //wordListAdapter.update(cand)
     }
 
@@ -72,7 +87,8 @@ class T9Vietnamese : InputMethodService(), MVPView {
         log.d("View: confirmInput:$word")
         // XXX Is inserting a space here a right place?
         currentInputConnection.commitText(" $word", 1)
-
+        setCandidatesViewShown(false)
+        logic.clearCandidates()
         //findViewById<EditText>(R.id.editText).append(" $word")
         //wordListAdapter.clear()
     }
