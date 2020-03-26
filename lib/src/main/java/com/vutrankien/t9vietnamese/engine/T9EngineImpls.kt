@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.io.File
 import java.text.Normalizer
 
 
@@ -70,7 +69,8 @@ class DefaultT9Engine constructor(
     override suspend fun push(key: Key) {
         _currentNumSeq.add(key)
         if (pad[key].type != KeyType.Confirm) {
-            val candidates = findCandidates(trie, pad, _currentNumSeq, 10).toMutableList()
+            log.d("push:${_currentNumSeq.joinNum()}")
+            val candidates = findCandidates(trie, pad, _currentNumSeq, 10, log).toMutableList()
             candidates.add(_currentNumSeq.joinNum())
             eventSource.send(T9Engine.Event.NewCandidates(candidates))
             _currentCandidates.clear()
@@ -95,26 +95,48 @@ class DefaultT9Engine constructor(
     companion object {
         private const val REPORT_PROGRESS_INTERVAL = 10
 
-        private fun findCandidates(trie: Trie, pad: PadConfiguration, keySeq: List<Key>, limit: Int/*TODO*/): Set<String> {
-            var accumulator = mutableSetOf<String>()
-            keySeq.forEach { key ->
+        private fun findCandidates(
+            trie: Trie,
+            pad: PadConfiguration,
+            keySeq: List<Key>,
+            limit: Int/*TODO*/,
+            log: LogFactory.Log
+        ): Set<String> {
+            var accumulator = sortedSetOf<String>()
+            val result = mutableSetOf<String>()
+            val emptyPrefixes = mutableSetOf<String>()
+            keySeq.forEachIndexed { i, key ->
                 if (accumulator.isEmpty()) {
                     accumulator.addAll(pad[key].chars.map { it.toString() })
                 } else {
                     // combine chars of current key to current set of combinations
-                    val newAcc = mutableSetOf<String>()
-                    pad[key].chars.forEach { c ->
-                        newAcc.addAll(accumulator.map{ it + c })
+                    val newAcc = sortedSetOf<String>()
+                    accumulator.forEach comb@ { comb ->
+                        if (emptyPrefixes.contains(comb)) return@comb
+                        pad[key].chars.forEach c@ { c ->
+                            val newComb = comb + c
+                            val searchResult = trie.search(newComb).keys.take(20)
+                            log.v("findCandidates:$i:$newComb -> ${searchResult.joinToString()}")
+                            if (searchResult.isEmpty()) {
+                                emptyPrefixes.add(newComb)
+                                return@c // no need to add to the result
+                            }
+                            newAcc.add(newComb) // add potential combination only
+                            if (i == keySeq.lastIndex) {
+                                result.addAll(searchResult.map { it.composeVietnamese() })
+                            }
+                        }
+                    }
+                    if (newAcc.isEmpty()) {
+                        log.d("findCandidates:Empty result @ " +
+                                StringBuilder(keySeq/*.take(i + 1)*/.joinNum()).insert(i, '|').toString()
+                        )
+                        return emptySet() // no candidates found pass this key
                     }
                     accumulator = newAcc
                 }
             }
-            return accumulator.fold(sortedSetOf()) { acc, s ->
-                acc.apply {
-                    // TODO: optimize this: For ex: if 'a' not found then 'aa' 'ab' 'ac' will also not exist!
-                    addAll(trie.search(s).keys.map { it.composeVietnamese() })
-                }
-            }
+            return result
         }
 
         private fun Iterable<Key>.joinNum(): String = buildString {
