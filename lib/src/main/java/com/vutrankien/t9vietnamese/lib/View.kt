@@ -9,7 +9,7 @@ interface View {
 
     fun showProgress(bytes: Int)
     fun showKeyboard()
-    fun showCandidates(cand: Collection<String>)
+    fun showCandidates(candidates: Collection<String>)
     fun confirmInput(word: String)
 }
 

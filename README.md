@@ -24,12 +24,15 @@ Specifications (Stories):
   1. Inputting
   1. Confirmed
 * Candidates: ...
-* numSeq: number sequence: the sequence of input keys' digit/char(?). (What should we call the Star/Sharp key?)
+* numSeq: number sequence: the sequence of input keys' digit/char(?). (What should we call the
+ Star/Sharp key?)
 * combination character: 
 
 ### Specs:
-1. [ ] User should interact mainly with the keypad (other means of interacting is optionally supported).
-        (Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside of the keypad (dialpad)).
+1. [ ] User should interact mainly with the keypad (other means of interacting is optionally
+ supported).
+        (Keypad-centric accessibility: make use all the key on the keypad, prevent actions outside
+         of the keypad (dialpad)).
 2. [ ] Uppercase should only occur at first letter of words.
 3. [ ] User should be able to select from a set of displayed candidates.
 4. [x] When inputting, the possible candidates should be displayed.
@@ -39,7 +42,8 @@ Specifications (Stories):
     3. [ ] The numSeq should be one of the candidates.
 6. [ ] If dawg has been built, use that dawg to minimize app start time.
 7. For Vietnamese:
-    7.1 [ ] The output should NOT contain combining character, it should be rigid unicode character.
+    1. [ ] The output should NOT contain combining character, it should contains only rigid unicode
+     character.
 
 Basic Design:
 ===========

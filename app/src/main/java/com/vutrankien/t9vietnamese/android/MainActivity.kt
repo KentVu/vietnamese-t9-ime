@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
 import android.content.Context
+import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.view.View
@@ -9,8 +10,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -23,6 +22,7 @@ class MainActivity : Activity(), MVPView {
     private lateinit var log: LogFactory.Log
     @Inject
     lateinit var presenter: Presenter
+    private val logic: UiLogic = UiLogic.DefaultUiLogic()
 
     companion object {
         private const val WAKELOCK_TIMEOUT = 60000L
@@ -43,37 +43,46 @@ class MainActivity : Activity(), MVPView {
         //defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
     }
 
-    override fun showCandidates(cand: Collection<String>) {
-        log.d("View: showCandidates:$cand")
-        wordListAdapter.update(cand)
+    override fun showCandidates(candidates: Collection<String>) {
+        log.d("View: showCandidates:$candidates")
+        logic.updateCandidates(candidates)
     }
 
     override fun confirmInput(word: String) {
         log.d("View: confirmInput")
         // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).append(" $word")
-        wordListAdapter.clear()
+        logic.clearCandidates()
     }
 
     private lateinit var wakelock: PowerManager.WakeLock
-
-    private val wordListAdapter = WordListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
-        presenter.attachView(this)
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = wordListAdapter
+        val kbView = findViewById<KeyboardView>(R.id.dialpad)
+        kbView.keyboard = T9Keyboard(this, R.xml.t9)
+        kbView.setOnKeyboardActionListener(
+            KeyboardActionListener(
+                logFactory,
+                scope,
+                eventSource
+            )
+        )
+        logic.initializeCandidatesView(findViewById(R.id.candidates_view))
+        //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        //recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        //recyclerView.adapter = wordListAdapter
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK,
                 "${BuildConfig.APPLICATION_ID}:MainActivity")
 
         wakelock.acquire(WAKELOCK_TIMEOUT)
+
+        presenter.attachView(this)
         scope.launch {
             eventSource.send(Event.START.noData())
         }
@@ -106,6 +115,12 @@ class MainActivity : Activity(), MVPView {
         displayError(e.message ?: "")
     }
 
+    fun onCandidateClick(view: View) {
+        log.d("onCandidateClick()")
+        //engine.flush()
+        (view as TextView).text = ""
+    }
+
     fun onBtnClick(view: View) {
         val text = (view as Button).text
         val key = text[0]
@@ -113,12 +128,6 @@ class MainActivity : Activity(), MVPView {
         scope.launch {
             eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
         }
-    }
-
-    fun onCandidateClick(view: View) {
-        log.d("onCandidateClick()")
-        //engine.flush()
-        (view as TextView).text = ""
     }
 
     fun onBtnStarClick(view: View) {
