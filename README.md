@@ -24,7 +24,7 @@ Specifications (Stories):
   1. Inputting
   1. Confirmed
 * Candidates: ...
-* numSeq: number sequence: the sequence of input keys' digit/char(?). (What should we call the
+* numSeq(keySeq): number sequence: the sequence of input keys' digit/char(?). (What should we call the
  Star/Sharp key?)
 * combination character: 
 

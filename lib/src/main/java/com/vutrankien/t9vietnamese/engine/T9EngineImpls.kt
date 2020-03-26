@@ -106,11 +106,26 @@ class DefaultT9Engine constructor(
             val result = mutableSetOf<String>()
             val emptyPrefixes = mutableSetOf<String>()
             keySeq.forEachIndexed { i, key ->
-                if (accumulator.isEmpty()) {
-                    accumulator.addAll(pad[key].chars.map { it.toString() })
+                // combine chars of current key to current set of combinations
+                val newAcc = sortedSetOf<String>()
+                if (i == 0) { // just seed the key's chars for the first key
+                    newAcc.addAll(pad[key].chars.map { newComb ->
+                        val searchResult = trie.search(newComb.toString()).keys.take(20)
+                        if (i == keySeq.lastIndex) {
+                            result.addAll(searchResult)
+                        }
+                        newComb.toString()
+                    })
+                } else if (i < 2) { // for the first few keys, just add the combinations to the result
+                    accumulator.forEach comb@{ comb ->
+                        pad[key].chars.forEach c@{ c ->
+                            newAcc.add(comb + c)
+                        }
+                    }
+                    if (i == keySeq.lastIndex) {
+                        result.addAll(newAcc)
+                    }
                 } else {
-                    // combine chars of current key to current set of combinations
-                    val newAcc = sortedSetOf<String>()
                     accumulator.forEach comb@ { comb ->
                         if (emptyPrefixes.contains(comb)) return@comb
                         pad[key].chars.forEach c@ { c ->
@@ -127,14 +142,14 @@ class DefaultT9Engine constructor(
                             }
                         }
                     }
-                    if (newAcc.isEmpty()) {
-                        log.d("findCandidates:Empty result @ " +
-                                StringBuilder(keySeq/*.take(i + 1)*/.joinNum()).insert(i, '|').toString()
-                        )
-                        return emptySet() // no candidates found pass this key
-                    }
-                    accumulator = newAcc
                 }
+                if (newAcc.isEmpty()) {
+                    log.d("findCandidates:Empty result @ " +
+                            StringBuilder(keySeq/*.take(i + 1)*/.joinNum()).insert(i, '|').toString()
+                    )
+                    return emptySet() // no candidates found pass this key
+                }
+                accumulator = newAcc
             }
             return result
         }
