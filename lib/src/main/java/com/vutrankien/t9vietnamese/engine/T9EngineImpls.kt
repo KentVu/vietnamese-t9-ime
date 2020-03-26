@@ -103,7 +103,7 @@ class DefaultT9Engine constructor(
             log: LogFactory.Log
         ): Set<String> {
             var accumulator = sortedSetOf<String>()
-            val result = mutableSetOf<String>()
+            val result = sortedSetOf<String>()
             val emptyPrefixes = mutableSetOf<String>()
             keySeq.forEachIndexed { i, key ->
                 // combine chars of current key to current set of combinations
