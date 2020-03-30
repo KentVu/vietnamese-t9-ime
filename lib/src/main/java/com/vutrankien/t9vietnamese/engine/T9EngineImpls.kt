@@ -31,6 +31,9 @@ class DefaultT9Engine constructor(
 
     private val _currentCandidates = mutableSetOf<String>()
     private val _currentNumSeq = mutableListOf<Key>()
+    private val findCandidates by lazy {
+        FindCandidates(trie, pad, 10, log)
+    }
 
     override suspend fun init(
         seed: Sequence<String>
@@ -54,7 +57,6 @@ class DefaultT9Engine constructor(
     }
 
     override fun canReuseDb(): Boolean {
-        // TODO This check always fails on Android!!
         env.fileExists(dawgPath).let {
             log.d("canReuseDb: $it")
             return it
@@ -70,7 +72,7 @@ class DefaultT9Engine constructor(
         _currentNumSeq.add(key)
         if (pad[key].type != KeyType.Confirm) {
             log.d("push:${_currentNumSeq.joinNum()}")
-            val candidates = findCandidates(trie, pad, _currentNumSeq, 10, log).toMutableList()
+            val candidates = findCandidates(_currentNumSeq).toMutableList()
             candidates.add(_currentNumSeq.joinNum())
             eventSource.send(T9Engine.Event.NewCandidates(candidates))
             _currentCandidates.clear()
@@ -95,69 +97,49 @@ class DefaultT9Engine constructor(
     companion object {
         private const val REPORT_PROGRESS_INTERVAL = 10
 
-        private fun findCandidates(
-            trie: Trie,
-            pad: PadConfiguration,
-            keySeq: List<Key>,
-            limit: Int/*TODO*/,
-            log: LogFactory.Log
-        ): Set<String> {
-            var accumulator = sortedSetOf<String>()
-            val result = sortedSetOf<String>()
-            val emptyPrefixes = mutableSetOf<String>()
-            keySeq.forEachIndexed { i, key ->
-                // combine chars of current key to current set of combinations
-                val newAcc = sortedSetOf<String>()
-                if (i == 0) { // just seed the key's chars for the first key
-                    newAcc.addAll(pad[key].chars.map { newComb ->
-                        val searchResult = trie.search(newComb.toString()).keys.take(20)
-                        if (i == keySeq.lastIndex) {
-                            result.addAll(searchResult)
-                        }
-                        newComb.toString()
-                    })
-                } else if (i < 2) { // for the first few keys, just add the combinations to the result
-                    accumulator.forEach comb@{ comb ->
-                        pad[key].chars.forEach c@{ c ->
-                            newAcc.add(comb + c)
-                        }
-                    }
-                    if (i == keySeq.lastIndex) {
-                        result.addAll(newAcc)
-                    }
-                } else {
-                    accumulator.forEach comb@ { comb ->
-                        if (emptyPrefixes.contains(comb)) return@comb
-                        pad[key].chars.forEach c@ { c ->
-                            val newComb = comb + c
-                            val searchResult = trie.search(newComb).keys.take(20)
-                            log.v("findCandidates:$i:$newComb -> ${searchResult.joinToString()}")
-                            if (searchResult.isEmpty()) {
-                                emptyPrefixes.add(newComb)
-                                return@c // no need to add to the result
-                            }
-                            newAcc.add(newComb) // add potential combination only
-                            if (i == keySeq.lastIndex) {
-                                result.addAll(searchResult.map { it.composeVietnamese() })
-                            }
-                        }
-                    }
-                }
-                if (newAcc.isEmpty()) {
-                    log.d("findCandidates:Empty result @ " +
-                            StringBuilder(keySeq/*.take(i + 1)*/.joinNum()).insert(i, '|').toString()
-                    )
-                    return emptySet() // no candidates found pass this key
-                }
-                accumulator = newAcc
-            }
-            return result
-        }
-
         private fun Iterable<Key>.joinNum(): String = buildString {
             this@joinNum.forEach {
                 append(it.char)
             }
+        }
+    }
+
+    class FindCandidates(
+        private val trie: Trie,
+        private val pad: PadConfiguration,
+        private val limit: Int/*TODO*/,
+        private val log: LogFactory.Log
+    ) {
+        operator fun invoke(
+            keySeq: List<Key>
+        ): Set<String> {
+            // find all combinations:
+            val possibleCombinations = possibleCombinations("", keySeq)
+            return possibleCombinations.fold(linkedSetOf<String>()) {acc, next ->
+                acc.apply { addAll(trie.search(next).keys.map { it.composeVietnamese() }) }
+            }
+        }
+
+        private fun possibleCombinations(currentPrefix: String, keySeq: List<Key>): Set<String> {
+            val result = LinkedHashSet<String>()
+            val possibleChars = linkedSetOf<Char>()
+            pad[keySeq[0]].chars.forEach {c ->
+                val newCombination = "$currentPrefix$c"
+                val searchResult = trie.search(newCombination).keys
+                if (searchResult.isNotEmpty())
+                    possibleChars.add(c)
+            }
+            if (keySeq.size == 1) {
+                return possibleChars.map {
+                    log.v("possibleCombinations:$currentPrefix$it")
+                    "$currentPrefix$it"
+                }.toSet()
+            }
+            // else
+            possibleChars.forEach { c ->
+                result.addAll(possibleCombinations(currentPrefix + c, keySeq.drop(1)))
+            }
+            return result
         }
     }
 }

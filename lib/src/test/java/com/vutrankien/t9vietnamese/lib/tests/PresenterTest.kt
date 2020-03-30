@@ -2,9 +2,9 @@ package com.vutrankien.t9vietnamese.lib.tests
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
-import io.kotlintest.IsolationMode
-import io.kotlintest.TestCase
-import io.kotlintest.specs.FunSpec
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.test.TestCase
 import io.mockk.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel

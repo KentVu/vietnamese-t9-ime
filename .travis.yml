@@ -84,7 +84,7 @@ script:
   # from https://github.com/travis-ci/travis-rubies/blob/9f7962a881c55d32da7c76baefc58b89e3941d91/build.sh#L38-L44
   - fold_start lib.build "gradle :lib:build"
   - ./gradlew -Plint.output.console=true --info :lib:build
-  - export s3key="$(git rev-parse --short ${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT:-HEAD}})"
+  - export s3key="${TRAVIS_PULL_REQUEST:+PR$TRAVIS_PULL_REQUEST-}$(git rev-parse --short ${TRAVIS_PULL_REQUEST_SHA:-${TRAVIS_COMMIT:-HEAD}})"
   - "aws s3 cp --recursive lib/build/reports/tests/test/ s3://t9vietnamese/$s3key/lib-test/
       --acl public-read --expires $(date -Iseconds -d '1 months')"
   - fold_end lib.build

@@ -10,8 +10,9 @@ class AndroidEnv(
 ) : Env {
     // https://stackoverflow.com/q/9713981/1562087
     override fun fileExists(path: String): Boolean =
-        //context.getFileStreamPath(path).exists()
-        File(path).exists()
+            // XXX The working dir is not the same as getFileStreamPath on Android
+            //context.getFileStreamPath(path).exists()
+            File(path).exists()
 
     override val workingDir: String
         get() = context.filesDir.absolutePath
