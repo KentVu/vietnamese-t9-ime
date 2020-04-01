@@ -115,7 +115,7 @@ class DefaultT9Engine constructor(
         ): Set<String> {
             // find all combinations:
             val possibleCombinations = possibleCombinations("", keySeq)
-            return possibleCombinations.fold(linkedSetOf<String>()) {acc, next ->
+            return possibleCombinations.fold(sortedSetOf<String>()) {acc, next ->
                 acc.apply { addAll(trie.search(next).keys.map { it.composeVietnamese() }) }
             }
         }

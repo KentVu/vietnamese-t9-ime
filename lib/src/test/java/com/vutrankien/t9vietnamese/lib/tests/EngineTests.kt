@@ -18,7 +18,7 @@ import kotlin.time.seconds
 
 @OptIn(ExperimentalTime::class)
 class EngineTests: FunSpec() {
-    override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
+    //override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
     private lateinit var engine: T9Engine
     private lateinit var log: LogFactory.Log
 
@@ -125,7 +125,7 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("f:engineFunction_1key_2") {
+        test("engineFunction_1key_2") {
             engineFunction(
                 """
                                 a
