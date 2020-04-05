@@ -2,9 +2,13 @@ package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -132,5 +136,25 @@ class MainActivity : Activity(), MVPView {
 
     fun onBtnStarClick(view: View) {
         log.d("onBtnStarClick()")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            R.id.select_system_ime -> {
+                startActivityForResult(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS), 0)
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        log.d("onActivityResult:$requestCode:res=$resultCode:data=$data")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

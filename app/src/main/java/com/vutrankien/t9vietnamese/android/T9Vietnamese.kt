@@ -57,13 +57,11 @@ class T9Vietnamese : InputMethodService(), MVPView {
     }
 
     override fun onCreateCandidatesView(): View {
+        setCandidatesViewShown(true)
         return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).also {
             log.d("onCreateCandidatesView:$it")
             logic.initializeCandidatesView(it)
         }
-        //return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).apply {
-        //    layoutManager = LinearLayoutManager(this@T9Vietnamese, RecyclerView.HORIZONTAL, false)
-        //}
     }
 
     override fun showProgress(bytes: Int) {
@@ -79,15 +77,13 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: TODO: showCandidates:$candidates")
         logic.updateCandidates(candidates)
-        setCandidatesViewShown(true)
-        //wordListAdapter.update(cand)
     }
 
     override fun confirmInput(word: String) {
         log.d("View: confirmInput:$word")
         // XXX Is inserting a space here a right place?
         currentInputConnection.commitText(" $word", 1)
-        setCandidatesViewShown(false)
+        //setCandidatesViewShown(false)
         logic.clearCandidates()
         //findViewById<EditText>(R.id.editText).append(" $word")
         //wordListAdapter.clear()
