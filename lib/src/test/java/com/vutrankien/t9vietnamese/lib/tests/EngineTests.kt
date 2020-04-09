@@ -2,17 +2,23 @@ package com.vutrankien.t9vietnamese.lib.tests
 
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
-import io.kotlintest.*
-import io.kotlintest.specs.FunSpec
-import kotlinx.coroutines.*
+import io.kotest.assertions.assertSoftly
+import io.kotest.core.spec.IsolationMode
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.test.TestCase
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
+@OptIn(ExperimentalTime::class)
 class EngineTests: FunSpec() {
-    override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
+    //override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
     private lateinit var engine: T9Engine
     private lateinit var log: LogFactory.Log
 
@@ -136,25 +142,27 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("engineFunction_2keys") {
-            engineFunction(
-                """
+        //context("f:engineFunction_2keys") {
+            test("engineFunction_2keys") {
+                engineFunction(
+                    """
                                 aa
                                 ab
                                 ac
                                 ba
                                 """.trimIndent().lineSequence(),
-                padConfig,
-                arrayOf(Key.num1, Key.num1, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
-                    T9Engine.Event.NewCandidates(setOf("aa")),
-                    T9Engine.Event.Confirm("aa")
+                    padConfig,
+                    arrayOf(Key.num1, Key.num1, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
+                        T9Engine.Event.NewCandidates(setOf("aa")),
+                        T9Engine.Event.Confirm("aa")
+                    )
                 )
-            )
-        }
+            }
+        //}
 
-        test("engineFunction_stdconfig_2keys").config(timeout = Duration.ofSeconds(180)) {
+        test("engineFunction_stdconfig_2keys").config(timeout = 180.seconds) {
             engineFunction(
                 """
                                 aa
@@ -175,7 +183,7 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("5.2.engineFunction_noCandidates").config(timeout = Duration.ofSeconds(180)) {
+        test("5.2.engineFunction_noCandidates").config(timeout = 180.seconds) {
             engineFunction(
                 emptySequence(),
                 padConfig,

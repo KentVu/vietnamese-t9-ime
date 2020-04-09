@@ -2,8 +2,8 @@ package com.vutrankien.t9vietnamese.lib.tests.trie
 
 import com.vutrankien.t9vietnamese.lib.DaggerEngineComponents
 import com.vutrankien.t9vietnamese.lib.LogFactory
-import io.kotlintest.matchers.maps.shouldContainKeys
-import io.kotlintest.specs.StringSpec
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.maps.shouldContainKeys
 import kentvu.dawgjava.DawgTrie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -11,7 +11,7 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
-class TrieTest: StringSpec ({
+class TrieTest: StringSpec({
     val log = DaggerEngineComponents.builder().build().lg.newLog("TrieTest")
     "Load large file" {
         // https://discuss.gradle.org/t/how-to-read-a-properties-file/15956/4

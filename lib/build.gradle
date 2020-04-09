@@ -25,7 +25,8 @@ dependencies {
     //kaptTest "com.google.dagger:dagger-compiler:$dagger_version"
     // Required for local unit tests (JUnit 4 framework)
     testImplementation "io.mockk:mockk:1.9.3"
-    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
+    testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotest_version"
+    testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
 }
 
 compileKotlin {
@@ -38,6 +39,7 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xuse-experimental=kotlin.Experimental"
     }
 }
 
