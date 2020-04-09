@@ -26,4 +26,5 @@
     <string name="test_hint">test here</string>
     <string name="notify_initialized">Engine initialized!</string>
     <string name="engine_loading">Loading engine… %d</string>
+    <string name="enable_ime">Enable ime</string>
 </resources>

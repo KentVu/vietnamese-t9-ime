@@ -131,9 +131,10 @@ class DefaultT9Engine constructor(
             }
             if (keySeq.size == 1) {
                 return possibleChars.map {
-                    log.v("possibleCombinations:$currentPrefix$it")
                     "$currentPrefix$it"
-                }.toSet()
+                }.toSet().also {
+                    log.v("possibleCombinations:$it")
+                }
             }
             // else
             possibleChars.forEach { c ->

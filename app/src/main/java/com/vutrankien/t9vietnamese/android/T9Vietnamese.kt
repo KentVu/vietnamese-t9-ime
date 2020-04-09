@@ -5,11 +5,8 @@ import android.view.View
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
@@ -33,6 +30,11 @@ class T9Vietnamese : InputMethodService(), MVPView {
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("T9IMService")
         log.d("onCreate")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel("T9Vietnamese.onDestroy()")
     }
 
     override fun onCreateInputView(): View {
