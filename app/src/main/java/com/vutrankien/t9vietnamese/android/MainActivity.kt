@@ -2,19 +2,28 @@ package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.vutrankien.t9vietnamese.lib.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
+
 
 class MainActivity : Activity(), MVPView {
     @Inject
@@ -132,5 +141,31 @@ class MainActivity : Activity(), MVPView {
 
     fun onBtnStarClick(view: View) {
         log.d("onBtnStarClick()")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId) {
+            R.id.enable_ime -> {
+                startActivityForResult(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS), 0)
+                return true
+            }
+            R.id.select_system_ime -> {
+                val imeManager: InputMethodManager =
+                    applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imeManager.showInputMethodPicker()
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        log.d("onActivityResult:$requestCode:res=$resultCode:data=$data")
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

@@ -5,11 +5,8 @@ import android.view.View
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
@@ -35,6 +32,11 @@ class T9Vietnamese : InputMethodService(), MVPView {
         log.d("onCreate")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel("T9Vietnamese.onDestroy()")
+    }
+
     override fun onCreateInputView(): View {
         val inputView = layoutInflater.inflate(
             R.layout.input, null) as (T9KeyboardView)
@@ -57,13 +59,11 @@ class T9Vietnamese : InputMethodService(), MVPView {
     }
 
     override fun onCreateCandidatesView(): View {
+        setCandidatesViewShown(true)
         return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).also {
             log.d("onCreateCandidatesView:$it")
             logic.initializeCandidatesView(it)
         }
-        //return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).apply {
-        //    layoutManager = LinearLayoutManager(this@T9Vietnamese, RecyclerView.HORIZONTAL, false)
-        //}
     }
 
     override fun showProgress(bytes: Int) {
@@ -79,15 +79,13 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: TODO: showCandidates:$candidates")
         logic.updateCandidates(candidates)
-        setCandidatesViewShown(true)
-        //wordListAdapter.update(cand)
     }
 
     override fun confirmInput(word: String) {
         log.d("View: confirmInput:$word")
         // XXX Is inserting a space here a right place?
         currentInputConnection.commitText(" $word", 1)
-        setCandidatesViewShown(false)
+        //setCandidatesViewShown(false)
         logic.clearCandidates()
         //findViewById<EditText>(R.id.editText).append(" $word")
         //wordListAdapter.clear()
