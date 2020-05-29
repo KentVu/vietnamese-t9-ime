@@ -4,6 +4,12 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
+import com.android.inputmethod.keyboard.KeyboardId
+import com.android.inputmethod.keyboard.KeyboardLayoutSet
+import com.android.inputmethod.keyboard.MainKeyboardView
+import com.android.inputmethod.keyboard.internal.KeyboardBuilder
+import com.android.inputmethod.keyboard.internal.KeyboardParams
+import com.android.inputmethod.latin.InputView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -39,9 +45,14 @@ class T9Vietnamese : InputMethodService(), MVPView {
 
     override fun onCreateInputView(): View {
         val inputView = layoutInflater.inflate(
-            R.layout.input, null) as (T9KeyboardView)
-        inputView.keyboard = T9Keyboard(this, R.xml.t9)
-        inputView.setOnKeyboardActionListener(
+            R.layout.input, null) as (InputView)
+        val kbView =
+            inputView.findViewById(com.android.inputmethod.latin.R.id.keyboard_view) as MainKeyboardView
+        val builder = KeyboardBuilder(this, KeyboardParams())
+        builder.load(R.xml.t9, KeyboardId(KeyboardId.ELEMENT_PHONE, KeyboardLayoutSet.Params()/*.also { mKeyboardWith = .... }*/))
+        val keyboard = builder.build()
+        kbView.setKeyboard(keyboard)
+        kbView.setKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
                 scope,

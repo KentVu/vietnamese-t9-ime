@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.android
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -15,6 +14,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.android.inputmethod.keyboard.KeyboardId
+import com.android.inputmethod.keyboard.KeyboardLayoutSet
+import com.android.inputmethod.keyboard.MainKeyboardView
+import com.android.inputmethod.keyboard.internal.KeyboardBuilder
+import com.android.inputmethod.keyboard.internal.KeyboardParams
+import com.android.inputmethod.latin.InputView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,9 +76,14 @@ class MainActivity : Activity(), MVPView {
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
-        val kbView = findViewById<KeyboardView>(R.id.dialpad)
-        kbView.keyboard = T9Keyboard(this, R.xml.t9)
-        kbView.setOnKeyboardActionListener(
+        val inputView = findViewById<InputView>(R.id.dialpad)
+        val kbView =
+            inputView.findViewById(com.android.inputmethod.latin.R.id.keyboard_view) as MainKeyboardView
+        val builder = KeyboardBuilder(this, KeyboardParams())
+        builder.load(R.xml.t9, KeyboardId(KeyboardId.ELEMENT_PHONE, KeyboardLayoutSet.Params()/*.also { mKeyboardWith = .... }*/))
+        val keyboard = builder.build()
+        kbView.setKeyboard(keyboard)
+        kbView.setKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
                 scope,
