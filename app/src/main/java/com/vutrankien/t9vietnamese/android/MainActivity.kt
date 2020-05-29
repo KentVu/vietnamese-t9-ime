@@ -6,20 +6,26 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.InputType
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodSubtype
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.android.inputmethod.accessibility.AccessibilityUtils
 import com.android.inputmethod.keyboard.KeyboardId
 import com.android.inputmethod.keyboard.KeyboardLayoutSet
 import com.android.inputmethod.keyboard.MainKeyboardView
-import com.android.inputmethod.keyboard.internal.KeyboardBuilder
-import com.android.inputmethod.keyboard.internal.KeyboardParams
 import com.android.inputmethod.latin.InputView
+import com.android.inputmethod.latin.RichInputMethodManager
+import com.android.inputmethod.latin.RichInputMethodSubtype
+import com.android.inputmethod.latin.utils.ResourceUtils
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +47,8 @@ class MainActivity : Activity(), MVPView {
     companion object {
         private const val WAKELOCK_TIMEOUT = 60000L
     }
+    private lateinit var subtype: InputMethodSubtype
+
     override val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override val eventSource: Channel<EventWithData<Event, Key>> =
@@ -76,13 +84,33 @@ class MainActivity : Activity(), MVPView {
         (application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
+        AccessibilityUtils.init(this)
         val inputView = findViewById<InputView>(R.id.dialpad)
         val kbView =
             inputView.findViewById(com.android.inputmethod.latin.R.id.keyboard_view) as MainKeyboardView
-        val builder = KeyboardBuilder(this, KeyboardParams())
-        builder.load(R.xml.t9, KeyboardId(KeyboardId.ELEMENT_PHONE, KeyboardLayoutSet.Params()/*.also { mKeyboardWith = .... }*/))
-        val keyboard = builder.build()
-        kbView.setKeyboard(keyboard)
+        val editorInfo = EditorInfo()
+        editorInfo.inputType = InputType.TYPE_CLASS_TEXT
+        val builder = KeyboardLayoutSet.Builder(this, editorInfo)
+        val res = resources
+        val keyboardWidth = ResourceUtils.getDefaultKeyboardWidth(res)
+        val keyboardHeight = ResourceUtils.getDefaultKeyboardHeight(res)
+        builder.setKeyboardGeometry(keyboardWidth, keyboardHeight)
+        RichInputMethodManager.init(this)
+        val mRichImm = RichInputMethodManager.getInstance()
+        val imi: InputMethodInfo = mRichImm.getInputMethodInfoOfThisIme()
+        val subtypeCount = imi.subtypeCount
+        for (index in 0 until subtypeCount) {
+            //mAllSubtypesList.add(imi.getSubtypeAt(index))
+            if (imi.getSubtypeAt(index) != null) {
+                subtype = imi.getSubtypeAt(index)!!
+                break
+            }
+        }
+        builder.setSubtype(RichInputMethodSubtype.getRichInputMethodSubtype(subtype))
+        builder.setIsSpellChecker(true /* isSpellChecker */)
+        builder.disableTouchPositionCorrectionData()
+        val keyboardLayoutSet = builder.build()
+        kbView.setKeyboard(keyboardLayoutSet.getKeyboard(KeyboardId.ELEMENT_ALPHABET))
         kbView.setKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,

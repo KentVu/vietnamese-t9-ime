@@ -78,7 +78,7 @@ public class ProximityInfo {
             return;
         }
         computeNearestNeighbors();
-        mNativeProximityInfo = createNativeProximityInfo(touchPositionCorrection);
+        //mNativeProximityInfo = createNativeProximityInfo(touchPositionCorrection);
     }
 
     private long mNativeProximityInfo;

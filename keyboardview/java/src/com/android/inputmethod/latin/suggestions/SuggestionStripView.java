@@ -481,8 +481,8 @@ public final class SuggestionStripView extends RelativeLayout implements OnClick
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
         // Called by the framework when the size is known. Show the important notice if applicable.
         // This may be overriden by showing suggestions later, if applicable.
-        if (oldw <= 0 && w > 0) {
-            maybeShowImportantNoticeTitle();
-        }
+//        if (oldw <= 0 && w > 0) {
+//            maybeShowImportantNoticeTitle();
+//        }
     }
 }
