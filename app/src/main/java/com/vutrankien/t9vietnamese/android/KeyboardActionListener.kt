@@ -1,6 +1,7 @@
 package com.vutrankien.t9vietnamese.android
 
-import android.inputmethodservice.KeyboardView
+import com.android.inputmethod.keyboard.KeyboardActionListener
+import com.android.inputmethod.latin.common.InputPointers
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
@@ -13,40 +14,25 @@ internal class KeyboardActionListener(
     logFactory: LogFactory,
     private val scope: CoroutineScope,
     private val eventSource: Channel<EventWithData<Event, Key>>
-) : KeyboardView.OnKeyboardActionListener {
+) : KeyboardActionListener {
     private val log: LogFactory.Log = logFactory.newLog("KeyboardActionListener")
-    override fun swipeRight() {
-        log.d("swipeRight")
+
+    override fun onPressKey(primaryCode: Int, repeatCount: Int, isSinglePointer: Boolean) {
+        log.d("onPressKey:$primaryCode")
     }
 
-    override fun onPress(primaryCode: Int) {
-        log.d("onPress")
+    override fun onReleaseKey(primaryCode: Int, withSliding: Boolean) {
+        log.d("onReleaseKey:$primaryCode")
     }
 
-    override fun onRelease(primaryCode: Int) {
-        log.d("onRelease")
+    override fun onCodeInput(primaryCode: Int, x: Int, y: Int, isKeyRepeat: Boolean) {
+        log.d("onCodeInput:$primaryCode")
     }
 
-    override fun swipeLeft() {
-        log.d("swipeLeft")
-    }
-
-    override fun swipeUp() {
-        log.d("swipeUp")
-    }
-
-    override fun swipeDown() {
-        log.d("swipeDown")
-    }
-
-    override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
-        log.d("onKey:$primaryCode,${keyCodes?.joinToString()}")
-    }
-
-    override fun onText(text: CharSequence?) {
-        log.d("onText:$text")
+    override fun onTextInput(text: String?) {
+        log.d("onTextInput:$text")
         if(text == null) {
-            log.w("onText:text is null!!")
+            log.w("onTextInput:text is null!!")
             return
         }
         scope.launch {
@@ -55,5 +41,34 @@ internal class KeyboardActionListener(
                     Key.fromNum(text[0])
                 ))
         }
+    }
+
+    override fun onStartBatchInput() {
+        log.d("onStartBatchInput")
+    }
+
+    override fun onUpdateBatchInput(batchPointers: InputPointers?) {
+        log.d("onUpdateBatchInput:$batchPointers")
+    }
+
+    override fun onEndBatchInput(batchPointers: InputPointers?) {
+        log.d("onEndBatchInput:$batchPointers")
+    }
+
+    override fun onCancelBatchInput() {
+        log.d("onCancelBatchInput")
+    }
+
+    override fun onCancelInput() {
+        log.d("onCancelInput")
+    }
+
+    override fun onFinishSlidingInput() {
+        log.d("onFinishSlidingInput")
+    }
+
+    override fun onCustomRequest(requestCode: Int): Boolean {
+        log.d("onCustomRequest")
+        return false
     }
 }

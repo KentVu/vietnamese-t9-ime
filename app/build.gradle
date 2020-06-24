@@ -38,6 +38,8 @@ dependencies {
     // implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(':lib')
+    // TODO not ready yet
+    implementation project(':keyboardview')
     //implementation project(':dawg-android')
     implementation "kentvu.dawgjava:dawg-android:$dawgjava_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
