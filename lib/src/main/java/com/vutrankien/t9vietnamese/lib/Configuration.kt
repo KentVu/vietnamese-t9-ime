@@ -80,7 +80,7 @@ val VnPad = PadConfiguration(
             Normal,
             linkedSetOf('w', 'x', 'y', 'z')
         ),
-        Key.keyStar to KeyConfig(
+        Key.star to KeyConfig(
             NextCandidate
         ),
         Key.keySharp to KeyConfig(
@@ -113,7 +113,7 @@ enum class Key(
     num7('7'),
     num8('8'),
     num9('9'),
-    keyStar('*'),
+    star('*'),
     keySharp('#');
 
     companion object {

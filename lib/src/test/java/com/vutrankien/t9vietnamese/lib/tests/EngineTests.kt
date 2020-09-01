@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.lib.tests
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
@@ -54,6 +53,9 @@ class EngineTests: FunSpec() {
             Key.num3 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('g', 'h', 'i')
+            ),
+            Key.star to KeyConfig(
+                KeyType.NextCandidate
             ),
             Key.num0 to KeyConfig(
                 KeyType.Confirm
@@ -232,6 +234,28 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        test("engineFunction_SelectCandidate") {
+            engineFunction(
+                """
+                                aa
+                                ab
+                                ac
+                                ad
+                                bd
+                                ce
+                                cf
+                                """.trimIndent().sortedSequence(),
+                padConfigStd,
+                arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                    T9Engine.Event.NextCandidate,
+                    T9Engine.Event.Confirm("ác")
+                )
+            )
+        }
     }
 
     private val vnPad = PadConfiguration(
@@ -271,7 +295,7 @@ class EngineTests: FunSpec() {
         seeds: Sequence<String>,
         padConfig: PadConfiguration,
         sequence: Array<Key>,
-        expectedEvent: Array<T9Engine.Event>
+        expectedEvents: Array<T9Engine.Event>
     ):Unit = coroutineScope {
         engine.pad = padConfig
         seedEngine(seeds)
@@ -279,10 +303,11 @@ class EngineTests: FunSpec() {
             sequence.forEach { engine.push(it) }
         }
         assertSoftly {
-            expectedEvent.forEach { expectedEvt ->
+            expectedEvents.forEach { expectedEvt ->
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
+                    assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected ($expectedEvt)")
                     //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
                     assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
                 } else {
