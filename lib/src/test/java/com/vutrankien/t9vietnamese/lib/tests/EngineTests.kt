@@ -235,9 +235,8 @@ class EngineTests: FunSpec() {
             )
         }
 
-        test("engineFunction_SelectCandidate") {
-            engineFunction(
-                """
+        context("SelectCandidate") {
+            val seeds = """
                                 aa
                                 ab
                                 ac
@@ -245,16 +244,20 @@ class EngineTests: FunSpec() {
                                 bd
                                 ce
                                 cf
-                                """.trimIndent().sortedSequence(),
-                padConfigStd,
-                arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                    T9Engine.Event.NextCandidate,
-                    T9Engine.Event.Confirm("ác")
+                                """.trimIndent().sortedSequence()
+            test("engineFunction_SelectCandidate") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.Confirm("ab")
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -307,7 +310,7 @@ class EngineTests: FunSpec() {
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
-                    assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected ($expectedEvt)")
+                    assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
                     //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
                     assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
                 } else {

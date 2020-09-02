@@ -34,6 +34,8 @@ class DefaultT9Engine constructor(
     private val findCandidates by lazy {
         FindCandidates(trie, pad, 10, log)
     }
+    // Preselect 1st candidate
+    private var _selectedCandidate = 0
 
     override suspend fun init(
         seed: Sequence<String>
@@ -70,27 +72,35 @@ class DefaultT9Engine constructor(
 
     override suspend fun push(key: Key) {
         _currentNumSeq.add(key)
-        if (pad[key].type != KeyType.Confirm) {
-            log.d("push:${_currentNumSeq.joinNum()}")
-            val candidates = findCandidates(_currentNumSeq).toMutableList()
-            candidates.add(_currentNumSeq.joinNum())
-            eventSource.send(T9Engine.Event.NewCandidates(candidates))
-            _currentCandidates.clear()
-            _currentCandidates.addAll(candidates)
-            // XXX: don't use _currentCandidates directly because it is being used on multiple threads
-        } else {
-            // TODO implement selecting feature
-            val selected = if (_currentCandidates.isEmpty()) {
-                // Return the number sequence if no match found.
-                _currentNumSeq
-                    .dropLast(1) // Drop the "confirm" key
-                    .joinNum()
-            } else {
-                _currentCandidates.first()
+        when (pad[key].type) {
+            KeyType.NextCandidate -> {
+                _selectedCandidate++
+                eventSource.send(T9Engine.Event.NextCandidate)
             }
-            eventSource.send(T9Engine.Event.Confirm(selected))
-            _currentCandidates.clear()
-            _currentNumSeq.clear()
+            KeyType.Confirm -> {
+                // TODO implement selecting feature
+                val selected = if (_currentCandidates.isEmpty()) {
+                    // Return the number sequence if no match found.
+                    _currentNumSeq
+                        .dropLast(1) // Drop the "confirm" key
+                        .joinNum()
+                } else {
+                    _currentCandidates.elementAt(_selectedCandidate)
+                }
+                eventSource.send(T9Engine.Event.Confirm(selected))
+                _currentCandidates.clear()
+                _currentNumSeq.clear()
+            }
+            else -> {
+                // Numeric keys
+                log.d("push:${_currentNumSeq.joinNum()}")
+                val candidates = findCandidates(_currentNumSeq).toMutableList()
+                candidates.add(_currentNumSeq.joinNum())
+                eventSource.send(T9Engine.Event.NewCandidates(candidates))
+                _currentCandidates.clear()
+                _currentCandidates.addAll(candidates)
+                // XXX: don't use _currentCandidates directly because it is being used on multiple threads
+            }
         }
     }
 
