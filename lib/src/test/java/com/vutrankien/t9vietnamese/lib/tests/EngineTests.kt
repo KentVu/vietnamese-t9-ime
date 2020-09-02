@@ -116,6 +116,11 @@ class EngineTests: FunSpec() {
             engine.initialized shouldBe true
         }
 
+        xtest("TODO:Engine should reset after Confirm") {
+            seedEngine("a\nb\nc".lineSequence())
+            engine.pad = padConfig
+        }
+
         test("engineFunction_1key_1") {
             engineFunction(
                 "a\nb\nc".lineSequence(), padConfig,
@@ -245,12 +250,32 @@ class EngineTests: FunSpec() {
                                 ce
                                 cf
                                 """.trimIndent().sortedSequence()
+
             test("engineFunction_SelectCandidate") {
                 engineFunction(
                     seeds,
                     padConfigStd,
                     arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
                     arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.Confirm("ab")
+                    )
+                )
+            }
+
+            test("engineFunction_SelectCandidate2") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0,
+                        Key.num1, Key.num1, Key.star, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.Confirm("ab"),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                         T9Engine.Event.NextCandidate,
