@@ -79,7 +79,7 @@ class PresenterTest: FunSpec() {
             view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
             verify(timeout = 1000) { view.showCandidates(cand) }
             view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
-            verify { view.confirmInput("4") }
+            verify(timeout = 100) { view.confirmInput("4") }
         }
 
         test("Select next candidate") {

@@ -13,18 +13,14 @@ class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
 
     private val words = mutableListOf<String>()
 
-    private var selectedWord = 0
+    internal var selectedWord = 0
 
     override fun getItemCount(): Int = words.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.textView.apply {
             text = words[position]
-            if (position == selectedWord) {
-                isSelected = true
-            } else {
-                isSelected = false
-            }
+            isSelected = position == selectedWord
         }
     }
 
