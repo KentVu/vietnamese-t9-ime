@@ -81,6 +81,10 @@ class T9Vietnamese : InputMethodService(), MVPView {
         logic.updateCandidates(candidates)
     }
 
+    override fun nextCandidate() {
+        logic.nextCandidate()
+    }
+
     override fun confirmInput(word: String) {
         log.d("View: confirmInput:$word")
         // XXX Is inserting a space here a right place?

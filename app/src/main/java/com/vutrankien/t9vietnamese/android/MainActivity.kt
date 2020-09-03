@@ -57,6 +57,10 @@ class MainActivity : Activity(), MVPView {
         logic.updateCandidates(candidates)
     }
 
+    override fun nextCandidate() {
+        logic.nextCandidate()
+    }
+
     override fun confirmInput(word: String) {
         log.d("View: confirmInput")
         // XXX Is inserting a space here a right place?
@@ -126,7 +130,7 @@ class MainActivity : Activity(), MVPView {
 
     fun onCandidateClick(view: View) {
         log.d("onCandidateClick()")
-        //engine.flush()
+        // TODO select
         (view as TextView).text = ""
     }
 

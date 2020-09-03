@@ -90,6 +90,7 @@ class DefaultT9Engine constructor(
                 eventSource.send(T9Engine.Event.Confirm(selected))
                 _currentCandidates.clear()
                 _currentNumSeq.clear()
+                _selectedCandidate = 0
             }
             else -> {
                 // Numeric keys

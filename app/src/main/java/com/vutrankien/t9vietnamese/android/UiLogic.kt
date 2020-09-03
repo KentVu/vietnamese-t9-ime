@@ -8,10 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
  */
 interface UiLogic {
     fun updateCandidates(candidates: Collection<String>)
-
     fun clearCandidates()
-
     fun initializeCandidatesView(recyclerView: RecyclerView)
+    fun nextCandidate()
 
     class DefaultUiLogic: UiLogic {
         private val wordListAdapter = WordListAdapter()
@@ -25,6 +24,10 @@ interface UiLogic {
 
         override fun updateCandidates(candidates: Collection<String>) {
             wordListAdapter.update(candidates)
+        }
+
+        override fun nextCandidate() {
+            wordListAdapter.selectNext()
         }
 
         override fun clearCandidates() {

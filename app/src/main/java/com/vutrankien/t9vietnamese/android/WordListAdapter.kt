@@ -10,12 +10,22 @@ import androidx.cardview.widget.CardView
  * Created by user on 2018/03/21.
  */
 class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
+
     private val words = mutableListOf<String>()
+
+    private var selectedWord = 0
 
     override fun getItemCount(): Int = words.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = words[position]
+        holder.textView.apply {
+            text = words[position]
+            if (position == selectedWord) {
+                isSelected = true
+            } else {
+                isSelected = false
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
@@ -38,6 +48,13 @@ class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
         words.clear()
         words.addAll(cand)
         notifyDataSetChanged()
+        selectedWord = 0
+    }
+
+    fun selectNext() {
+        notifyItemChanged(selectedWord)
+        selectedWord++
+        notifyItemChanged(selectedWord)
     }
 
     class ViewHolder(cardView: CardView) : RecyclerView.ViewHolder(cardView) {

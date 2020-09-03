@@ -82,6 +82,24 @@ class PresenterTest: FunSpec() {
             verify { view.confirmInput("4") }
         }
 
+        test("Select next candidate") {
+            getPresenter().attachView(view)
+            val candidates = setOf("5", "6")
+            setupEngine(
+                mapOf(Key.num0 to T9Engine.Event.Confirm("5"),
+                    Key.num1 to T9Engine.Event.NextCandidate),
+                {T9Engine.Event.NewCandidates(candidates)})
+
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num4))
+            verify(timeout = 10) { view.showCandidates(candidates) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num2))
+            verify(timeout = 1000) { view.showCandidates(candidates) }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num1))
+            verify { view.nextCandidate() }
+            view.eventSource.send(Event.KEY_PRESS.withData(Key.num0))
+            verify { view.confirmInput("5") }
+        }
+
         test("Confirm input") {
             getPresenter().attachView(view)
             val candidates = setOf("5")
