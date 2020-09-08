@@ -16,7 +16,7 @@ interface UiLogic {
     fun initializeCandidatesView(recyclerView: RecyclerView)
     fun nextCandidate()
 
-    class DefaultUiLogic: UiLogic {
+    class DefaultUiLogic(val preferences: Preferences) : UiLogic {
         private lateinit var candidatesView: RecyclerView
         private val wordListAdapter = WordListAdapter()
 
@@ -35,7 +35,7 @@ interface UiLogic {
         override fun nextCandidate() {
             wordListAdapter.selectNext()
             @Suppress("ConstantConditionIf")
-            if (BuildConfig.AUTO_SCROLL_CANDIDATE) {
+            if (preferences.autoScroll) {
                 candidatesView.scrollToPosition(wordListAdapter.selectedWord)
             }
         }

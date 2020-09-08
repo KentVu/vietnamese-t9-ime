@@ -31,15 +31,18 @@ class MainActivity : Activity(), MVPView {
     private lateinit var log: LogFactory.Log
     @Inject
     lateinit var presenter: Presenter
-    private val logic: UiLogic = UiLogic.DefaultUiLogic()
 
     companion object {
         private const val WAKELOCK_TIMEOUT = 60000L
     }
+
     override val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
+
+    private val preferences by lazy { Preferences(applicationContext) }
+    private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
     override fun showProgress(bytes: Int) {
         displayInfo(R.string.engine_loading, bytes)
@@ -85,9 +88,6 @@ class MainActivity : Activity(), MVPView {
             )
         )
         logic.initializeCandidatesView(findViewById(R.id.candidates_view))
-        //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        //recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-        //recyclerView.adapter = wordListAdapter
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK,
@@ -152,6 +152,12 @@ class MainActivity : Activity(), MVPView {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val autoScroll = menu!!.findItem(R.id.auto_scroll_candidate)
+        autoScroll.isChecked = preferences.autoScroll
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId) {
             R.id.enable_ime -> {
@@ -162,6 +168,11 @@ class MainActivity : Activity(), MVPView {
                 val imeManager: InputMethodManager =
                     applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imeManager.showInputMethodPicker()
+                return true
+            }
+            R.id.auto_scroll_candidate -> {
+                item.isChecked = !item.isChecked
+                preferences.autoScroll = item.isChecked
                 return true
             }
         }

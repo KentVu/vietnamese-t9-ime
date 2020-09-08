@@ -22,7 +22,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override val scope = CoroutineScope(Dispatchers.Main + Job())
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
-    private val logic: UiLogic = UiLogic.DefaultUiLogic()
+    private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(Preferences(applicationContext)) }
     //private val wordListAdapter = WordListAdapter()
 
     override fun onCreate() {
