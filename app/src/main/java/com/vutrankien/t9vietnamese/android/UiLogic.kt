@@ -16,7 +16,7 @@ interface UiLogic {
     fun initializeCandidatesView(recyclerView: RecyclerView)
     fun nextCandidate()
 
-    class DefaultUiLogic(val preferences: Preferences) : UiLogic {
+    class DefaultUiLogic(private val preferences: Preferences) : UiLogic {
         private lateinit var candidatesView: RecyclerView
         private val wordListAdapter = WordListAdapter()
 
@@ -36,7 +36,14 @@ interface UiLogic {
             wordListAdapter.selectNext()
             @Suppress("ConstantConditionIf")
             if (preferences.autoScroll) {
-                candidatesView.scrollToPosition(wordListAdapter.selectedWord)
+                //candidatesView.scrollToPosition(wordListAdapter.selectedWord)
+                // check candidates_view.xml
+                (candidatesView.layoutManager as LinearLayoutManager).run {
+                    val selectedWord = wordListAdapter.selectedWord
+                    if (selectedWord !in findFirstCompletelyVisibleItemPosition()..findLastCompletelyVisibleItemPosition()) {
+                        scrollToPositionWithOffset(selectedWord, 20)
+                    }
+                }
             }
         }
 
