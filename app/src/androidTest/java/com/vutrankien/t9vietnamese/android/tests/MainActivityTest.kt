@@ -1,9 +1,6 @@
 package com.vutrankien.t9vietnamese.android.tests
 
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -11,12 +8,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
-import com.vutrankien.t9vietnamese.android.T9Application
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.anyOf
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,19 +51,37 @@ class MainActivityTest {
         //})
     }
 
+    private val robot by lazy { Robot(mActivityRule.activity.testingHook.eventSink) }
+
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
         val initializedStr = mActivityRule.activity.getString(R.string.notify_initialized)
         // Drop the progress string
-        onView(anyOf(withText(containsString(engineLoadStr.dropLast(7))),withText(containsString(initializedStr))))
-                .check(matches(isDisplayed()))
+        robot.checkTextDisplayed(anyOf(containsString(engineLoadStr.dropLast(7)), containsString(initializedStr)))
     }
 
     @Test fun basicTyping(): Unit = runBlocking<Unit> {
-        "24236".forEach {
-            //onView(withText(startsWith("$it"))).perform(click())
-            mActivityRule.activity.testingHook.eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+        robot
+            .pressSequentially("24236")
+            .checkTextDisplayed("chào")
+    }
+
+    class Robot(
+        private val eventSink: SendChannel<EventWithData<Event, Key>>
+    ) {
+        suspend fun pressSequentially(numSeq: String): Robot = apply {
+            numSeq.forEach {
+                //onView(withText(startsWith("$it"))).perform(click())
+                eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+            }
         }
-        onView(withText("chào")).check(matches(isDisplayed()))
+
+        fun checkTextDisplayed(text: String) {
+            onView(withText(text)).check(matches(isDisplayed()))
+        }
+
+        fun checkTextDisplayed(stringCondition: Matcher<String>) {
+            onView(withText(stringCondition)).check(matches(isDisplayed()))
+        }
     }
 }
