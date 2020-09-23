@@ -6,13 +6,13 @@ import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
 import com.vutrankien.t9vietnamese.lib.LogFactory
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 
 internal class KeyboardActionListener(
     logFactory: LogFactory,
     private val scope: CoroutineScope,
-    private val eventSink: Channel<EventWithData<Event, Key>>
+    private val eventSink: SendChannel<EventWithData<Event, Key>>
 ) : KeyboardView.OnKeyboardActionListener {
     private val log: LogFactory.Log = logFactory.newLog("KeyboardActionListener")
     override fun swipeRight() {

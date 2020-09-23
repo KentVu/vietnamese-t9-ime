@@ -2,10 +2,11 @@ package com.vutrankien.t9vietnamese.lib
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface View {
     val scope: CoroutineScope
-    val eventSource: Channel<EventWithData<Event, Key>>
+    val eventSource: ReceiveChannel<EventWithData<Event, Key>>
 
     fun showProgress(bytes: Int)
     fun showKeyboard()

@@ -8,6 +8,10 @@ import android.inputmethodservice.Keyboard;
  */
 
 class T9Keyboard extends Keyboard {
+    T9Keyboard(Context context) {
+        this(context, R.xml.t9);
+    }
+
     T9Keyboard(Context context, int xmlLayoutResId) {
         super(context, xmlLayoutResId);
     }

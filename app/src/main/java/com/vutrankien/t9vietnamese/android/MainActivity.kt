@@ -14,12 +14,15 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
@@ -38,10 +41,12 @@ class MainActivity : Activity(), MVPView {
 
     override val scope = CoroutineScope(Dispatchers.Main + Job())
 
-    override val eventSource: Channel<EventWithData<Event, Key>> =
-        Channel()
+    private val channel: Channel<EventWithData<Event, Key>> = Channel()
+    override val eventSource: ReceiveChannel<EventWithData<Event, Key>> = channel
+    private val eventSink: SendChannel<EventWithData<Event, Key>> = channel
 
     private val preferences by lazy { Preferences(applicationContext) }
+
     private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
     override fun showProgress(bytes: Int) {
@@ -79,12 +84,12 @@ class MainActivity : Activity(), MVPView {
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)
-        kbView.keyboard = T9Keyboard(this, R.xml.t9)
+        kbView.keyboard = T9Keyboard(this)
         kbView.setOnKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
                 scope,
-                eventSource
+                eventSink
             )
         )
         logic.initializeCandidatesView(findViewById(R.id.candidates_view))
@@ -97,7 +102,7 @@ class MainActivity : Activity(), MVPView {
 
         presenter.attachView(this)
         scope.launch {
-            eventSource.send(Event.START.noData())
+            eventSink.send(Event.START.noData())
         }
     }
 
@@ -139,7 +144,7 @@ class MainActivity : Activity(), MVPView {
         val key = text[0]
         log.d("onBtnClick() btn=$key")
         scope.launch {
-            eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
         }
     }
 
@@ -182,5 +187,15 @@ class MainActivity : Activity(), MVPView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         log.d("onActivityResult:$requestCode:res=$resultCode:data=$data")
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    interface TestingHook {
+        val eventSink: SendChannel<EventWithData<Event, Key>>
+    }
+
+    /** For integration testing. */
+    @VisibleForTesting
+    val testingHook = object: TestingHook {
+        override val eventSink = this@MainActivity.eventSink
     }
 }

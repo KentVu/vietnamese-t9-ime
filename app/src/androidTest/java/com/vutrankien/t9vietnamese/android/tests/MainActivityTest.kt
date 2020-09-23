@@ -12,6 +12,10 @@ import androidx.test.rule.ActivityTestRule
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
 import com.vutrankien.t9vietnamese.android.T9Application
+import com.vutrankien.t9vietnamese.lib.Event
+import com.vutrankien.t9vietnamese.lib.EventWithData
+import com.vutrankien.t9vietnamese.lib.Key
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.junit.Before
 import org.junit.Rule
@@ -52,14 +56,15 @@ class MainActivityTest {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
         val initializedStr = mActivityRule.activity.getString(R.string.notify_initialized)
         // Drop the progress string
-        onView(anyOf(withText(containsString(engineLoadStr.dropLast(7)))))
-                .check(matches(isDisplayed()))
-        onView((withText(containsString(initializedStr))))
+        onView(anyOf(withText(containsString(engineLoadStr.dropLast(7))),withText(containsString(initializedStr))))
                 .check(matches(isDisplayed()))
     }
 
-    @Test fun basicTyping() {
-        "24236".forEach { onView(withText(startsWith("$it"))).perform(click()) }
+    @Test fun basicTyping(): Unit = runBlocking<Unit> {
+        "24236".forEach {
+            //onView(withText(startsWith("$it"))).perform(click())
+            mActivityRule.activity.testingHook.eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+        }
         onView(withText("chào")).check(matches(isDisplayed()))
     }
 }
