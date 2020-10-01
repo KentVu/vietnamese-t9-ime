@@ -22,7 +22,7 @@ class PresenterModule() {
     fun getSeed(): Lazy<Sequence<String>> {
         return lazy {
             val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
-            javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
+            javaClass.classLoader.getResourceAsStream("/vi-DauMoi.dic").bufferedReader().useLines {
                 it.forEach { line ->
                     sortedWords.add(line.decomposeVietnamese())
                 }
