@@ -81,8 +81,8 @@ class T9Vietnamese : InputMethodService(), MVPView {
         logic.updateCandidates(candidates)
     }
 
-    override fun nextCandidate() {
-        logic.nextCandidate()
+    override fun candidateSelected(selectedCandidate: Int) {
+        logic.selectCandidate(selectedCandidate)
     }
 
     override fun confirmInput(word: String) {

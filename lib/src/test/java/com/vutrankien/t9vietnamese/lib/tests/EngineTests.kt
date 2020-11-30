@@ -259,7 +259,7 @@ class EngineTests: FunSpec() {
                     arrayOf(
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.SelectCandidate(1),
                         T9Engine.Event.Confirm("ab")
                     )
                 )
@@ -274,11 +274,11 @@ class EngineTests: FunSpec() {
                     arrayOf(
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.SelectCandidate(1),
                         T9Engine.Event.Confirm("ab"),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.NextCandidate,
+                        T9Engine.Event.SelectCandidate(1),
                         T9Engine.Event.Confirm("ab")
                     )
                 )

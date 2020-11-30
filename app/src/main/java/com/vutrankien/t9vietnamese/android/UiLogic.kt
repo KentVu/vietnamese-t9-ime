@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.android
 
+import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -14,11 +15,12 @@ interface UiLogic {
     fun updateCandidates(candidates: Collection<String>)
     fun clearCandidates()
     fun initializeCandidatesView(recyclerView: RecyclerView)
-    fun nextCandidate()
+    fun selectCandidate(selectedCandidate: Int)
 
     class DefaultUiLogic(private val preferences: Preferences) : UiLogic {
         private lateinit var candidatesView: RecyclerView
-        private val wordListAdapter = WordListAdapter()
+        @VisibleForTesting
+        internal val wordListAdapter = WordListAdapter()
 
         override fun initializeCandidatesView(recyclerView: RecyclerView) {
             recyclerView.apply {
@@ -32,8 +34,8 @@ interface UiLogic {
             wordListAdapter.update(candidates)
         }
 
-        override fun nextCandidate() {
-            wordListAdapter.selectNext()
+        override fun selectCandidate(selectedCandidate: Int) {
+            wordListAdapter.select(selectedCandidate)
             @Suppress("ConstantConditionIf")
             if (preferences.autoScroll) {
                 //candidatesView.scrollToPosition(wordListAdapter.selectedWord)

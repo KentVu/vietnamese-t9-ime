@@ -46,7 +46,7 @@ class DefaultT9Engine constructor(
             trie = DawgTrie.build(dawgPath, seed, channel)
         }
         var markPos = 0
-        var count = 0
+        val count = 0
         for (bytes in channel) {
             if (count - markPos == REPORT_PROGRESS_INTERVAL) {
                 eventSource.send(T9Engine.Event.LoadProgress(bytes))
@@ -75,7 +75,7 @@ class DefaultT9Engine constructor(
         when (pad[key].type) {
             KeyType.NextCandidate -> {
                 _selectedCandidate++
-                eventSource.send(T9Engine.Event.NextCandidate)
+                eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
             }
             KeyType.Confirm -> {
                 // TODO implement selecting feature
@@ -132,7 +132,6 @@ class DefaultT9Engine constructor(
         }
 
         private fun possibleCombinations(currentPrefix: String, keySeq: List<Key>): Set<String> {
-            val result = LinkedHashSet<String>()
             val possibleChars = linkedSetOf<Char>()
             pad[keySeq[0]].chars.forEach {c ->
                 val newCombination = "$currentPrefix$c"
@@ -148,6 +147,7 @@ class DefaultT9Engine constructor(
                 }
             }
             // else
+            val result = LinkedHashSet<String>()
             possibleChars.forEach { c ->
                 result.addAll(possibleCombinations(currentPrefix + c, keySeq.drop(1)))
             }

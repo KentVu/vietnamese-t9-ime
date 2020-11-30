@@ -32,7 +32,7 @@ interface T9Engine {
         }
         class LoadProgress(val bytes: Int) : Event()
         object Initialized : Event()
-        object NextCandidate : Event()
+        data class SelectCandidate(val selectedCandidate: Int) : Event()
     }
 
     suspend fun init(seed: Sequence<String>)

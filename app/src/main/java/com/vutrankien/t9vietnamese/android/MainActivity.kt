@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,12 +66,12 @@ class MainActivity : Activity(), MVPView {
         logic.updateCandidates(candidates)
     }
 
-    override fun nextCandidate() {
-        logic.nextCandidate()
+    override fun candidateSelected(selectedCandidate: Int) {
+        logic.selectCandidate(selectedCandidate)
     }
 
     override fun confirmInput(word: String) {
-        log.d("View: confirmInput")
+        log.d("View: confirmInput($word)")
         // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).append(" $word")
         logic.clearCandidates()
@@ -190,12 +191,16 @@ class MainActivity : Activity(), MVPView {
     }
 
     interface TestingHook {
+        val candidatesAdapter: WordListAdapter
         val eventSink: SendChannel<EventWithData<Event, Key>>
     }
 
     /** For integration testing. */
     @VisibleForTesting
     val testingHook = object: TestingHook {
+        override val candidatesAdapter: WordListAdapter
+            //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
+            get() = (this@MainActivity.logic as UiLogic.DefaultUiLogic).wordListAdapter
         override val eventSink = this@MainActivity.eventSink
     }
 }

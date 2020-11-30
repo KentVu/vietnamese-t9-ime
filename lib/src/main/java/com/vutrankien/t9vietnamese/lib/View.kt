@@ -1,7 +1,6 @@
 package com.vutrankien.t9vietnamese.lib
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 
 interface View {
@@ -11,7 +10,7 @@ interface View {
     fun showProgress(bytes: Int)
     fun showKeyboard()
     fun showCandidates(candidates: Collection<String>)
-    fun nextCandidate()
+    fun candidateSelected(selectedCandidate: Int)
     fun confirmInput(word: String)
 }
 

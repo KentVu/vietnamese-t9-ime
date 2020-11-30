@@ -47,10 +47,15 @@ class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
         selectedWord = 0
     }
 
-    fun selectNext() {
-        notifyItemChanged(selectedWord)
-        selectedWord++
-        notifyItemChanged(selectedWord)
+    fun select(selectedWord: Int) {
+        val tmp = this.selectedWord
+        this.selectedWord = selectedWord
+        notifyItemChanged(tmp)
+        notifyItemChanged(this.selectedWord)
+    }
+
+    fun findItem(targetWord: String): Int {
+        return words.indexOf(targetWord)
     }
 
     class ViewHolder(cardView: CardView) : RecyclerView.ViewHolder(cardView) {
