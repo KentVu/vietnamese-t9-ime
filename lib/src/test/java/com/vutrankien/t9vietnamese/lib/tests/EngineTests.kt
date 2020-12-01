@@ -57,6 +57,9 @@ class EngineTests: FunSpec() {
             Key.star to KeyConfig(
                 KeyType.NextCandidate
             ),
+            Key.left to KeyConfig(
+                KeyType.PrevCandidate
+            ),
             Key.num0 to KeyConfig(
                 KeyType.Confirm
             )
@@ -280,6 +283,21 @@ class EngineTests: FunSpec() {
                         T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                         T9Engine.Event.SelectCandidate(1),
                         T9Engine.Event.Confirm("ab")
+                    )
+                )
+            }
+
+            test("engineFunction_SelectPrevCandidate") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.left, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.SelectCandidate(1),
+                        T9Engine.Event.SelectCandidate(0),
+                        T9Engine.Event.Confirm("aa")
                     )
                 )
             }

@@ -92,7 +92,7 @@ class PresenterTest: FunSpec() {
             verify(timeout = 100) { view.confirmInput("4") }
         }
 
-        test("Select next candidate") {
+        test("Select candidate") {
             getPresenter().attachView(view)
             val candidates = setOf("5", "6")
             val selectedCandidate = 1

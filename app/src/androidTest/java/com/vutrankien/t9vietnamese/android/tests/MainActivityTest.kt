@@ -68,19 +68,29 @@ class MainActivityTest {
         robot.pressSequentially("24236")
             .checkTextDisplayed("chào")
             .browseTo("chào")
-            .pressSequentially("0")
+            .confirm()
+            .checkWordConfirmed("chào")
+    }
+
+    @Test fun selectCandidateBackward(): Unit = runBlocking {
+        robot.pressSequentially("24236")
+            .checkTextDisplayed("chào")
+            .browseTo("chào")
+            .selectNext()
+            .selectPrev()
+            .confirm()
             .checkWordConfirmed("chào")
     }
 
     class Robot(
         private val testingHook: MainActivity.TestingHook
     ) {
-        private val eventSink: SendChannel<EventWithData<Event, Key>> = testingHook.eventSink
+        private val uiEventSink: SendChannel<EventWithData<Event, Key>> = testingHook.eventSink
 
         suspend fun pressSequentially(numSeq: String): Robot = apply {
             numSeq.forEach {
                 //onView(withText(startsWith("$it"))).perform(click())
-                eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+                uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
             }
         }
 
@@ -96,13 +106,25 @@ class MainActivityTest {
             // Find distance from selected word to targetWord
             val distance = testingHook.candidatesAdapter.findItem(targetWord) - testingHook.candidatesAdapter.selectedWord
             repeat(distance) {
-                eventSink.send(Event.KEY_PRESS.withData(Key.star))
+                uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
             }
         }
 
         fun checkWordConfirmed(word: String) {
             onView(allOf(withId(R.id.editText), withText(containsString(word))))
                     .check(matches(isDisplayed()))
+        }
+
+        suspend fun selectNext() = apply {
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
+        }
+
+        suspend fun selectPrev() = apply {
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.left))
+        }
+
+        suspend fun confirm() = apply {
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.num0))
         }
     }
 }

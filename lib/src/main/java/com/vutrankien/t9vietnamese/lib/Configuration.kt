@@ -86,13 +86,16 @@ val VnPad = PadConfiguration(
         ),
         Key.keySharp to KeyConfig(
             ToNum
+        ),
+        Key.left to KeyConfig(
+            PrevCandidate
         )
     )
 )
 
 enum class KeyType(val isConfirmationKey: Boolean) {
     Normal(false), Symbol(false), NextCandidate(false),
-    Confirm(true), ToNum(false);
+    Confirm(true), ToNum(false), PrevCandidate(false);
 }
 
 data class KeyConfig(val type: KeyType, val chars: Set<Char> = emptySet()) {
@@ -115,7 +118,8 @@ enum class Key(
     num8('8'),
     num9('9'),
     star('*'),
-    keySharp('#');
+    keySharp('#'),
+    left('<');
 
     companion object {
         fun fromNum(num: Char): Key {
