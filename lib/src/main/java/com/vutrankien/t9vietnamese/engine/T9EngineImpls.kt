@@ -113,6 +113,20 @@ class DefaultT9Engine constructor(
                 append(it.char)
             }
         }
+
+        /**
+         * Support case-insensitive matching.
+         */
+        @OptIn(ExperimentalStdlibApi::class)
+        private fun Set<Char>.fillCase(): Set<Char> = buildSet {
+            this@fillCase.forEach {
+                add(it)
+                if (Character.isUpperCase(it))
+                    add(it.toLowerCase())
+                else if (Character.isLowerCase(it))
+                    add (it.toUpperCase())
+            }
+        }
     }
 
     class FindCandidates(
@@ -133,7 +147,7 @@ class DefaultT9Engine constructor(
 
         private fun possibleCombinations(currentPrefix: String, keySeq: List<Key>): Set<String> {
             val possibleChars = linkedSetOf<Char>()
-            pad[keySeq[0]].chars.forEach {c ->
+            pad[keySeq[0]].chars.fillCase().forEach {c ->
                 val newCombination = "$currentPrefix$c"
                 val searchResult = trie.search(newCombination).keys
                 if (searchResult.isNotEmpty())
@@ -154,5 +168,6 @@ class DefaultT9Engine constructor(
             return result
         }
     }
+
 }
 

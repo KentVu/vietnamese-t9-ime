@@ -38,6 +38,7 @@ object VNConfiguration: Configuration {
     )
 }
 
+// TODO match case-insensitively
 val VnPad = PadConfiguration(
     mapOf(
         Key.num0 to KeyConfig(
