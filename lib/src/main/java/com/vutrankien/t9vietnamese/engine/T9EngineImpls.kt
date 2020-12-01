@@ -77,6 +77,10 @@ class DefaultT9Engine constructor(
                 _selectedCandidate++
                 eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
             }
+            KeyType.PrevCandidate -> {
+                _selectedCandidate--
+                eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
+            }
             KeyType.Confirm -> {
                 // TODO implement selecting feature
                 val selected = if (_currentCandidates.isEmpty()) {
