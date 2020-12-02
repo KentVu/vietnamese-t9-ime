@@ -42,30 +42,33 @@
             android:popupCharacters="@string/btn_7" />
         <Key
             android:keyLabel="@string/btn_8"
-            android:popupCharacters="@string/btn_8"
-            android:keyOutputText="@string/btn_8" />
+            android:keyOutputText="@string/btn_8"
+            android:popupCharacters="@string/btn_8" />
         <Key
             android:keyLabel="@string/btn_9"
-            android:popupCharacters="@string/btn_9"
-            android:keyOutputText="@string/btn_9" />
+            android:keyOutputText="@string/btn_9"
+            android:popupCharacters="@string/btn_9" />
         <!--android:keyIcon="@drawable/sym_keyboard_delete"-->
         <Key
             android:keyEdgeFlags="right"
             android:keyIcon="@drawable/sym_keyboard_delete"
-            android:keyLabel="&lt;" />
+            android:keyLabel="@string/btn_left"
+            android:keyOutputText="@string/btn_left" />
     </Row>
     <Row>
         <Key
             android:keyIcon="@drawable/sym_keyboard_space"
-            android:keyLabel="*" />
+            android:keyLabel="@string/btn_star"
+            android:keyOutputText="@string/btn_star"
+            android:popupCharacters="@string/btn_star" />
         <Key
             android:keyLabel="@string/btn_0"
-            android:popupCharacters="@string/btn_0"
-            android:keyOutputText="@string/btn_0" />
+            android:keyOutputText="@string/btn_0"
+            android:popupCharacters="@string/btn_0" />
         <Key
             android:keyLabel="@string/btn_sharp"
-            android:popupCharacters="@string/btn_sharp"
-            android:keyOutputText="@string/btn_sharp" />
+            android:keyOutputText="@string/btn_sharp"
+            android:popupCharacters="@string/btn_sharp" />
         <Key
             android:keyIcon="@drawable/sym_keyboard_return"
             android:keyLabel="rt" />

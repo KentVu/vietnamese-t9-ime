@@ -8,4 +8,9 @@
     <item
         android:id="@+id/select_system_ime"
         android:title="Select IME" />
+
+    <item
+        android:id="@+id/auto_scroll_candidate"
+        android:checkable="true"
+        android:title="Auto scroll candidate" />
 </menu>

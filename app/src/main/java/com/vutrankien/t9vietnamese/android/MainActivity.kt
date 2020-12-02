@@ -14,12 +14,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
@@ -31,15 +35,20 @@ class MainActivity : Activity(), MVPView {
     private lateinit var log: LogFactory.Log
     @Inject
     lateinit var presenter: Presenter
-    private val logic: UiLogic = UiLogic.DefaultUiLogic()
 
     companion object {
         private const val WAKELOCK_TIMEOUT = 60000L
     }
+
     override val scope = CoroutineScope(Dispatchers.Main + Job())
 
-    override val eventSource: Channel<EventWithData<Event, Key>> =
-        Channel()
+    private val channel: Channel<EventWithData<Event, Key>> = Channel()
+    override val eventSource: ReceiveChannel<EventWithData<Event, Key>> = channel
+    private val eventSink: SendChannel<EventWithData<Event, Key>> = channel
+
+    private val preferences by lazy { Preferences(applicationContext) }
+
+    private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
     override fun showProgress(bytes: Int) {
         displayInfo(R.string.engine_loading, bytes)
@@ -57,8 +66,12 @@ class MainActivity : Activity(), MVPView {
         logic.updateCandidates(candidates)
     }
 
+    override fun candidateSelected(selectedCandidate: Int) {
+        logic.selectCandidate(selectedCandidate)
+    }
+
     override fun confirmInput(word: String) {
-        log.d("View: confirmInput")
+        log.d("View: confirmInput($word)")
         // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).append(" $word")
         logic.clearCandidates()
@@ -72,18 +85,15 @@ class MainActivity : Activity(), MVPView {
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)
-        kbView.keyboard = T9Keyboard(this, R.xml.t9)
+        kbView.keyboard = T9Keyboard(this)
         kbView.setOnKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
                 scope,
-                eventSource
+                eventSink
             )
         )
         logic.initializeCandidatesView(findViewById(R.id.candidates_view))
-        //val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        //recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-        //recyclerView.adapter = wordListAdapter
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakelock = powerManager.newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK,
@@ -93,7 +103,7 @@ class MainActivity : Activity(), MVPView {
 
         presenter.attachView(this)
         scope.launch {
-            eventSource.send(Event.START.noData())
+            eventSink.send(Event.START.noData())
         }
     }
 
@@ -126,7 +136,7 @@ class MainActivity : Activity(), MVPView {
 
     fun onCandidateClick(view: View) {
         log.d("onCandidateClick()")
-        //engine.flush()
+        // TODO select
         (view as TextView).text = ""
     }
 
@@ -135,7 +145,7 @@ class MainActivity : Activity(), MVPView {
         val key = text[0]
         log.d("onBtnClick() btn=$key")
         scope.launch {
-            eventSource.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
         }
     }
 
@@ -145,6 +155,12 @@ class MainActivity : Activity(), MVPView {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.options, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val autoScroll = menu!!.findItem(R.id.auto_scroll_candidate)
+        autoScroll.isChecked = preferences.autoScroll
         return true
     }
 
@@ -160,6 +176,11 @@ class MainActivity : Activity(), MVPView {
                 imeManager.showInputMethodPicker()
                 return true
             }
+            R.id.auto_scroll_candidate -> {
+                item.isChecked = !item.isChecked
+                preferences.autoScroll = item.isChecked
+                return true
+            }
         }
         return false
     }
@@ -167,5 +188,19 @@ class MainActivity : Activity(), MVPView {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         log.d("onActivityResult:$requestCode:res=$resultCode:data=$data")
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    interface TestingHook {
+        val candidatesAdapter: WordListAdapter
+        val eventSink: SendChannel<EventWithData<Event, Key>>
+    }
+
+    /** For integration testing. */
+    @VisibleForTesting
+    val testingHook = object: TestingHook {
+        override val candidatesAdapter: WordListAdapter
+            //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
+            get() = (this@MainActivity.logic as UiLogic.DefaultUiLogic).wordListAdapter
+        override val eventSink = this@MainActivity.eventSink
     }
 }

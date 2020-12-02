@@ -22,7 +22,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override val scope = CoroutineScope(Dispatchers.Main + Job())
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
-    private val logic: UiLogic = UiLogic.DefaultUiLogic()
+    private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(Preferences(applicationContext)) }
     //private val wordListAdapter = WordListAdapter()
 
     override fun onCreate() {
@@ -40,7 +40,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override fun onCreateInputView(): View {
         val inputView = layoutInflater.inflate(
             R.layout.input, null) as (T9KeyboardView)
-        inputView.keyboard = T9Keyboard(this, R.xml.t9)
+        inputView.keyboard = T9Keyboard(this)
         inputView.setOnKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
@@ -79,6 +79,10 @@ class T9Vietnamese : InputMethodService(), MVPView {
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: TODO: showCandidates:$candidates")
         logic.updateCandidates(candidates)
+    }
+
+    override fun candidateSelected(selectedCandidate: Int) {
+        logic.selectCandidate(selectedCandidate)
     }
 
     override fun confirmInput(word: String) {

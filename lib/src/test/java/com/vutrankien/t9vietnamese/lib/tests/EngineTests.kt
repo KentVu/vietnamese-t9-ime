@@ -3,7 +3,6 @@ package com.vutrankien.t9vietnamese.lib.tests
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
@@ -54,6 +53,12 @@ class EngineTests: FunSpec() {
             Key.num3 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('g', 'h', 'i')
+            ),
+            Key.star to KeyConfig(
+                KeyType.NextCandidate
+            ),
+            Key.left to KeyConfig(
+                KeyType.PrevCandidate
             ),
             Key.num0 to KeyConfig(
                 KeyType.Confirm
@@ -112,6 +117,11 @@ class EngineTests: FunSpec() {
             engine.initialized shouldBe false
             seedEngine("a\nb\nc".lineSequence())
             engine.initialized shouldBe true
+        }
+
+        xtest("TODO:Engine should reset after Confirm") {
+            seedEngine("a\nb\nc".lineSequence())
+            engine.pad = padConfig
         }
 
         test("engineFunction_1key_1") {
@@ -232,6 +242,66 @@ class EngineTests: FunSpec() {
                 )
             )
         }
+
+        context("SelectCandidate") {
+            val seeds = """
+                                aa
+                                ab
+                                ac
+                                ad
+                                bd
+                                ce
+                                cf
+                                """.trimIndent().sortedSequence()
+
+            test("engineFunction_SelectCandidate") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.SelectCandidate(1),
+                        T9Engine.Event.Confirm("ab")
+                    )
+                )
+            }
+
+            test("engineFunction_SelectCandidate2") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0,
+                        Key.num1, Key.num1, Key.star, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.SelectCandidate(1),
+                        T9Engine.Event.Confirm("ab"),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.SelectCandidate(1),
+                        T9Engine.Event.Confirm("ab")
+                    )
+                )
+            }
+
+            test("engineFunction_SelectPrevCandidate") {
+                engineFunction(
+                    seeds,
+                    padConfigStd,
+                    arrayOf(Key.num1, Key.num1, Key.star, Key.left, Key.num0),
+                    arrayOf(
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                        T9Engine.Event.SelectCandidate(1),
+                        T9Engine.Event.SelectCandidate(0),
+                        T9Engine.Event.Confirm("aa")
+                    )
+                )
+            }
+        }
     }
 
     private val vnPad = PadConfiguration(
@@ -271,7 +341,7 @@ class EngineTests: FunSpec() {
         seeds: Sequence<String>,
         padConfig: PadConfiguration,
         sequence: Array<Key>,
-        expectedEvent: Array<T9Engine.Event>
+        expectedEvents: Array<T9Engine.Event>
     ):Unit = coroutineScope {
         engine.pad = padConfig
         seedEngine(seeds)
@@ -279,10 +349,11 @@ class EngineTests: FunSpec() {
             sequence.forEach { engine.push(it) }
         }
         assertSoftly {
-            expectedEvent.forEach { expectedEvt ->
+            expectedEvents.forEach { expectedEvt ->
                 val event = engine.eventSource.receive()
                 log.d("receive evt: $event")
                 if (event is T9Engine.Event.NewCandidates) {
+                    assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
                     //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
                     assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
                 } else {
