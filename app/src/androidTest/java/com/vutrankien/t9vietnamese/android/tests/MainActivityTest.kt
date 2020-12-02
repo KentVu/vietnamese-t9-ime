@@ -32,21 +32,6 @@ class MainActivityTest {
 
     @Before
     fun setup() {
-        //(mActivityRule.activity.application as T9Application).appComponent...
-        //IdlingRegistry.getInstance().register(object : IdlingResource {
-        //    override fun getName(): String {
-        //        return "MainActivityTestIdling"
-        //    }
-        //
-        //    override fun isIdleNow(): Boolean {
-        //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //    }
-        //
-        //    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //    }
-        //
-        //})
     }
 
     private val robot by lazy { Robot(mActivityRule.activity.testingHook) }
