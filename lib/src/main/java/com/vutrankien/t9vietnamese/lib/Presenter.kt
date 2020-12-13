@@ -7,10 +7,10 @@ import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
 class Presenter(
-    private val engineSeed: Lazy<Sequence<String>>,
-    private val engine: T9Engine,
-    private val env: Env,
-    lg: LogFactory
+        private val engineSeed: Sequence<String>,
+        private val engine: T9Engine,
+        private val env: Env,
+        lg: LogFactory
 ) {
     private val log = lg.newLog("Presenter")
     private lateinit var view: View
@@ -33,7 +33,7 @@ class Presenter(
                     view.showProgress(0)
                     val loadTime = measureTimeMillis {
                         if (!engine.canReuseDb()) {
-                            engine.init(engineSeed.value)
+                            engine.init(engineSeed)
                         } else {
                             engine.initFromDb()
                             view.showProgress(100)

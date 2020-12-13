@@ -67,7 +67,13 @@ class EngineTests: FunSpec() {
     )
 
     override fun beforeTest(testCase: TestCase) {
-        val engineComponents = DaggerEngineComponents.builder().build()
+        prepareEngine()
+    }
+
+    private fun prepareEngine() {
+        val engineComponents = DaggerEnvComponent.builder()
+                .configurationModule(ConfigurationModule(VnPad))
+                .build()
         engine = engineComponents.engine()
         log = engineComponents.lg.newLog("EngineTests")
     }

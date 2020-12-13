@@ -9,7 +9,7 @@ interface T9Engine {
     /**
      * This NEED to be set before pushing anything to the engine!
      */
-    var pad: PadConfiguration
+    val pad: PadConfiguration
     val eventSource: Channel<Event>
 
     sealed class Event {
