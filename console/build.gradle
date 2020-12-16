@@ -16,12 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'kotlin'
+plugins {
+    id 'application'
+    id 'org.jetbrains.kotlin.jvm'
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation project(path: ':lib', configuration: 'default')
 }
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+application {
+    mainClassName = 'com.vutrankien.t9vietnamese.console.SortJavaKt'
+}
+
+//kotlin {
+//    sourceSets {
+//        jvmMain {
+//            dependencies {
+//                implementation project(':lib')
+//            }
+//        }
+//    }
+//}

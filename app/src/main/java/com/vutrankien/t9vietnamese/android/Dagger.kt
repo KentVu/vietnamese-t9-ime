@@ -1,8 +1,10 @@
 package com.vutrankien.t9vietnamese.android
 
 import android.content.Context
+import android.util.Log
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
+import com.vutrankien.t9vietnamese.lib.VietnameseWordSeed.decomposeVietnamese
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -51,13 +53,23 @@ class ConfigurationModule(private val context: Context) {
     fun padConfiguration(): PadConfiguration =
         VnPad
 
-    @Provides
     fun seed(): Sequence<String> {
+        Log.d("seed", "making seed")
         return sequence {
-            context.resources.assets.open("vi-DauMoi.dic").bufferedReader().useLines {
-                yieldAll(it)
+            context.resources.assets.open("vi-DauMoi.dic").bufferedReader().useLines { lines ->
+                context.openFileOutput("decomposed.dic", Context.MODE_PRIVATE).bufferedWriter().use {writer ->
+                    lines.forEach { yield(it.decomposeVietnamese().also { writer.write("$it\n") }) }
+                }
             }
+        }
+    }
 
+    @Provides
+    fun decomposedSeed(): Sequence<String> {
+        return sequence {
+            context.resources.assets.open("decomposed.dic.sorted").bufferedReader().useLines { lines ->
+                lines.forEach { yield(it) }
+            }
         }
     }
 }

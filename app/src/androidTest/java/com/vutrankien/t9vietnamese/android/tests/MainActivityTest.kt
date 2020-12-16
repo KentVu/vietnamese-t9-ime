@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.android.tests
 
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -14,6 +15,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,18 +42,18 @@ class MainActivityTest {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
         val initializedStr = mActivityRule.activity.getString(R.string.notify_initialized)
         // Drop the progress string
-        robot.checkTextDisplayed(anyOf(containsString(engineLoadStr.dropLast(7)), containsString(initializedStr)))
+        robot.checkCandidateDisplayed(anyOf(containsString(engineLoadStr.dropLast(7)), containsString(initializedStr)))
     }
 
     @Test fun basicTyping(): Unit = runBlocking<Unit> {
         robot
             .pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
     }
 
     @Test fun selectCandidate(): Unit = runBlocking<Unit> {
         robot.pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .confirm()
             .checkWordConfirmed("chào")
@@ -59,7 +61,7 @@ class MainActivityTest {
 
     @Test fun selectCandidateBackward(): Unit = runBlocking {
         robot.pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .selectNext()
             .selectPrev()
@@ -79,11 +81,13 @@ class MainActivityTest {
             }
         }
 
-        fun checkTextDisplayed(text: String):Robot = apply {
-            onView(withText(text)).check(matches(isDisplayed()))
+        fun checkCandidateDisplayed(candidate: String):Robot = apply {
+            Assert.assertTrue("checkCandidateDisplayed:$candidate", testingHook.candidatesAdapter.findItem(candidate)  != -1)
+            //onView(withId(R.id.candidates_view)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("A")), click()));
+            //onData(withText(candidate)).check(matches(isDisplayed()))
         }
 
-        fun checkTextDisplayed(stringCondition: Matcher<String>) {
+        fun checkCandidateDisplayed(stringCondition: Matcher<String>) {
             onView(withText(stringCondition)).check(matches(isDisplayed()))
         }
 

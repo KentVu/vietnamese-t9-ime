@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.vutrankien.t9vietnamese.android
+package com.vutrankien.t9vietnamese.lib
 
-import dagger.Provides
 import java.text.Normalizer
 
 object VietnameseWordSeed {

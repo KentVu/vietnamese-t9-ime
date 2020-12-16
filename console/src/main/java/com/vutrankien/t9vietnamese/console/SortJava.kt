@@ -16,7 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.kenvu.t9vietnamese.console
+package com.vutrankien.t9vietnamese.console
+
+import com.vutrankien.t9vietnamese.lib.VietnameseWordSeed.decomposeVietnamese
+import java.io.File
+import java.nio.file.Paths
+
+fun main(args: Array<String>) {
+    val fromFile = File(args[0])
+    val wd = Paths.get("").toAbsolutePath()
+    val toFile = File(fromFile.parent, "${fromFile.name}.sorted")
+    println("Sorting file $fromFile wd=$toFile")
+    val sorted = sortedSetOf<String>()
+    fromFile.bufferedReader().useLines { lines ->
+        lines.forEach { sorted.add(it.decomposeVietnamese()) }
+    }
+    toFile.bufferedWriter().use { writer -> sorted.forEach { writer.write(it + "\n") } }
+    print("Written to $toFile")
+}
 
 class MyClass {
 }
