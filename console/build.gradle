@@ -33,13 +33,3 @@ targetCompatibility = "1.7"
 application {
     mainClassName = 'com.vutrankien.t9vietnamese.console.SortJavaKt'
 }
-
-//kotlin {
-//    sourceSets {
-//        jvmMain {
-//            dependencies {
-//                implementation project(':lib')
-//            }
-//        }
-//    }
-//}
