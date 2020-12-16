@@ -7,6 +7,7 @@ import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -147,6 +148,19 @@ class MainActivity : Activity(), MVPView {
         scope.launch {
             eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event == null) {
+            log.e("onKeyDown:event is null!")
+            return false
+        }
+        val num = event.unicodeChar.toChar()
+        log.d("onKeyDown:$keyCode,$event,num=$num")
+        scope.launch {
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(num)))
+        }
+        return true
     }
 
     fun onBtnStarClick(view: View) {

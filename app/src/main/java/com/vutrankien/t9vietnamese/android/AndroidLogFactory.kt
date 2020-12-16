@@ -22,6 +22,10 @@ class AndroidLogFactory: LogFactory {
                 Log.w(tag, msg)
             }
 
+            override fun e(msg: String) {
+                Log.e(tag, msg)
+            }
+
         }
     }
 }
