@@ -12,6 +12,7 @@ import java.io.File
 @Component(modules = [LogModule::class, EnvModule::class])
 abstract class EnvComponent {
     abstract val lg: LogFactory
+    abstract val engineComponentBuilder: EngineComponent.Builder
 }
 
 @Module(subcomponents = [EngineComponent::class])
