@@ -1,6 +1,5 @@
 package com.vutrankien.t9vietnamese.android.tests
 
-import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -11,11 +10,11 @@ import com.vutrankien.t9vietnamese.android.R
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.LogFactory
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +28,8 @@ class MainActivityTest {
     @get:Rule val mActivityRule = ActivityTestRule<MainActivity>(
         MainActivity::class.java)
 
+    private val log: LogFactory.Log by lazy { mActivityRule.activity.logFactory.newLog("MainActivityTest") }
+
     @Before
     fun unlockScreen() = mActivityRule.activity.unlockScreen()
 
@@ -36,7 +37,7 @@ class MainActivityTest {
     fun setup() {
     }
 
-    private val robot by lazy { Robot(mActivityRule.activity.testingHook) }
+    private val robot by lazy { Robot(log, mActivityRule.activity.testingHook) }
 
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
@@ -67,23 +68,31 @@ class MainActivityTest {
             .selectPrev()
             .confirm()
             .checkWordConfirmed("chào")
+        // wait if necessary
     }
 
     class Robot(
+        private val log: LogFactory.Log,
         private val testingHook: MainActivity.TestingHook
     ) {
         private val uiEventSink: SendChannel<EventWithData<Event, Key>> = testingHook.eventSink
 
         suspend fun pressSequentially(numSeq: String): Robot = apply {
             numSeq.forEach {
-                //onView(withText(startsWith("$it"))).perform(click())
-                uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+                pressAndCheck(it)
             }
         }
 
+        private suspend fun pressAndCheck(key: Char) {
+            //onView(withText(startsWith("$it"))).perform(click())
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+            // TODO wait for completion
+            //testingHook.waitNewCandidates()
+        }
+
         fun checkCandidateDisplayed(candidate: String):Robot = apply {
-            Assert.assertTrue("checkCandidateDisplayed:$candidate", testingHook.candidatesAdapter.findItem(candidate)  != -1)
-            //onView(withId(R.id.candidates_view)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText("A")), click()));
+            //Assert.assertTrue("checkCandidateDisplayed:$candidate", testingHook.candidatesAdapter.findItem(candidate)  != -1)
+            onView(withText(candidate)).check(matches(isDisplayed()))
             //onData(withText(candidate)).check(matches(isDisplayed()))
         }
 
@@ -94,6 +103,7 @@ class MainActivityTest {
         suspend fun browseTo(targetWord: String): Robot = apply {
             // Find distance from selected word to targetWord
             val distance = testingHook.candidatesAdapter.findItem(targetWord) - testingHook.candidatesAdapter.selectedWord
+            log.d("browseTo:distance=$distance")
             repeat(distance) {
                 uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
             }

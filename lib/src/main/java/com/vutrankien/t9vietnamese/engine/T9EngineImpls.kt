@@ -98,9 +98,10 @@ class DefaultT9Engine(
             }
             else -> {
                 // Numeric keys
-                log.d("push:${_currentNumSeq.joinNum()}")
+                val numSeqStr = _currentNumSeq.joinNum()
+                log.d("push:$numSeqStr")
                 val candidates = findCandidates(_currentNumSeq).toMutableList()
-                candidates.add(_currentNumSeq.joinNum())
+                candidates.add(numSeqStr)
                 eventSource.send(T9Engine.Event.NewCandidates(candidates))
                 _currentCandidates.clear()
                 _currentCandidates.addAll(candidates)

@@ -12,7 +12,6 @@ import dagger.Provides
 interface ActivityComponent {
     fun inject(service: T9Vietnamese)
     fun inject(activity: MainActivity)
-
 }
 
 @Deprecated("Presenter is @Injected")

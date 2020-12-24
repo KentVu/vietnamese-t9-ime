@@ -65,6 +65,7 @@ class MainActivity : Activity(), MVPView {
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: showCandidates:$candidates")
         logic.updateCandidates(candidates)
+        //testingHook.onShowCandidates()
     }
 
     override fun candidateSelected(selectedCandidate: Int) {
@@ -207,6 +208,8 @@ class MainActivity : Activity(), MVPView {
     interface TestingHook {
         val candidatesAdapter: WordListAdapter
         val eventSink: SendChannel<EventWithData<Event, Key>>
+
+        //fun waitNewCandidates()
     }
 
     /** For integration testing. */
@@ -216,5 +219,8 @@ class MainActivity : Activity(), MVPView {
             //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
             get() = (this@MainActivity.logic as UiLogic.DefaultUiLogic).wordListAdapter
         override val eventSink = this@MainActivity.eventSink
+        //override fun waitNewCandidates() {
+        //    this@MainActivity.
+        //}
     }
 }
