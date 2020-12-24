@@ -7,6 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
+import com.vutrankien.t9vietnamese.android.tests.TestHelpers.unlockScreen
+import com.vutrankien.t9vietnamese.android.tests.TestHelpers.waitUntilViewFound
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
@@ -91,9 +93,7 @@ class MainActivityTest {
         }
 
         fun checkCandidateDisplayed(candidate: String):Robot = apply {
-            //Assert.assertTrue("checkCandidateDisplayed:$candidate", testingHook.candidatesAdapter.findItem(candidate)  != -1)
-            onView(withText(candidate)).check(matches(isDisplayed()))
-            //onData(withText(candidate)).check(matches(isDisplayed()))
+            waitUntilViewFound(withText(candidate),1000)
         }
 
         fun checkCandidateDisplayed(stringCondition: Matcher<String>) {
