@@ -14,6 +14,7 @@ import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
 import com.vutrankien.t9vietnamese.lib.LogFactory
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
@@ -90,6 +91,7 @@ class MainActivityTest {
             uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
             // TODO wait for completion
             //testingHook.waitNewCandidates()
+            delay(500)
         }
 
         fun checkCandidateDisplayed(candidate: String):Robot = apply {
@@ -110,8 +112,8 @@ class MainActivityTest {
         }
 
         fun checkWordConfirmed(word: String) {
-            onView(allOf(withId(R.id.editText), withText(containsString(word))))
-                    .check(matches(isDisplayed()))
+            waitUntilViewFound(allOf(withId(R.id.editText), withText(containsString(word))), 1000)
+            //onView(allOf(withId(R.id.editText), withText(containsString(word)))).check(matches(isDisplayed()))
         }
 
         suspend fun selectNext() = apply {
