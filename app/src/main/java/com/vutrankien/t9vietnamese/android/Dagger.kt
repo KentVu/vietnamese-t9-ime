@@ -8,33 +8,34 @@ import dagger.Module
 import dagger.Provides
 
 
-@Component(modules = [PresenterModule::class, EngineModule::class, AndroidLogModule::class, EnvModule::class])
+@Component(modules = [ConfigurationModule::class/*, PresenterModule::class*/, EngineModule::class, AndroidLogModule::class, EnvModule::class])
 interface ActivityComponent {
     fun inject(service: T9Vietnamese)
     fun inject(activity: MainActivity)
-
 }
 
+@Deprecated("Presenter is @Injected")
 @Module
 class PresenterModule() {
 
     @Provides
     fun presenter(
-        engine: T9Engine,
-        lg: LogFactory,
-        env: Env
+            engine: T9Engine,
+            lg: LogFactory,
+            env: Env,
+            seed: Sequence<String>
     ): Presenter {
         // TODO: Make this configurable
-        engine.pad = VnPad
-        return Presenter(VietnameseWordSeed.getFromJavaResource(), engine, env, lg)
+        return Presenter(seed, engine, env, lg)
     }
 }
 
 @Module
 class EnvModule(private val context: Context) {
     @Provides
-    fun env(): Env =
-        AndroidEnv(context)
+    fun env(): Env {
+        return AndroidEnv(context)
+    }
 }
 
 @Module
@@ -42,6 +43,22 @@ class AndroidLogModule {
     @Provides
     fun logFactory(): LogFactory =
         AndroidLogFactory()
+}
+
+@Module
+class ConfigurationModule(private val context: Context) {
+    @Provides
+    fun padConfiguration(): PadConfiguration =
+        VnPad
+
+    @Provides
+    fun decomposedSeed(): Sequence<String> {
+        return sequence {
+            context.resources.assets.open("decomposed.dic.sorted").bufferedReader().useLines { lines ->
+                lines.forEach { yield(it) }
+            }
+        }
+    }
 }
 
 

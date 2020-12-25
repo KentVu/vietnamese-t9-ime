@@ -23,13 +23,13 @@
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
         android:supportsSwitchingToNextInputMethod="true"
 >
-    <subtype
-        android:label="@string/label_subtype_generic"
+<!--    <subtype
+        android:label="@string/label_subtype_en_US"
         android:icon="@drawable/icon_en_us"
         android:imeSubtypeLocale="en_US"
-        android:imeSubtypeMode="keyboard" />
+        android:imeSubtypeMode="keyboard" />-->
     <subtype
-        android:label="@string/label_subtype_generic"
+        android:label="@string/label_subtype_vi_VN"
         android:icon="@drawable/icon_vi_vn"
         android:imeSubtypeLocale="vi_VN"
         android:imeSubtypeMode="keyboard" />

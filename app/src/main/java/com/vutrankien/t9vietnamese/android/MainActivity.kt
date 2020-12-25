@@ -7,6 +7,7 @@ import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -64,6 +65,7 @@ class MainActivity : Activity(), MVPView {
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: showCandidates:$candidates")
         logic.updateCandidates(candidates)
+        //testingHook.onShowCandidates()
     }
 
     override fun candidateSelected(selectedCandidate: Int) {
@@ -149,6 +151,19 @@ class MainActivity : Activity(), MVPView {
         }
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (event == null) {
+            log.e("onKeyDown:event is null!")
+            return false
+        }
+        val num = event.unicodeChar.toChar()
+        log.d("onKeyDown:$keyCode,$event,num=$num")
+        scope.launch {
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(num)))
+        }
+        return true
+    }
+
     fun onBtnStarClick(view: View) {
         log.d("onBtnStarClick()")
     }
@@ -193,6 +208,8 @@ class MainActivity : Activity(), MVPView {
     interface TestingHook {
         val candidatesAdapter: WordListAdapter
         val eventSink: SendChannel<EventWithData<Event, Key>>
+
+        //fun waitNewCandidates()
     }
 
     /** For integration testing. */
@@ -202,5 +219,8 @@ class MainActivity : Activity(), MVPView {
             //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
             get() = (this@MainActivity.logic as UiLogic.DefaultUiLogic).wordListAdapter
         override val eventSink = this@MainActivity.eventSink
+        //override fun waitNewCandidates() {
+        //    this@MainActivity.
+        //}
     }
 }

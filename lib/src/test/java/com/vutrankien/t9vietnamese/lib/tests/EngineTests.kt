@@ -18,8 +18,6 @@ import kotlin.time.seconds
 @OptIn(ExperimentalTime::class)
 class EngineTests: FunSpec() {
     //override fun isolationMode(): IsolationMode? = IsolationMode.InstancePerTest
-    private lateinit var engine: T9Engine
-    private lateinit var log: LogFactory.Log
 
     private val padConfig = PadConfiguration(
         mapOf(
@@ -66,10 +64,19 @@ class EngineTests: FunSpec() {
         )
     )
 
-    override fun beforeTest(testCase: TestCase) {
-        val engineComponents = DaggerEngineComponents.builder().build()
-        engine = engineComponents.engine()
-        log = engineComponents.lg.newLog("EngineTests")
+    //private lateinit var engine: T9Engine
+    private val envComponent: EnvComponent = DaggerEnvComponent.builder()
+        //.logModule(ConfigurationModule(VnPad))
+        .build()
+
+    private val log: LogFactory.Log = envComponent.lg.newLog("EngineTests")
+
+    private fun prepareEngine(pad: PadConfiguration): T9Engine {
+        //engine = EngineComponent.Builder()
+        val engine: T9Engine
+        engine = envComponent.engineComponentBuilder
+            .configurationModule(ConfigurationModule(pad)).build().engine()
+        return engine
     }
 
     /**
@@ -108,20 +115,23 @@ class EngineTests: FunSpec() {
         }
 
         test("engineInitializing") {
-            engine.initialized shouldBe false
-            seedEngine()
-            engine.initialized shouldBe true
+            prepareEngine(VnPad).apply {
+                initialized shouldBe false
+                seed()
+                initialized shouldBe true
+            }
         }
 
         test("engineInitializingWithProgress") {
-            engine.initialized shouldBe false
-            seedEngine("a\nb\nc".lineSequence())
-            engine.initialized shouldBe true
+            prepareEngine(VnPad).apply {
+                initialized shouldBe false
+                seed("a\nb\nc".lineSequence())
+                initialized shouldBe true
+            }
         }
 
         xtest("TODO:Engine should reset after Confirm") {
-            seedEngine("a\nb\nc".lineSequence())
-            engine.pad = padConfig
+            prepareEngine(padConfig).seed("a\nb\nc".lineSequence())
         }
 
         test("engineFunction_1key_1") {
@@ -324,11 +334,11 @@ class EngineTests: FunSpec() {
         )
     )
 
-    private suspend fun seedEngine(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
+    private suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
         launch {
-            engine.init(sequence)
+            init(sequence)
         }
-        for (event in engine.eventSource)
+        for (event in eventSource)
             if (event is T9Engine.Event.LoadProgress)
                 log.v("Engine.LoadProgress ${event.bytes}")
             else if (event is T9Engine.Event.Initialized) {
@@ -342,22 +352,23 @@ class EngineTests: FunSpec() {
         padConfig: PadConfiguration,
         sequence: Array<Key>,
         expectedEvents: Array<T9Engine.Event>
-    ):Unit = coroutineScope {
-        engine.pad = padConfig
-        seedEngine(seeds)
-        launch {
-            sequence.forEach { engine.push(it) }
-        }
-        assertSoftly {
-            expectedEvents.forEach { expectedEvt ->
-                val event = engine.eventSource.receive()
-                log.d("receive evt: $event")
-                if (event is T9Engine.Event.NewCandidates) {
-                    assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
-                    //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
-                    assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
-                } else {
-                    event shouldBe expectedEvt
+    ):Unit = coroutineScope<Unit> {
+        prepareEngine(padConfig).apply {
+            seed(seeds)
+            launch {
+                sequence.forEach { push(it) }
+            }
+            assertSoftly {
+                expectedEvents.forEach { expectedEvt ->
+                    val event = eventSource.receive()
+                    log.d("receive evt: $event")
+                    if (event is T9Engine.Event.NewCandidates) {
+                        assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
+                        //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
+                        assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
+                    } else {
+                        event shouldBe expectedEvt
+                    }
                 }
             }
         }

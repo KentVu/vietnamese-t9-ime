@@ -15,17 +15,17 @@ internal fun String.composeVietnamese() = Normalizer.normalize(
     Normalizer.Form.NFKC
 )
 
-class DefaultT9Engine constructor(
+class DefaultT9Engine(
         lg: LogFactory,
         private val env: Env,
-        dawgFile: String = "T9Engine.dawg"
+        dawgFile: String = "T9Engine.dawg",
+        override val pad: PadConfiguration
 ) : T9Engine {
     private val dawgPath = "${env.workingDir}/$dawgFile"
     private val log = lg.newLog("T9Engine")
     private lateinit var trie: Trie
     override var initialized: Boolean = false
         private set
-    override lateinit var pad: PadConfiguration
 
     override val eventSource: Channel<T9Engine.Event> = Channel()
 
@@ -98,9 +98,10 @@ class DefaultT9Engine constructor(
             }
             else -> {
                 // Numeric keys
-                log.d("push:${_currentNumSeq.joinNum()}")
+                val numSeqStr = _currentNumSeq.joinNum()
+                log.d("push:$numSeqStr")
                 val candidates = findCandidates(_currentNumSeq).toMutableList()
-                candidates.add(_currentNumSeq.joinNum())
+                candidates.add(numSeqStr)
                 eventSource.send(T9Engine.Event.NewCandidates(candidates))
                 _currentCandidates.clear()
                 _currentCandidates.addAll(candidates)

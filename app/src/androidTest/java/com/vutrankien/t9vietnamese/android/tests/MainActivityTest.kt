@@ -7,10 +7,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
+import com.vutrankien.t9vietnamese.android.tests.TestHelpers.unlockScreen
+import com.vutrankien.t9vietnamese.android.tests.TestHelpers.waitUntilViewFound
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
+import com.vutrankien.t9vietnamese.lib.LogFactory
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
@@ -27,46 +31,33 @@ class MainActivityTest {
     @get:Rule val mActivityRule = ActivityTestRule<MainActivity>(
         MainActivity::class.java)
 
+    private val log: LogFactory.Log by lazy { mActivityRule.activity.logFactory.newLog("MainActivityTest") }
+
     @Before
     fun unlockScreen() = mActivityRule.activity.unlockScreen()
 
     @Before
     fun setup() {
-        //(mActivityRule.activity.application as T9Application).appComponent...
-        //IdlingRegistry.getInstance().register(object : IdlingResource {
-        //    override fun getName(): String {
-        //        return "MainActivityTestIdling"
-        //    }
-        //
-        //    override fun isIdleNow(): Boolean {
-        //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //    }
-        //
-        //    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        //    }
-        //
-        //})
     }
 
-    private val robot by lazy { Robot(mActivityRule.activity.testingHook) }
+    private val robot by lazy { Robot(log, mActivityRule.activity.testingHook) }
 
     @Test fun initialize() {
         val engineLoadStr = mActivityRule.activity.getString(R.string.engine_loading)
         val initializedStr = mActivityRule.activity.getString(R.string.notify_initialized)
         // Drop the progress string
-        robot.checkTextDisplayed(anyOf(containsString(engineLoadStr.dropLast(7)), containsString(initializedStr)))
+        robot.checkCandidateDisplayed(anyOf(containsString(engineLoadStr.dropLast(7)), containsString(initializedStr)))
     }
 
     @Test fun basicTyping(): Unit = runBlocking<Unit> {
         robot
             .pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
     }
 
     @Test fun selectCandidate(): Unit = runBlocking<Unit> {
         robot.pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .confirm()
             .checkWordConfirmed("chào")
@@ -74,45 +65,55 @@ class MainActivityTest {
 
     @Test fun selectCandidateBackward(): Unit = runBlocking {
         robot.pressSequentially("24236")
-            .checkTextDisplayed("chào")
+            .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .selectNext()
             .selectPrev()
             .confirm()
             .checkWordConfirmed("chào")
+        // wait if necessary
     }
 
     class Robot(
+        private val log: LogFactory.Log,
         private val testingHook: MainActivity.TestingHook
     ) {
         private val uiEventSink: SendChannel<EventWithData<Event, Key>> = testingHook.eventSink
 
         suspend fun pressSequentially(numSeq: String): Robot = apply {
             numSeq.forEach {
-                //onView(withText(startsWith("$it"))).perform(click())
-                uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(it)))
+                pressAndCheck(it)
             }
         }
 
-        fun checkTextDisplayed(text: String):Robot = apply {
-            onView(withText(text)).check(matches(isDisplayed()))
+        private suspend fun pressAndCheck(key: Char) {
+            //onView(withText(startsWith("$it"))).perform(click())
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+            // TODO wait for completion
+            //testingHook.waitNewCandidates()
+            delay(500)
         }
 
-        fun checkTextDisplayed(stringCondition: Matcher<String>) {
+        fun checkCandidateDisplayed(candidate: String):Robot = apply {
+            waitUntilViewFound(withText(candidate),1000)
+        }
+
+        fun checkCandidateDisplayed(stringCondition: Matcher<String>) {
             onView(withText(stringCondition)).check(matches(isDisplayed()))
         }
 
         suspend fun browseTo(targetWord: String): Robot = apply {
             // Find distance from selected word to targetWord
             val distance = testingHook.candidatesAdapter.findItem(targetWord) - testingHook.candidatesAdapter.selectedWord
+            log.d("browseTo:distance=$distance")
             repeat(distance) {
                 uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
             }
         }
 
         fun checkWordConfirmed(word: String) {
-            onView(allOf(withId(R.id.editText), withText(containsString(word))))
-                    .check(matches(isDisplayed()))
+            waitUntilViewFound(allOf(withId(R.id.editText), withText(containsString(word))), 1000)
+            //onView(allOf(withId(R.id.editText), withText(containsString(word)))).check(matches(isDisplayed()))
         }
 
         suspend fun selectNext() = apply {

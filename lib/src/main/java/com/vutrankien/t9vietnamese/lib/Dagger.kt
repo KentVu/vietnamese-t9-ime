@@ -5,28 +5,41 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.Subcomponent
 import java.io.File
 
-@Component(modules = [EngineModule::class, LogModule::class, EnvModule::class])
-abstract class EngineComponents {
+
+@Component(modules = [LogModule::class, EnvModule::class])
+abstract class EnvComponent {
     abstract val lg: LogFactory
-    abstract fun engine(): T9Engine
+    abstract val engineComponentBuilder: EngineComponent.Builder
 }
 
-@Module
+@Module(subcomponents = [EngineComponent::class])
 class LogModule {
     @Provides
     fun logFactory(): LogFactory =
-        JavaLogFactory()
+            JavaLogFactory()
+}
+
+@Subcomponent(modules = [ConfigurationModule::class, EngineModule::class])
+abstract class EngineComponent {
+    abstract fun engine(): T9Engine
+    @Subcomponent.Builder
+    interface Builder {
+        fun configurationModule(cm: ConfigurationModule): Builder
+        fun build(): EngineComponent
+    }
 }
 
 @Module
 class EngineModule() {
     @Provides
     fun engine(
-        lg: LogFactory,
-        env: Env
-    ): T9Engine = DefaultT9Engine(lg, env)
+            lg: LogFactory,
+            env: Env,
+            pad: PadConfiguration
+    ): T9Engine = DefaultT9Engine(lg, env, pad = pad)
 }
 
 @Component(modules = [PresenterModule::class, LogModule::class])
@@ -44,7 +57,7 @@ class PresenterModule(
     fun presenter(
         lg: LogFactory
     ): Presenter =
-        Presenter(lazy { engineSeed }, engine, env, lg)
+        Presenter(engineSeed, engine, env, lg)
 }
 
 @Module
@@ -58,4 +71,11 @@ class EnvModule() {
                 override val workingDir: String
                     get() = "."
             }
+}
+
+@Module
+class ConfigurationModule(private val pad: PadConfiguration) {
+    @Provides
+    fun padConfiguration(): PadConfiguration =
+            pad
 }

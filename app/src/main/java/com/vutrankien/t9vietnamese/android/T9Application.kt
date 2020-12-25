@@ -8,8 +8,10 @@ import android.app.Application
 class T9Application : Application(){
     // TODO: Introduce scoped components.
     val appComponent: ActivityComponent by lazy {
-        DaggerActivityComponent.builder().envModule(EnvModule(this))
-            .build()
+        DaggerActivityComponent.builder()
+                .envModule(EnvModule(this))
+                .configurationModule(ConfigurationModule(this))
+                .build()
     }
 
     override fun onCreate() {
