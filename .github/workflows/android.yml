@@ -48,9 +48,3 @@ jobs:
             app/build/outputs/apk
             dawg-java/dawg-java/src/main/resources
           # wildcard not supported /*-release.aar
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
-        if: always()
-        with:
-          files: app/build/test-results/**/*.xml
