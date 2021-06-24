@@ -1,0 +1,47 @@
+name: Android CI
+
+on: [push]
+
+jobs:
+
+  android-test:
+    runs-on: macos-10.15 # macos-11.0 is not public for now
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Cache build
+        id: cache-swig
+        uses: actions/cache@v1
+        with:
+          path: |
+            ~/.m2
+            ~/.gradle
+          key: ${{ runner.os }}-gradle
+
+       - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          emulator-build: 6110076
+          script: |
+            ./gradlew -Plint.output.console=true --info :lib:build
+            ./gradlew -Plint.output.console=true --info :app:build
+            adb wait-for-device shell settings put global window_animation_scale 0 || true
+            adb shell settings put global transition_animation_scale 0 &
+            adb shell settings put global animator_duration_scale 0 &
+            ./gradlew -Plint.output.console=true --info connectedCheck
+
+      - name: Persist test result
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: vietnamese-t9-ime-test-result
+          path: app/build/outputs/androidTest-results/connected
+
+      - name: Upload lib artifact
+        continue-on-error: true
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: vietnamese-t9-ime
+          path: app/build/outputs/aar
+          # wildcard not supported /*-release.aar
