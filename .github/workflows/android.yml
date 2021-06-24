@@ -39,10 +39,18 @@ jobs:
           name: vietnamese-t9-ime-test-result
           path: app/build/outputs/androidTest-results/connected
 
-      - name: Upload lib artifact
+      - name: Upload apk
         continue-on-error: true
         uses: actions/upload-artifact@v1.0.0
         with:
           name: vietnamese-t9-ime
-          path: app/build/outputs/aar
+          path: |
+            app/build/outputs/apk
+            dawg-java/dawg-java/src/main/resources
           # wildcard not supported /*-release.aar
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: app/build/test-results/**/*.xml
