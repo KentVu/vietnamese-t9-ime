@@ -20,7 +20,7 @@ class TrieTest: StringSpec({
         var size = 0
         TrieTest::class.java.classLoader.getResourceAsStream("vi-DauMoi.dic").bufferedReader().useLines {
             it.forEach { line ->
-                log.v(line)
+                //log.v(line)  // critical
                 sortedWords.add(line)
                 size += line.toByteArray().size + 1
             }
