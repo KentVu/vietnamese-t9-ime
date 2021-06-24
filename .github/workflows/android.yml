@@ -13,13 +13,15 @@ jobs:
           submodules: true
 
       - name: Cache build
-        id: cache-swig
+        id: cache-build
         uses: actions/cache@v1
         with:
           path: |
             ~/.m2
-            ~/.gradle
-          key: ${{ runner.os }}-gradle
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android
+          key: ${{ runner.os }}-build-${{ hashFiles('**/gradle-wrapper.properties') }}
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
