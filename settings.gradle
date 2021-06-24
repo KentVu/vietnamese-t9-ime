@@ -1,6 +1,8 @@
-include ':app', ':lib', ':dawg-jni'
-//include ':dawg-java'
+include ':app', ':lib'
+
 include ':console'
 
+include ':dawg-jni'
 project(':dawg-jni').projectDir = new File(rootDir, 'dawg-java/dawg-jni')
-//project(':dawg-java').projectDir = new File(rootDir, 'dawg-java/dawg-java')
+include ':dawg-java'
+project(':dawg-java').projectDir = new File(rootDir, 'dawg-java/dawg-java')
