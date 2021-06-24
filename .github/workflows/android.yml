@@ -44,7 +44,11 @@ jobs:
         uses: actions/upload-artifact@v1.0.0
         with:
           name: vietnamese-t9-ime
-          path: |
-            app/build/outputs/apk
-            dawg-java/dawg-java/src/main/resources
-          # wildcard not supported /*-release.aar
+          path: app/build/outputs/apk
+
+      - name: Upload dylibs
+        continue-on-error: true
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: dawg-jni-darwin
+          path: dawg-java/dawg-java/src/main/resources
