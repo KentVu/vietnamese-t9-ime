@@ -15,8 +15,8 @@ test {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //implementation project(':dawg-java')
-    implementation "kentvu.dawgjava:dawg-java:$dawgjava_version"
+    implementation project(':dawg-java')  // remember to enable dawg-java & executeSwig below
+    //implementation "kentvu.dawgjava:dawg-java:$dawgjava_version"  // remember to set personal token to fetch
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     implementation 'com.github.takawitter:trie4j:0.9.7'

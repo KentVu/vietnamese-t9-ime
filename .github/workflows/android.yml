@@ -1,0 +1,54 @@
+name: Android CI
+
+on: [push]
+
+jobs:
+
+  android-test:
+    runs-on: macos-10.15 # macos-11.0 is not public for now
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Cache build
+        id: cache-build
+        uses: actions/cache@v1
+        with:
+          path: |
+            ~/.m2
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android
+          key: ${{ runner.os }}-build-${{ hashFiles('**/gradle-wrapper.properties') }}
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          emulator-build: 6110076
+          script: |
+            ./gradlew -Plint.output.console=true --info :lib:build
+            ./gradlew -Plint.output.console=true --info :app:build
+            ./gradlew -Plint.output.console=true --info connectedCheck
+
+      - name: Persist test result
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: vietnamese-t9-ime-test-result
+          path: app/build/outputs/androidTest-results/connected
+
+      - name: Upload apk
+        continue-on-error: true
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: vietnamese-t9-ime
+          path: app/build/outputs/apk
+
+      - name: Upload dylibs
+        continue-on-error: true
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: dawg-jni-darwin
+          path: dawg-java/dawg-java/src/main/resources
