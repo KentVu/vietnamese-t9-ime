@@ -5,7 +5,7 @@ on: [push]
 jobs:
 
   android-test:
-    runs-on: macos-10.15 # macos-11.0 is not public for now
+    runs-on: macOS-latest # macos-11.0 is not public for now
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -27,7 +27,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          emulator-build: 6110076
+          arch: x86
+          emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
           script: |
             ./gradlew -Plint.output.console=true --info :lib:build
             ./gradlew -Plint.output.console=true --info :app:build
@@ -43,7 +44,7 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: vietnamese-t9-ime
+          name: vietnamese-t9-ime-apk
           path: app/build/outputs/apk
 
       - name: Upload dylibs
