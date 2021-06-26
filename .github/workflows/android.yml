@@ -44,7 +44,7 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: vietnamese-t9-ime
+          name: vietnamese-t9-ime-apk
           path: app/build/outputs/apk
 
       - name: Upload dylibs
