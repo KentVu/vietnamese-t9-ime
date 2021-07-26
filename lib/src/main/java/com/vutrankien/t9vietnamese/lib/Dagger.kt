@@ -9,13 +9,26 @@ import dagger.Subcomponent
 import java.io.File
 
 
-@Component(modules = [LogModule::class, EnvModule::class])
+@Component(modules = [EnvModule::class, LogModule::class])
 abstract class EnvComponent {
     abstract val lg: LogFactory
     abstract val engineComponentBuilder: EngineComponent.Builder
 }
 
 @Module(subcomponents = [EngineComponent::class])
+class EnvModule() {
+    @Provides
+    fun env(): Env =
+            object : Env {
+                override fun fileExists(path: String): Boolean =
+                        File(path).exists()
+
+                override val workingDir: String
+                    get() = "."
+            }
+}
+
+@Module
 class LogModule {
     @Provides
     fun logFactory(): LogFactory =
@@ -28,18 +41,20 @@ abstract class EngineComponent {
     @Subcomponent.Builder
     interface Builder {
         fun configurationModule(cm: ConfigurationModule): Builder
+        fun engineModule(em: EngineModule): Builder
         fun build(): EngineComponent
     }
 }
 
 @Module
-class EngineModule() {
+abstract class EngineModule() {
     @Provides
     fun engine(
             lg: LogFactory,
             env: Env,
-            pad: PadConfiguration
-    ): T9Engine = DefaultT9Engine(lg, env, pad = pad)
+            pad: PadConfiguration,
+            seed: Sequence<String>
+    ): T9Engine = DefaultT9Engine(seed, pad, lg, TrieDb(lg, env))
 }
 
 @Component(modules = [PresenterModule::class, LogModule::class])
@@ -49,7 +64,6 @@ abstract class PresenterComponents {
 
 @Module
 class PresenterModule(
-        private val engineSeed: Sequence<String>,
         private val engine: T9Engine,
         private val env: Env
 ) {
@@ -57,20 +71,7 @@ class PresenterModule(
     fun presenter(
         lg: LogFactory
     ): Presenter =
-        Presenter(engineSeed, engine, env, lg)
-}
-
-@Module
-class EnvModule() {
-    @Provides
-    fun env(): Env =
-            object : Env {
-                override fun fileExists(path: String): Boolean =
-                        File(path).exists()
-
-                override val workingDir: String
-                    get() = "."
-            }
+        Presenter(engine, env, lg)
 }
 
 @Module

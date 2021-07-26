@@ -5,31 +5,16 @@ import com.vutrankien.t9vietnamese.lib.LogFactory
 import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kentvu.dawgjava.Trie
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import java.text.Normalizer
 
 private class OldT9Engine(
     override var pad: PadConfiguration,
     private val log: LogFactory.Log
 ) : T9Engine {
-    override var initialized: Boolean = false
 
     override val eventSource: Channel<T9Engine.Event>
         = Channel(1)
 
     private lateinit var trie: Trie
-
-    override suspend fun init(
-        seed: Sequence<String>
-    ) {
-        initialized = true
-        //TODO()
-        delay(10)
-    }
-
-    override fun initFromDb() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     private val currentNumSeq = mutableListOf<Key>()
     /**
@@ -70,8 +55,8 @@ private class OldT9Engine(
         log.d("after pushing [$key${pad[key].chars}]: seq${currentNumSeq}comb${currentCombinations}cands$candidates")
     }
 
-    override fun canReuseDb(): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun init() {
+        TODO("Not yet implemented")
     }
 
     private fun <E> MutableList<E>.push(num: E) = add(num)

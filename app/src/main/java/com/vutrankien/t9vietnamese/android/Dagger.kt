@@ -22,11 +22,10 @@ class PresenterModule() {
     fun presenter(
             engine: T9Engine,
             lg: LogFactory,
-            env: Env,
-            seed: Sequence<String>
+            env: Env
     ): Presenter {
         // TODO: Make this configurable
-        return Presenter(seed, engine, env, lg)
+        return Presenter(engine, env, lg)
     }
 }
 

@@ -51,6 +51,7 @@ class MainActivity : Activity(), MVPView {
 
     private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
+    // TODO bytes -> percentage
     override fun showProgress(bytes: Int) {
         displayInfo(R.string.engine_loading, bytes)
     }

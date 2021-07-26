@@ -5,12 +5,6 @@ import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
-    val initialized: Boolean
-    /**
-     * This NEED to be set before pushing anything to the engine!
-     */
-    val pad: PadConfiguration
-    val eventSource: Channel<Event>
 
     sealed class Event {
         class NewCandidates(val candidates: Collection<String>) : Event() {
@@ -35,11 +29,12 @@ interface T9Engine {
         data class SelectCandidate(val selectedCandidate: Int) : Event()
     }
 
-    suspend fun init(seed: Sequence<String>)
     /**
-     * Init from built db.
+     * This NEED to be set before pushing anything to the engine!
      */
-    fun initFromDb()
+    val pad: PadConfiguration
+    val eventSource: Channel<Event>
+
     suspend fun push(key: Key)
-    fun canReuseDb(): Boolean
+    suspend fun init()
 }
