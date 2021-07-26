@@ -17,7 +17,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
+import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +82,10 @@ class MainActivity : Activity(), MVPView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
+        presenter = Presenter(
+            logFactory,
+            DefaultT9Engine(makeSeed(), VNConfiguration, logFactory, TrieDb())
+        )
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)

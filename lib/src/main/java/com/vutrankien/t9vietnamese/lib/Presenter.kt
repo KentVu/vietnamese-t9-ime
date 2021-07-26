@@ -6,9 +6,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
-class Presenter constructor(
-        private val engine: T9Engine,
-        lg: LogFactory
+class Presenter(
+    lg: LogFactory,
+    private val engine: T9Engine
 ) {
     private val log = lg.newLog("Presenter")
     private lateinit var view: View
