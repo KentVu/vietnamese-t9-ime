@@ -26,15 +26,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
 class MainActivity : Activity(), MVPView {
-    @Inject
-    lateinit var logFactory: LogFactory
+    val logFactory: LogFactory = AndroidLogFactory()
     private lateinit var log: LogFactory.Log
-    @Inject
     lateinit var presenter: Presenter
 
     companion object {
@@ -84,7 +81,8 @@ class MainActivity : Activity(), MVPView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as T9Application).appComponent.inject(this)
+
+
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)

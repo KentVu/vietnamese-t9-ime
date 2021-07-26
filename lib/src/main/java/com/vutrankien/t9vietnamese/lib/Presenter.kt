@@ -4,12 +4,10 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
-class Presenter @Inject constructor(
+class Presenter constructor(
         private val engine: T9Engine,
-        private val env: Env,
         lg: LogFactory
 ) {
     private val log = lg.newLog("Presenter")

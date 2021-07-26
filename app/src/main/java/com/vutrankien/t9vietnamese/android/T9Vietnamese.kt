@@ -7,17 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 /**
  * Created by vutrankien on 17/05/02.
  */
 class T9Vietnamese : InputMethodService(), MVPView {
-    @Inject
     lateinit var logFactory: LogFactory
     private lateinit var log: LogFactory.Log
-    @Inject
     lateinit var presenter: Presenter
     override val scope = CoroutineScope(Dispatchers.Main + Job())
     override val eventSource: Channel<EventWithData<Event, Key>> =
@@ -27,7 +24,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
 
     override fun onCreate() {
         super.onCreate()
-        (application as T9Application).appComponent.inject(this)
+        //(application as T9Application).appComponent.inject(this)
         log = logFactory.newLog("T9IMService")
         log.d("onCreate")
     }
