@@ -84,7 +84,12 @@ class MainActivity : Activity(), MVPView {
 
         presenter = Presenter(
             logFactory,
-            DefaultT9Engine(makeSeed(), VNConfiguration, logFactory, TrieDb())
+            DefaultT9Engine(
+                decomposedSeed(),
+                VnPad,
+                logFactory,
+                TrieDb(logFactory, AndroidEnv(applicationContext))
+            )
         )
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
@@ -108,6 +113,14 @@ class MainActivity : Activity(), MVPView {
         presenter.attachView(this)
         scope.launch {
             eventSink.send(Event.START.noData())
+        }
+    }
+
+    fun decomposedSeed(): Sequence<String> {
+        return sequence {
+            resources.assets.open("decomposed.dic.sorted").bufferedReader().useLines { lines ->
+                lines.forEach { yield(it) }
+            }
         }
     }
 
