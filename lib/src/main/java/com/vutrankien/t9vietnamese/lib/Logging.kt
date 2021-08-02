@@ -14,7 +14,7 @@ interface LogFactory {
 /**
  * Created by vutrankien on 17/07/21.
  */
-class JavaLogFactory: LogFactory {
+object JavaLogFactory: LogFactory {
     override fun newLog(tag: String): LogFactory.Log =
         JavaLog(tag)
 }

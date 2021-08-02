@@ -7,9 +7,11 @@ import kentvu.dawgjava.Trie
 import kotlinx.coroutines.channels.Channel
 
 private class OldT9Engine(
-    override var pad: PadConfiguration,
-    private val log: LogFactory.Log
+    override val engineSeed: Sequence<String>,
+    override var pad: PadConfiguration, private val log: LogFactory.Log
 ) : T9Engine {
+    override val initialized: Boolean
+        get() = TODO("Not yet implemented")
 
     override val eventSource: Channel<T9Engine.Event>
         = Channel(1)

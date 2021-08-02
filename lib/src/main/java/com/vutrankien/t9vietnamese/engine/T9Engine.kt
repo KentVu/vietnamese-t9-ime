@@ -29,6 +29,8 @@ interface T9Engine {
         data class SelectCandidate(val selectedCandidate: Int) : Event()
     }
 
+    val engineSeed: Sequence<String>
+    val initialized: Boolean
     /**
      * This NEED to be set before pushing anything to the engine!
      */

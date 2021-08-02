@@ -11,12 +11,14 @@ internal fun String.composeVietnamese() = Normalizer.normalize(
 )
 
 class DefaultT9Engine(
-        private val engineSeed: Sequence<String>,
+        override val engineSeed: Sequence<String>,
         override val pad: PadConfiguration,
         lg: LogFactory,
         private val db: Db
 ) : T9Engine {
     private val log = lg.newLog("T9Engine")
+    override val initialized: Boolean
+        get() = db.initialized
 
     override val eventSource: Channel<T9Engine.Event> = Channel()
 
