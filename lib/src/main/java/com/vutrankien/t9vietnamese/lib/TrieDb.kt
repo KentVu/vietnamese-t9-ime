@@ -22,39 +22,56 @@ class TrieDb(
     override var initialized: Boolean = false
         private set
 
-    override fun canReuse(): Boolean {
+    fun canReuse(): Boolean {
         env.fileExists(dawgPath).let {
             log.d("canReuseDb: $it")
             return it
         }
     }
 
-    override fun load() {
+    /**
+     * Init from built db.
+     * Visible for test only.
+     */
+    fun load() {
         log.d("initFromDb")
         trie = DawgTrie.load(dawgPath)
-        initialized = true
     }
 
     override fun search(prefix: String): Map<String, Int> = trie.search(prefix)
 
-    override suspend fun init(
+    override suspend fun initOrLoad(
             seed: Sequence<String>,
             onBytes: suspend (Int) -> Unit
     ) = coroutineScope {
-        log.d("init: fromSeed,initialized=$initialized")
-        val channel = Channel<Int>()
-        launch(Dispatchers.IO) {
-            trie = DawgTrie.build(dawgPath, seed, channel)
-        }
-        var markPos = 0
-        val count = 0
-        for (bytes in channel) {
-            if (count - markPos == DEFAULT_REPORT_PROGRESS_INTERVAL) {
-                onBytes.invoke(bytes)
-                //print("progress $count/${sortedWords.size}: ${bytes.toFloat() / size * 100}%\r")
-                markPos = count
-            }
+        if (canReuse()) {
+            log.d("init: initialized=$initialized,canReuse -> load")
+            load()
+        } else {
+            log.i("init: initialized=$initialized from seed")
+            init(seed, onBytes)
         }
         initialized = true
+    }
+
+    suspend fun init(
+        seed: Sequence<String>,
+        onBytes: suspend (Int) -> Unit
+    ) {
+        coroutineScope {
+            val channel = Channel<Int>()
+            launch (Dispatchers.IO) {
+                trie = DawgTrie.build(dawgPath, seed, channel)
+            }
+            var markPos = 0
+            val count = 0
+            for (bytes in channel) {
+                if (count - markPos == DEFAULT_REPORT_PROGRESS_INTERVAL) {
+                    onBytes.invoke(bytes)
+                    //print("progress $count/${sortedWords.size}: ${bytes.toFloat() / size * 100}%\r")
+                    markPos = count
+                }
+            }
+        }
     }
 }

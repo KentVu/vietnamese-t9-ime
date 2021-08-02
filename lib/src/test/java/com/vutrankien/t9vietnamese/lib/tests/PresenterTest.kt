@@ -18,6 +18,7 @@ class PresenterTest: FunSpec() {
     private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     private lateinit var engine: T9Engine
     private lateinit var env: Env
+    private lateinit var db: Db
 
     abstract class MockView : View {
         private val channel = Channel<EventWithData<Event, Key>>()
@@ -37,21 +38,12 @@ class PresenterTest: FunSpec() {
 
         engine = mockk(relaxUnitFun = true)
         every { engine.eventSource } returns Channel()
-        every { engine.canReuseDb() } returns false
+        //every { engine.canReuseDb() } returns false
     }
 
     //val logGenerator = daggerComponents.logGenerator()
     private fun getPresenter(): Presenter {
-        return DaggerPresenterComponents.builder()
-            .presenterModule(
-                PresenterModule(
-                    seed,
-                    engine,
-                    env
-                )
-            )
-            .build()
-            .presenter()
+        return Presenter(JavaLogFactory, engine)
     }
 
     init {
@@ -64,14 +56,13 @@ class PresenterTest: FunSpec() {
         test("initializeEngineOnStart") {
             getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
-            coVerify { engine.init(seed) }
+            coVerify { engine.init() }
         }
 
         test("6.ReuseBuiltDawg") {
-            every { engine.canReuseDb() } returns true
             getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
-            coVerify { engine.initFromDb() }
+            coVerify { engine.init() }
         }
 
         test("showKeyboardWhenEngineLoadCompleted") {
