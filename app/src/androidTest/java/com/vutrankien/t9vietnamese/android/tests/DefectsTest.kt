@@ -34,7 +34,7 @@ class DefectsTest {
     private val robot by lazy { Robot(log, mActivityRule.activity.testingHook) }
 
 
-    @Test fun crashWhenNavigatingWBackTooMuch(): Unit = runBlocking<Unit> {
+    @Test fun crashWhenNavigatingBackTooMuch(): Unit = runBlocking<Unit> {
         robot
                 .pressSequentially("2423**<<<")
                 .confirm()

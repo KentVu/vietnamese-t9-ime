@@ -39,7 +39,11 @@ class DefaultT9Engine(
                 eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
             }
             KeyType.PrevCandidate -> {
-                _selectedCandidate--
+                if (_selectedCandidate > 0) {
+                    _selectedCandidate--
+                } else {
+                    log.v("push: Navigating back too much!")
+                }
                 eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
             }
             KeyType.Confirm -> {
