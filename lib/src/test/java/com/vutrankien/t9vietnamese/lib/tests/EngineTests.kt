@@ -5,7 +5,6 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.coroutineScope
@@ -114,7 +113,7 @@ class EngineTests: FunSpec() {
         return engine
     }
 
-    suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence()) = seed(log)
+    suspend fun T9Engine.seed() = seed(log)
 
     private fun Test.runTest() {
         test(name) {
@@ -274,7 +273,7 @@ class EngineTests: FunSpec() {
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "113")),
                 T9Engine.Event.Confirm("ác")
             )
-        )
+        ).run { test(name) { go() } }
 
         context("SelectCandidate") {
             val seeds = """
@@ -300,7 +299,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.SelectCandidate(1),
                     T9Engine.Event.Confirm("ab")
                 )
-            )
+            ).run { test(name) { go() } }
 
             EnginePushTest(
                 lg, "engineFunction_SelectCandidate2",
@@ -322,7 +321,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.SelectCandidate(1),
                     T9Engine.Event.Confirm("ab")
                 )
-            )
+            ).run { test(name) { go() } }
 
             EnginePushTest(
                 lg, "engineFunction_SelectPrevCandidate",
@@ -338,7 +337,36 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.SelectCandidate(0),
                     T9Engine.Event.Confirm("aa")
                 )
-            )
+            ).run { test(name) { go() } }
+        }
+
+        context("Defects") {
+            val seeds = """
+                                aa
+                                ab
+                                ac
+                                ad
+                                bd
+                                ce
+                                cf
+                                """.trimIndent().sortedSequence()
+
+            EnginePushTest(
+                lg, "Cannot navigate back anymore",
+                prepareEngine(
+                    padConfigStd,
+                    seeds
+                ),
+                arrayOf(Key.num1, Key.star, Key.left, Key.left, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.SelectCandidate(1),
+                    T9Engine.Event.SelectCandidate(0),
+                    T9Engine.Event.SelectCandidate(0),
+                    T9Engine.Event.Confirm("aa")
+                )
+            ).run { test(name) { go() } }
+
         }
     }
 
