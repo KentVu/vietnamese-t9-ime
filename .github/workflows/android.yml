@@ -3,6 +3,45 @@ name: Android CI
 on: [push]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Cache build
+        id: cache-build
+        uses: actions/cache@v1
+        with:
+          path: |
+            ~/.m2
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android
+          key: ${{ runner.os }}-build-${{ hashFiles('**/gradle-wrapper.properties') }}
+
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt' # See 'Supported distributions' for available options
+          java-version: '8'
+
+      - name: Build with Gradle & SWIG
+        run: |
+          ./gradlew clean
+          ./gradlew -Plint.output.console=true :lib:build
+          ./gradlew -Plint.output.console=true :app:build
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: |
+            lib/build/test-results/**/*.xml
+            app/build/test-results/**/*.xml
 
   android-test:
     runs-on: macOS-latest # macos-11.0 is not public for now
@@ -30,9 +69,6 @@ jobs:
           arch: x86
           emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
           script: |
-            ./gradlew clean
-            ./gradlew -Plint.output.console=true :lib:build
-            ./gradlew -Plint.output.console=true :app:build
             ./gradlew -Plint.output.console=true --info connectedCheck
 
       - name: Persist test result
