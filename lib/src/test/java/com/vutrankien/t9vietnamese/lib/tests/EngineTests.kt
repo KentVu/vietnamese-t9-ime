@@ -1,5 +1,6 @@
 package com.vutrankien.t9vietnamese.lib.tests
 
+import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
@@ -11,9 +12,23 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.ByteArrayInputStream
-import java.io.InputStream
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.toDuration
+
+suspend fun T9Engine.seed(log: LogFactory.Log): Unit = coroutineScope {
+    launch {
+        init()
+    }
+    for (event in eventSource)
+        if (event is T9Engine.Event.LoadProgress)
+            log.v("Engine.LoadProgress ${event.bytes}")
+        else if (event is T9Engine.Event.Initialized) {
+            log.v("Engine.Initialized!")
+            break
+        }
+}
 
 @OptIn(ExperimentalTime::class)
 class EngineTests: FunSpec() {
@@ -64,256 +79,6 @@ class EngineTests: FunSpec() {
         )
     )
 
-    //private lateinit var engine: T9Engine
-    private val envComponent: EnvComponent = DaggerEnvComponent.builder()
-        //.logModule(ConfigurationModule(VnPad))
-        .build()
-
-    private val log: LogFactory.Log = envComponent.lg.newLog("EngineTests")
-
-    private fun prepareEngine(pad: PadConfiguration): T9Engine {
-        //engine = EngineComponent.Builder()
-        val engine: T9Engine
-        engine = envComponent.engineComponentBuilder
-            .configurationModule(ConfigurationModule(pad)).build().engine()
-        return engine
-    }
-
-    /**
-     * assert inputStream has closed?
-     */
-    class CheckableInputStream(val delegated: InputStream) : InputStream() {
-        var closed = false
-            private set
-
-        override fun read(): Int =
-            delegated.read()
-
-        override fun close() {
-            delegated.close()
-            super.close()
-            closed = true
-        }
-    }
-
-    init {
-        test("progressiveReaderTest") {
-            val content = "a\nb\nc"
-            val bytes = content.toByteArray()
-            val inputStream =
-                CheckableInputStream(
-                    ByteArrayInputStream(bytes)
-                )
-            val progresses = inputStream.progressiveRead(this).toList()
-            inputStream.closed shouldBe true
-            progresses[0] shouldBe Progress(2, "a")
-            progresses[1] shouldBe Progress(4, "b")
-            progresses[2] shouldBe Progress(
-                6,
-                "c"
-            ) // null terminating?
-        }
-
-        test("engineInitializing") {
-            prepareEngine(VnPad).apply {
-                initialized shouldBe false
-                seed()
-                initialized shouldBe true
-            }
-        }
-
-        test("engineInitializingWithProgress") {
-            prepareEngine(VnPad).apply {
-                initialized shouldBe false
-                seed("a\nb\nc".lineSequence())
-                initialized shouldBe true
-            }
-        }
-
-        xtest("TODO:Engine should reset after Confirm") {
-            prepareEngine(padConfig).seed("a\nb\nc".lineSequence())
-        }
-
-        test("engineFunction_1key_1") {
-            engineFunction(
-                "a\nb\nc".lineSequence(), padConfig,
-                arrayOf(Key.num1, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("a")),
-                    T9Engine.Event.Confirm("a")
-                )
-            )
-        }
-
-        test("engineFunction_1key_2") {
-            engineFunction(
-                """
-                                a
-                                aa
-                                ab
-                                ac
-                                """.trimIndent().lineSequence(),
-                padConfig,
-                arrayOf(Key.num1, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
-                    T9Engine.Event.Confirm("a")
-                )
-            )
-        }
-
-        //context("f:engineFunction_2keys") {
-            test("engineFunction_2keys") {
-                engineFunction(
-                    """
-                                aa
-                                ab
-                                ac
-                                ba
-                                """.trimIndent().lineSequence(),
-                    padConfig,
-                    arrayOf(Key.num1, Key.num1, Key.num0),
-                    arrayOf(
-                        T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
-                        T9Engine.Event.NewCandidates(setOf("aa")),
-                        T9Engine.Event.Confirm("aa")
-                    )
-                )
-            }
-        //}
-
-        test("engineFunction_stdconfig_2keys").config(timeout = 180.seconds) {
-            engineFunction(
-                """
-                                aa
-                                ab
-                                ac
-                                ad
-                                bd
-                                ce
-                                cf
-                                """.trimIndent().lineSequence(),
-                padConfigStd,
-                arrayOf(Key.num1, Key.num2, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
-                    T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
-                    T9Engine.Event.Confirm("ad")
-                )
-            )
-        }
-
-        test("5.2.engineFunction_noCandidates").config(timeout = 180.seconds) {
-            engineFunction(
-                emptySequence(),
-                padConfig,
-                arrayOf(Key.num1, Key.num2, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(emptySet()),
-                    T9Engine.Event.NewCandidates(emptySet()),
-                    T9Engine.Event.Confirm("12")
-                )
-            )
-        }
-
-        test("5.3.engineFunction_noCandidates_2keys") {
-            engineFunction(
-                """
-                                aa
-                                ab
-                                ba
-                                """.trimIndent().lineSequence(),
-                padConfig,
-                arrayOf(Key.num1, Key.num3, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                    T9Engine.Event.NewCandidates(setOf("13")),
-                    T9Engine.Event.Confirm("13")
-                )
-            )
-        }
-
-        test("engineFunction_Vietnamese") {
-            engineFunction(
-                """
-                                aa
-                                ác
-                                ắc
-                                ách
-                                bá
-                                """.trimIndent().sortedSequence(),
-                vnPad,
-                arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "1")),
-                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "11")),
-                    T9Engine.Event.NewCandidates(setOf("ác", "ách", "113")),
-                    T9Engine.Event.Confirm("ác")
-                )
-            )
-        }
-
-        context("SelectCandidate") {
-            val seeds = """
-                                aa
-                                ab
-                                ac
-                                ad
-                                bd
-                                ce
-                                cf
-                                """.trimIndent().sortedSequence()
-
-            test("engineFunction_SelectCandidate") {
-                engineFunction(
-                    seeds,
-                    padConfigStd,
-                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
-                    arrayOf(
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.SelectCandidate(1),
-                        T9Engine.Event.Confirm("ab")
-                    )
-                )
-            }
-
-            test("engineFunction_SelectCandidate2") {
-                engineFunction(
-                    seeds,
-                    padConfigStd,
-                    arrayOf(Key.num1, Key.num1, Key.star, Key.num0,
-                        Key.num1, Key.num1, Key.star, Key.num0),
-                    arrayOf(
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.SelectCandidate(1),
-                        T9Engine.Event.Confirm("ab"),
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.SelectCandidate(1),
-                        T9Engine.Event.Confirm("ab")
-                    )
-                )
-            }
-
-            test("engineFunction_SelectPrevCandidate") {
-                engineFunction(
-                    seeds,
-                    padConfigStd,
-                    arrayOf(Key.num1, Key.num1, Key.star, Key.left, Key.num0),
-                    arrayOf(
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
-                        T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
-                        T9Engine.Event.SelectCandidate(1),
-                        T9Engine.Event.SelectCandidate(0),
-                        T9Engine.Event.Confirm("aa")
-                    )
-                )
-            }
-        }
-    }
-
     private val vnPad = PadConfiguration(
         mapOf(
             Key.num1 to KeyConfig(
@@ -334,44 +99,332 @@ class EngineTests: FunSpec() {
         )
     )
 
-    private suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence()): Unit = coroutineScope {
-        launch {
-            init(sequence)
-        }
-        for (event in eventSource)
-            if (event is T9Engine.Event.LoadProgress)
-                log.v("Engine.LoadProgress ${event.bytes}")
-            else if (event is T9Engine.Event.Initialized) {
-                log.v("Engine.Initialized!")
-                break
-            }
+    private val lg: LogFactory = JavaLogFactory
+    private val log: LogFactory.Log = lg.newLog("EngineTests")
+
+    private fun prepareEngine(
+        pad: PadConfiguration,
+        seed: Sequence<String> = emptySequence(),
+        env: Env = JvmEnv,
+        dawgFile: String = "TestT9Engine.dawg",
+        overwriteDawgFile: Boolean = true
+    ): T9Engine {
+        val engine: T9Engine
+        engine = DefaultT9Engine(seed, pad, lg, TrieDb(lg, env, dawgFile, overwriteDawgFile))
+        return engine
     }
 
-    private suspend fun engineFunction(
-        seeds: Sequence<String>,
-        padConfig: PadConfiguration,
-        sequence: Array<Key>,
-        expectedEvents: Array<T9Engine.Event>
-    ):Unit = coroutineScope<Unit> {
-        prepareEngine(padConfig).apply {
-            seed(seeds)
-            launch {
-                sequence.forEach { push(it) }
+    suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence()) = seed(log)
+
+    private fun Test.runTest() {
+        test(name) {
+            this@runTest.go()
+        }
+    }
+
+    init {
+        ProgressiveReaderTest().runTest()
+
+        EngineInitializingTest(lg, prepareEngine(VnPad, env = NoFileEnv)).run {
+            test(name).config(timeout = Duration.seconds(10)) { go() }
+        }
+
+        EngineInitializingTest(lg, prepareEngine(VnPad), "EngineLoadingTest").run {
+            test(name) { go() }
+        }
+
+        EngineInitializingWithProgress(
+            lg, prepareEngine(
+                VnPad,
+                "a\nb\nc".lineSequence()
+            )
+        ).runTest()
+
+        xtest("TODO:Engine should reset after Confirm") {
+            prepareEngine(padConfig, "a\nb\nc".lineSequence())
+        }
+
+        EnginePushTest(
+            lg,
+            "engineFunction_1key_1",
+            prepareEngine(
+                padConfig,
+                "a\nb\nc".lineSequence()
+            ),
+            arrayOf(Key.num1, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("a")),
+                T9Engine.Event.Confirm("a")
+            )
+        ).runTest()
+
+        EnginePushTest(
+            lg,
+            "engineFunction_1key_2",
+            prepareEngine(
+                padConfig,
+                """
+                                a
+                                aa
+                                ab
+                                ac
+                                """.trimIndent().lineSequence()
+            ),
+            arrayOf(Key.num1, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
+                T9Engine.Event.Confirm("a")
+            )
+        ).runTest()
+
+        //context("f:engineFunction_2keys") {
+        EnginePushTest(
+            lg,
+            "engineFunction_2keys",
+            prepareEngine(
+                padConfig,
+                """
+                    aa
+                    ab
+                    ac
+                    ba
+                    """.trimIndent().lineSequence()
+            ),
+            arrayOf(Key.num1, Key.num1, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
+                T9Engine.Event.NewCandidates(setOf("aa")),
+                T9Engine.Event.Confirm("aa")
+            )
+        ).runTest()
+        //}
+
+        EnginePushTest(lg, "engineFunction_stdconfig_2keys",
+                prepareEngine(
+                    padConfigStd,
+                    """
+                                    aa
+                                    ab
+                                    ac
+                                    ad
+                                    bd
+                                    ce
+                                    cf
+                                    """.trimIndent().lineSequence()
+                ),
+                arrayOf(Key.num1, Key.num2, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
+                    T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
+                    T9Engine.Event.Confirm("ad")
+                )
+        ).run {
+            test(name).config(timeout = (180).toDuration(TimeUnit.SECONDS)) { go() }
+        }
+
+        EnginePushTest(
+            lg, "5.2.engineFunction_noCandidates",
+            prepareEngine(
+                padConfig,
+                emptySequence()
+            ),
+            arrayOf(Key.num1, Key.num2, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(emptySet()),
+                T9Engine.Event.NewCandidates(emptySet()),
+                T9Engine.Event.Confirm("12")
+            )
+        ).run {
+            test(name).config(timeout = Duration.seconds(180)) { go() }
+        }
+
+        EnginePushTest(
+            lg, "5.3.engineFunction_noCandidates_2keys", prepareEngine(
+                padConfig,
+                """
+                    aa
+                    ab
+                    ba
+                """.trimIndent().lineSequence()
+            ),
+            arrayOf(Key.num1, Key.num3, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                T9Engine.Event.NewCandidates(setOf("13")),
+                T9Engine.Event.Confirm("13")
+            )
+        ).runTest()
+
+        EnginePushTest(
+            lg, "engineFunction_Vietnamese",
+            prepareEngine(
+                vnPad,
+                """
+                                aa
+                                ác
+                                ắc
+                                ách
+                                bá
+                                """.trimIndent().sortedSequence()
+            ),
+            arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("ác", "ách", "1")),
+                T9Engine.Event.NewCandidates(setOf("ác", "ách", "11")),
+                T9Engine.Event.NewCandidates(setOf("ác", "ách", "113")),
+                T9Engine.Event.Confirm("ác")
+            )
+        )
+
+        context("SelectCandidate") {
+            val seeds = """
+                                aa
+                                ab
+                                ac
+                                ad
+                                bd
+                                ce
+                                cf
+                                """.trimIndent().sortedSequence()
+
+            EnginePushTest(
+                lg, "engineFunction_SelectCandidate",
+                prepareEngine(
+                    padConfigStd,
+                    seeds
+                ),
+                arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                    T9Engine.Event.SelectCandidate(1),
+                    T9Engine.Event.Confirm("ab")
+                )
+            )
+
+            EnginePushTest(
+                lg, "engineFunction_SelectCandidate2",
+                prepareEngine(
+                    padConfigStd,
+                    seeds
+                ),
+                arrayOf(
+                    Key.num1, Key.num1, Key.star, Key.num0,
+                    Key.num1, Key.num1, Key.star, Key.num0
+                ),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                    T9Engine.Event.SelectCandidate(1),
+                    T9Engine.Event.Confirm("ab"),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                    T9Engine.Event.SelectCandidate(1),
+                    T9Engine.Event.Confirm("ab")
+                )
+            )
+
+            EnginePushTest(
+                lg, "engineFunction_SelectPrevCandidate",
+                prepareEngine(
+                    padConfigStd,
+                    seeds
+                ),
+                arrayOf(Key.num1, Key.num1, Key.star, Key.left, Key.num0),
+                arrayOf(
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
+                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
+                    T9Engine.Event.SelectCandidate(1),
+                    T9Engine.Event.SelectCandidate(0),
+                    T9Engine.Event.Confirm("aa")
+                )
+            )
+        }
+    }
+
+    class ProgressiveReaderTest() : Test {
+        override val name: String = "progressiveReaderTest"
+
+        @kotlinx.coroutines.ExperimentalCoroutinesApi
+        override suspend fun go() = coroutineScope {
+            val content = "a\nb\nc"
+            val bytes = content.toByteArray()
+            val inputStream =
+                CheckableInputStream(
+                    ByteArrayInputStream(bytes)
+                )
+            val progresses = inputStream.progressiveRead(this).toList()
+            inputStream.closed shouldBe true
+            progresses[0] shouldBe Progress(2, "a")
+            progresses[1] shouldBe Progress(4, "b")
+            progresses[2] shouldBe Progress(
+                6,
+                "c"
+            ) // null terminating?
+        }
+
+    }
+
+    class EngineInitializingTest(val lg: LogFactory, private val engine: T9Engine,
+                                 override val name: String = "engineInitializing"
+    ): Test {
+
+        override suspend fun go() {
+            engine.apply {
+                initialized shouldBe false
+                seed(lg.newLog(name))
+                initialized shouldBe true
             }
-            assertSoftly {
-                expectedEvents.forEach { expectedEvt ->
-                    val event = eventSource.receive()
-                    log.d("receive evt: $event")
-                    if (event is T9Engine.Event.NewCandidates) {
-                        assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
-                        //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
-                        assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
-                    } else {
-                        event shouldBe expectedEvt
+        }
+
+    }
+
+    class EngineInitializingWithProgress(val lg: LogFactory, private val engine: T9Engine): Test {
+        override val name: String = "engineInitializingWithProgress"
+
+        override suspend fun go() {
+            engine.apply {
+                initialized shouldBe false
+                seed(lg.newLog("EngineInitializingWithProgress"))
+                initialized shouldBe true
+            }
+        }
+
+    }
+
+    class EnginePushTest(
+        lg: LogFactory,
+        override val name: String,
+        private val engine: T9Engine,
+        private val sequence: Array<Key>,
+        private val expectedEvents: Array<T9Engine.Event>
+    ): Test {
+
+        private val log: LogFactory.Log = lg.newLog("name")
+
+        override suspend fun go() = coroutineScope<Unit> {
+            engine.apply {
+                seed(log)
+                launch {
+                    sequence.forEach { push(it) }
+                }
+                assertSoftly {
+                    expectedEvents.forEach { expectedEvt ->
+                        val event = eventSource.receive()
+                        log.d("receive evt: $event")
+                        if (event is T9Engine.Event.NewCandidates) {
+                            assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
+                            //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
+                            assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
+                        } else {
+                            event shouldBe expectedEvt
+                        }
                     }
                 }
             }
+
         }
+
     }
 }
 

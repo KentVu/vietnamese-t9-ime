@@ -4,14 +4,11 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
-class Presenter @Inject constructor(
-        private val engineSeed: Sequence<String>,
-        private val engine: T9Engine,
-        private val env: Env,
-        lg: LogFactory
+class Presenter(
+    lg: LogFactory,
+    private val engine: T9Engine
 ) {
     private val log = lg.newLog("Presenter")
     private lateinit var view: View
@@ -33,12 +30,7 @@ class Presenter @Inject constructor(
                     log.i("Start initializing")
                     view.showProgress(0)
                     val loadTime = measureTimeMillis {
-                        if (!engine.canReuseDb()) {
-                            engine.init(engineSeed)
-                        } else {
-                            engine.initFromDb()
-                            view.showProgress(100)
-                        }
+                        engine.init()
                     }
                     log.i("Initialization Completed! loadTime=$loadTime")
                     view.showKeyboard()

@@ -1,6 +1,6 @@
 package com.vutrankien.t9vietnamese.lib.tests.trie
 
-import com.vutrankien.t9vietnamese.lib.DaggerEnvComponent
+import com.vutrankien.t9vietnamese.lib.JavaLogFactory
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.maps.shouldContainKeys
 import kentvu.dawgjava.DawgTrie
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class TrieTest: StringSpec({
-    val log = DaggerEnvComponent.builder().build().lg.newLog("TrieTest")
+    val log = JavaLogFactory.newLog("TrieTest")
     "Load large file" {
         // https://discuss.gradle.org/t/how-to-read-a-properties-file/15956/4
         //log.d(System.getProperty("word_list_file"))

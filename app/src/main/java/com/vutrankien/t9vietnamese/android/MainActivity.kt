@@ -17,7 +17,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
+import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,15 +26,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
 class MainActivity : Activity(), MVPView {
-    @Inject
-    lateinit var logFactory: LogFactory
+    val logFactory: LogFactory = AndroidLogFactory()
     private lateinit var log: LogFactory.Log
-    @Inject
     lateinit var presenter: Presenter
 
     companion object {
@@ -51,6 +48,7 @@ class MainActivity : Activity(), MVPView {
 
     private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
+    // TODO bytes -> percentage
     override fun showProgress(bytes: Int) {
         displayInfo(R.string.engine_loading, bytes)
     }
@@ -83,7 +81,16 @@ class MainActivity : Activity(), MVPView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as T9Application).appComponent.inject(this)
+
+        presenter = Presenter(
+            logFactory,
+            DefaultT9Engine(
+                decomposedSeed(),
+                VnPad,
+                logFactory,
+                TrieDb(logFactory, AndroidEnv(applicationContext))
+            )
+        )
         log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)
@@ -106,6 +113,14 @@ class MainActivity : Activity(), MVPView {
         presenter.attachView(this)
         scope.launch {
             eventSink.send(Event.START.noData())
+        }
+    }
+
+    fun decomposedSeed(): Sequence<String> {
+        return sequence {
+            resources.assets.open("decomposed.dic.sorted").bufferedReader().useLines { lines ->
+                lines.forEach { yield(it) }
+            }
         }
     }
 
