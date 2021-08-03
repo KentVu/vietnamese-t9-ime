@@ -5,17 +5,19 @@ import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.core.test.TestCase
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.io.ByteArrayInputStream
-import java.io.InputStream
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
+import kotlin.time.toDuration
 
-suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence(), log: LogFactory.Log): Unit = coroutineScope {
+suspend fun T9Engine.seed(log: LogFactory.Log): Unit = coroutineScope {
     launch {
         init()
     }
@@ -100,29 +102,19 @@ class EngineTests: FunSpec() {
     private val lg: LogFactory = JavaLogFactory
     private val log: LogFactory.Log = lg.newLog("EngineTests")
 
-    private fun prepareEngine(pad: PadConfiguration, seed: Sequence<String> = emptySequence()): T9Engine {
-        //engine = EngineComponent.Builder()
+    private fun prepareEngine(
+        pad: PadConfiguration,
+        seed: Sequence<String> = emptySequence(),
+        env: Env = JvmEnv,
+        dawgFile: String = "TestT9Engine.dawg",
+        overwriteDawgFile: Boolean = true
+    ): T9Engine {
         val engine: T9Engine
-        engine = DefaultT9Engine(seed, pad, lg, TrieDb(lg, JvmEnv))
+        engine = DefaultT9Engine(seed, pad, lg, TrieDb(lg, env, dawgFile, overwriteDawgFile))
         return engine
     }
 
-    /**
-     * assert inputStream has closed?
-     */
-    class CheckableInputStream(val delegated: InputStream) : InputStream() {
-        var closed = false
-            private set
-
-        override fun read(): Int =
-            delegated.read()
-
-        override fun close() {
-            delegated.close()
-            super.close()
-            closed = true
-        }
-    }
+    suspend fun T9Engine.seed(sequence: Sequence<String> = emptySequence()) = seed(log)
 
     private fun Test.runTest() {
         test(name) {
@@ -133,7 +125,13 @@ class EngineTests: FunSpec() {
     init {
         ProgressiveReaderTest().runTest()
 
-        EngineInitializingTest(prepareEngine(VnPad)).runTest()
+        EngineInitializingTest(lg, prepareEngine(VnPad, env = NoFileEnv)).run {
+            test(name).config(timeout = Duration.seconds(10)) { go() }
+        }
+
+        EngineInitializingTest(lg, prepareEngine(VnPad), "EngineLoadingTest").run {
+            test(name) { go() }
+        }
 
         EngineInitializingWithProgress(
             lg, prepareEngine(
@@ -143,7 +141,7 @@ class EngineTests: FunSpec() {
         ).runTest()
 
         xtest("TODO:Engine should reset after Confirm") {
-            prepareEngine(padConfig,"a\nb\nc".lineSequence())
+            prepareEngine(padConfig, "a\nb\nc".lineSequence())
         }
 
         EnginePushTest(
@@ -202,16 +200,18 @@ class EngineTests: FunSpec() {
         //}
 
         EnginePushTest(lg, "engineFunction_stdconfig_2keys",
-                prepareEngine(padConfigStd,
-                """
-                                aa
-                                ab
-                                ac
-                                ad
-                                bd
-                                ce
-                                cf
-                                """.trimIndent().lineSequence()),
+                prepareEngine(
+                    padConfigStd,
+                    """
+                                    aa
+                                    ab
+                                    ac
+                                    ad
+                                    bd
+                                    ce
+                                    cf
+                                    """.trimIndent().lineSequence()
+                ),
                 arrayOf(Key.num1, Key.num2, Key.num0),
                 arrayOf(
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
@@ -219,7 +219,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.Confirm("ad")
                 )
         ).run {
-            test(name).config(timeout = 180.seconds) { go() }
+            test(name).config(timeout = (180).toDuration(TimeUnit.SECONDS)) { go() }
         }
 
         EnginePushTest(
@@ -235,7 +235,7 @@ class EngineTests: FunSpec() {
                 T9Engine.Event.Confirm("12")
             )
         ).run {
-            test(name).config(timeout = 180.seconds) { go() }
+            test(name).config(timeout = Duration.seconds(180)) { go() }
         }
 
         EnginePushTest(
@@ -365,13 +365,14 @@ class EngineTests: FunSpec() {
 
     }
 
-    class EngineInitializingTest(private val engine: T9Engine): Test {
-        override val name: String = "engineInitializing"
+    class EngineInitializingTest(val lg: LogFactory, private val engine: T9Engine,
+                                 override val name: String = "engineInitializing"
+    ): Test {
 
         override suspend fun go() {
             engine.apply {
                 initialized shouldBe false
-                init()
+                seed(lg.newLog(name))
                 initialized shouldBe true
             }
         }
@@ -384,7 +385,7 @@ class EngineTests: FunSpec() {
         override suspend fun go() {
             engine.apply {
                 initialized shouldBe false
-                seed(log = lg.newLog("EngineInitializingWithProgress"))
+                seed(lg.newLog("EngineInitializingWithProgress"))
                 initialized shouldBe true
             }
         }
@@ -399,10 +400,11 @@ class EngineTests: FunSpec() {
         private val expectedEvents: Array<T9Engine.Event>
     ): Test {
 
-        private val log: LogFactory.Log = lg.newLog("EngineTests")
+        private val log: LogFactory.Log = lg.newLog("name")
 
         override suspend fun go() = coroutineScope<Unit> {
             engine.apply {
+                seed(log)
                 launch {
                     sequence.forEach { push(it) }
                 }

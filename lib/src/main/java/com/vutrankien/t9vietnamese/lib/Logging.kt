@@ -21,27 +21,32 @@ object JavaLogFactory: LogFactory {
 
 private class JavaLog(private val tag: String) :
     LogFactory.Log {
+
     override fun v(msg: String) {
-        println(FORMAT.format("V", tag, msg))
+        format("V", msg)
     }
 
     override fun d(msg: String) {
-        println(FORMAT.format("D", tag, msg))
+        format("D", msg)
     }
 
     override fun i(msg: String) {
-        println(FORMAT.format("I", tag, msg))
+        format("I", msg)
     }
 
     override fun w(msg: String) {
-        println(FORMAT.format("W", tag, msg))
+        format("W", msg)
     }
 
     override fun e(msg: String) {
-        println(FORMAT.format("E", tag, msg))
+        format("E", msg)
+    }
+
+    private fun format(lvl: String, msg: String) {
+        println(FORMAT.format(Thread.currentThread().name, lvl, tag, msg))
     }
 
     companion object {
-        private const val FORMAT = "%s [%s]:%s"
+        private const val FORMAT = "[%s]%s [%s]:%s"
     }
 }
