@@ -30,9 +30,9 @@ jobs:
           arch: x86
           emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
           script: |
-            ./gradlew -Plint.output.console=true --info clean
-            ./gradlew -Plint.output.console=true --info :lib:build
-            ./gradlew -Plint.output.console=true --info :app:build
+            ./gradlew clean
+            ./gradlew -Plint.output.console=true :lib:build
+            ./gradlew -Plint.output.console=true :app:build
             ./gradlew -Plint.output.console=true --info connectedCheck
 
       - name: Persist test result
