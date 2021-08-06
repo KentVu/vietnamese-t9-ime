@@ -64,4 +64,13 @@ class MainActivityTest {
         // wait if necessary
     }
 
+    @Test fun selectCandidateBackwardWhenNotTyping(): Unit = runBlocking {
+        robot.selectPrev()
+            .selectPrev()
+            .checkReadyState()
+            .confirm()
+            .checkWordConfirmed("chào")
+        // wait if necessary
+    }
+
 }

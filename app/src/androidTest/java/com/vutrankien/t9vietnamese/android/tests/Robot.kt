@@ -67,4 +67,8 @@ class Robot(
     suspend fun confirm() = apply {
         uiEventSink.send(Event.KEY_PRESS.withData(Key.num0))
     }
+
+    fun checkReadyState() = apply {
+        TODO("Not yet implemented")
+    }
 }
