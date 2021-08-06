@@ -5,6 +5,7 @@ import com.vutrankien.t9vietnamese.lib.Seed
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
+import io.kotest.core.plan.Descriptor.EngineDescriptor.name
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
@@ -268,13 +269,13 @@ class EngineTests: FunSpec() {
             lg, "engineFunction_Vietnamese",
             prepareEngine(
                 vnPad,
-                SortedSeed(MockSeed(
+                SortedSeed(
                     "aa",
                     "ác",
                     "ắc",
                     "ách",
                     "bá"
-                ))
+                )
             ),
             arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
             arrayOf(
@@ -286,7 +287,7 @@ class EngineTests: FunSpec() {
         ).run { test(name) { go() } }
 
         context("SelectCandidate") {
-            val seeds = SortedSeed(MockSeed(
+            val seeds = SortedSeed(
                 "aa",
                 "ab",
                 "ac",
@@ -294,7 +295,7 @@ class EngineTests: FunSpec() {
                 "bd",
                 "ce",
                 "cf"
-            ))
+            )
             EnginePushTest(
                 lg, "engineFunction_SelectCandidate",
                 prepareEngine(
@@ -350,16 +351,14 @@ class EngineTests: FunSpec() {
         }
 
         context("Defects") {
-            val seeds = SortedSeed(
-                MockSeed(
-                    "aa",
-                    "ab",
-                    "ac",
-                    "ad",
-                    "bd",
-                    "ce",
-                    "cf"
-                )
+            val seeds = MockSeed(
+                "aa",
+                "ab",
+                "ac",
+                "ad",
+                "bd",
+                "ce",
+                "cf"
             )
             EnginePushTest(
                 lg, "Cannot navigate back anymore",
@@ -380,27 +379,18 @@ class EngineTests: FunSpec() {
         }
     }
 
-    class SortedSeed(private val seed: ArraySeed) :
+    class SortedSeed(private vararg val words: String) :
         Seed {
         override fun sequence(): Sequence<String> {
-            return seed.array().toSortedSet().asSequence()
+            return words.toSortedSet().asSequence()
         }
-
-    }
-
-    interface ArraySeed: Seed {
-        fun array(): Array<out String>
 
     }
 
     class MockSeed(private vararg val words: String) :
-        ArraySeed {
-        override fun array(): Array<out String> {
-            return words
-        }
-
+        Seed {
         override fun sequence(): Sequence<String> {
-            return sequenceOf(*words)
+            return words.asSequence()
         }
 
     }
