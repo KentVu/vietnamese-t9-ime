@@ -31,7 +31,7 @@ import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 class MainActivity : Activity(), MVPView {
     val logFactory: LogFactory = AndroidLogFactory()
-    private lateinit var log: LogFactory.Log
+    private val log = logFactory.newLog("MainActivity")
     lateinit var presenter: Presenter
 
     companion object {
@@ -85,13 +85,12 @@ class MainActivity : Activity(), MVPView {
         presenter = Presenter(
             logFactory,
             DefaultT9Engine(
-                decomposedSeed(),
+                DecomposedSeed(resources),
                 VnPad,
                 logFactory,
                 TrieDb(logFactory, AndroidEnv(applicationContext))
             )
         )
-        log = logFactory.newLog("MainActivity")
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)
         kbView.keyboard = T9Keyboard(this)
@@ -113,14 +112,6 @@ class MainActivity : Activity(), MVPView {
         presenter.attachView(this)
         scope.launch {
             eventSink.send(Event.START.noData())
-        }
-    }
-
-    fun decomposedSeed(): Sequence<String> {
-        return sequence {
-            resources.assets.open("decomposed.dic.sorted").bufferedReader().useLines { lines ->
-                lines.forEach { yield(it) }
-            }
         }
     }
 
