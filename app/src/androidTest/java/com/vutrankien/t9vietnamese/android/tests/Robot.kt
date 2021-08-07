@@ -1,14 +1,19 @@
 package com.vutrankien.t9vietnamese.android.tests
 
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
 import com.vutrankien.t9vietnamese.lib.LogFactory
+import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
 import org.hamcrest.CoreMatchers
@@ -68,7 +73,11 @@ class Robot(
         uiEventSink.send(Event.KEY_PRESS.withData(Key.num0))
     }
 
-    fun checkReadyState() = apply {
-        TODO("Not yet implemented")
+    fun checkNoCandidatesDisplayed() = apply {
+        assertTrue(testingHook.candidatesAdapter.itemCount == 0)
+    }
+
+    fun checkNoWordConfirmed() = apply {
+        onView(withId(R.id.editText)).check(matches(withText("")))
     }
 }
