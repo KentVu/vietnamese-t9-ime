@@ -1,9 +1,11 @@
 package com.vutrankien.t9vietnamese.lib.tests
 
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
+import com.vutrankien.t9vietnamese.lib.Seed
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
+import io.kotest.core.plan.Descriptor.EngineDescriptor.name
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
@@ -103,7 +105,7 @@ class EngineTests: FunSpec() {
 
     private fun prepareEngine(
         pad: PadConfiguration,
-        seed: Sequence<String> = emptySequence(),
+        seed: Seed = Seed.EmptySeed,
         env: Env = JvmEnv,
         dawgFile: String = "TestT9Engine.dawg",
         overwriteDawgFile: Boolean = true
@@ -135,12 +137,12 @@ class EngineTests: FunSpec() {
         EngineInitializingWithProgress(
             lg, prepareEngine(
                 VnPad,
-                "a\nb\nc".lineSequence()
+                MockSeed("a", "b", "c")
             )
         ).runTest()
 
         xtest("TODO:Engine should reset after Confirm") {
-            prepareEngine(padConfig, "a\nb\nc".lineSequence())
+            prepareEngine(padConfig, MockSeed("a", "b", "c"))
         }
 
         EnginePushTest(
@@ -148,7 +150,7 @@ class EngineTests: FunSpec() {
             "engineFunction_1key_1",
             prepareEngine(
                 padConfig,
-                "a\nb\nc".lineSequence()
+                MockSeed("a", "b", "c")
             ),
             arrayOf(Key.num1, Key.num0),
             arrayOf(
@@ -162,12 +164,12 @@ class EngineTests: FunSpec() {
             "engineFunction_1key_2",
             prepareEngine(
                 padConfig,
-                """
-                                a
-                                aa
-                                ab
-                                ac
-                                """.trimIndent().lineSequence()
+                MockSeed(
+                    "a",
+                    "aa",
+                    "ab",
+                    "ac"
+                )
             ),
             arrayOf(Key.num1, Key.num0),
             arrayOf(
@@ -182,12 +184,13 @@ class EngineTests: FunSpec() {
             "engineFunction_2keys",
             prepareEngine(
                 padConfig,
-                """
-                    aa
-                    ab
-                    ac
-                    ba
-                    """.trimIndent().lineSequence()
+                MockSeed
+                    (
+                    "aa",
+                    "ab",
+                    "ac",
+                    "ba"
+                )
             ),
             arrayOf(Key.num1, Key.num1, Key.num0),
             arrayOf(
@@ -198,25 +201,26 @@ class EngineTests: FunSpec() {
         ).runTest()
         //}
 
-        EnginePushTest(lg, "engineFunction_stdconfig_2keys",
-                prepareEngine(
-                    padConfigStd,
-                    """
-                                    aa
-                                    ab
-                                    ac
-                                    ad
-                                    bd
-                                    ce
-                                    cf
-                                    """.trimIndent().lineSequence()
-                ),
-                arrayOf(Key.num1, Key.num2, Key.num0),
-                arrayOf(
-                    T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
-                    T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
-                    T9Engine.Event.Confirm("ad")
+        EnginePushTest(
+            lg, "engineFunction_stdconfig_2keys",
+            prepareEngine(
+                padConfigStd,
+                MockSeed(
+                    "aa",
+                    "ab",
+                    "ac",
+                    "ad",
+                    "bd",
+                    "ce",
+                    "cf"
                 )
+            ),
+            arrayOf(Key.num1, Key.num2, Key.num0),
+            arrayOf(
+                T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
+                T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
+                T9Engine.Event.Confirm("ad")
+            )
         ).run {
             test(name).config(timeout = (180).toDuration(TimeUnit.SECONDS)) { go() }
         }
@@ -225,7 +229,7 @@ class EngineTests: FunSpec() {
             lg, "5.2.engineFunction_noCandidates",
             prepareEngine(
                 padConfig,
-                emptySequence()
+                Seed.EmptySeed
             ),
             arrayOf(Key.num1, Key.num2, Key.num0),
             arrayOf(
@@ -240,11 +244,11 @@ class EngineTests: FunSpec() {
         EnginePushTest(
             lg, "5.3.engineFunction_noCandidates_2keys", prepareEngine(
                 padConfig,
-                """
-                    aa
-                    ab
-                    ba
-                """.trimIndent().lineSequence()
+                MockSeed(
+                    "aa",
+                    "ab",
+                    "ba"
+                )
             ),
             arrayOf(Key.num1, Key.num3, Key.num0),
             arrayOf(
@@ -258,13 +262,13 @@ class EngineTests: FunSpec() {
             lg, "engineFunction_Vietnamese",
             prepareEngine(
                 vnPad,
-                """
-                                aa
-                                ác
-                                ắc
-                                ách
-                                bá
-                                """.trimIndent().sortedSequence()
+                SortedSeed(
+                    "aa",
+                    "ác",
+                    "ắc",
+                    "ách",
+                    "bá"
+                )
             ),
             arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
             arrayOf(
@@ -276,16 +280,15 @@ class EngineTests: FunSpec() {
         ).run { test(name) { go() } }
 
         context("SelectCandidate") {
-            val seeds = """
-                                aa
-                                ab
-                                ac
-                                ad
-                                bd
-                                ce
-                                cf
-                                """.trimIndent().sortedSequence()
-
+            val seeds = SortedSeed(
+                "aa",
+                "ab",
+                "ac",
+                "ad",
+                "bd",
+                "ce",
+                "cf"
+            )
             EnginePushTest(
                 lg, "engineFunction_SelectCandidate",
                 prepareEngine(
@@ -341,16 +344,15 @@ class EngineTests: FunSpec() {
         }
 
         context("Defects") {
-            val seeds = """
-                                aa
-                                ab
-                                ac
-                                ad
-                                bd
-                                ce
-                                cf
-                                """.trimIndent().sortedSequence()
-
+            val seeds = MockSeed(
+                "aa",
+                "ab",
+                "ac",
+                "ad",
+                "bd",
+                "ce",
+                "cf"
+            )
             EnginePushTest(
                 lg, "Cannot navigate back anymore",
                 prepareEngine(
@@ -368,6 +370,22 @@ class EngineTests: FunSpec() {
             ).run { test(name) { go() } }
 
         }
+    }
+
+    class SortedSeed(private vararg val words: String) :
+        Seed {
+        override fun sequence(): Sequence<String> {
+            return words.toSortedSet().asSequence()
+        }
+
+    }
+
+    class MockSeed(private vararg val words: String) :
+        Seed {
+        override fun sequence(): Sequence<String> {
+            return words.asSequence()
+        }
+
     }
 
     class ProgressiveReaderTest() : Test {
@@ -454,8 +472,4 @@ class EngineTests: FunSpec() {
         }
 
     }
-}
-
-private fun String.sortedSequence(): Sequence<String> {
-    return lineSequence().toSortedSet().asSequence()
 }

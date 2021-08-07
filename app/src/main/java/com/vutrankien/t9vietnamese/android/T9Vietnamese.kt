@@ -4,6 +4,7 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
+import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -13,9 +14,9 @@ import com.vutrankien.t9vietnamese.lib.View as MVPView
  * Created by vutrankien on 17/05/02.
  */
 class T9Vietnamese : InputMethodService(), MVPView {
-    lateinit var logFactory: LogFactory
-    private lateinit var log: LogFactory.Log
-    lateinit var presenter: Presenter
+    private val logFactory: LogFactory = AndroidLogFactory()
+    private val log = logFactory.newLog("T9IMService")
+    private lateinit var presenter: Presenter
     override val scope = CoroutineScope(Dispatchers.Main + Job())
     override val eventSource: Channel<EventWithData<Event, Key>> =
         Channel()
@@ -24,8 +25,15 @@ class T9Vietnamese : InputMethodService(), MVPView {
 
     override fun onCreate() {
         super.onCreate()
-        //(application as T9Application).appComponent.inject(this)
-        log = logFactory.newLog("T9IMService")
+        presenter = Presenter(
+            logFactory,
+            DefaultT9Engine(
+                DecomposedSeed(resources),
+                VnPad,
+                logFactory,
+                TrieDb(logFactory, AndroidEnv(applicationContext))
+            )
+        )
         log.d("onCreate")
     }
 

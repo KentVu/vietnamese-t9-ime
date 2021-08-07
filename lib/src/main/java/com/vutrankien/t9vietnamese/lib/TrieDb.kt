@@ -43,7 +43,7 @@ class TrieDb(
     override fun search(prefix: String): Map<String, Int> = trie.search(prefix)
 
     override suspend fun initOrLoad(
-            seed: Sequence<String>,
+            seed: Seed,
             onBytes: suspend (Int) -> Unit
     ) = coroutineScope {
         if (overwriteDawgFile || !canReuse()) {
@@ -57,14 +57,14 @@ class TrieDb(
     }
 
     suspend fun init(
-        seed: Sequence<String>,
+        seed: Seed,
         onBytes: suspend (Int) -> Unit
     ) {
         coroutineScope {
             log.d("load")
             val channel = Channel<Int>()
             launch (Dispatchers.IO) {
-                trie = DawgTrie.build(dawgPath, seed, channel)
+                trie = DawgTrie.build(dawgPath, seed.sequence(), channel)
             }
             var markPos = 0
             val count = 0

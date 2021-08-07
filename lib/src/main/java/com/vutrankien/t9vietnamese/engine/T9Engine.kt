@@ -2,6 +2,7 @@ package com.vutrankien.t9vietnamese.engine
 
 import com.vutrankien.t9vietnamese.lib.Key
 import com.vutrankien.t9vietnamese.lib.PadConfiguration
+import com.vutrankien.t9vietnamese.lib.Seed
 import kotlinx.coroutines.channels.Channel
 
 interface T9Engine {
@@ -29,7 +30,7 @@ interface T9Engine {
         data class SelectCandidate(val selectedCandidate: Int) : Event()
     }
 
-    val engineSeed: Sequence<String>
+    val engineSeed: Seed
     val initialized: Boolean
     /**
      * This NEED to be set before pushing anything to the engine!
