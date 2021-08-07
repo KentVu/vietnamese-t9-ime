@@ -30,4 +30,5 @@
     <string name="engine_loading">Loading engine… %d</string>
     <string name="enable_ime">Enable ime</string>
     <string name="btn_left"><![CDATA[<]]></string>
+    <!--<string name="btn_delete"><![CDATA[-]]></string>-->
 </resources>

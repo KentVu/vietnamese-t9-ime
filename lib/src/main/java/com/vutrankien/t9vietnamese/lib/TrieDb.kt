@@ -45,7 +45,7 @@ class TrieDb(
     override suspend fun initOrLoad(
             seed: Seed,
             onBytes: suspend (Int) -> Unit
-    ) = coroutineScope {
+    ) {
         if (overwriteDawgFile || !canReuse()) {
             log.i("init: initialized=$initialized from seed")
             init(seed, onBytes)

@@ -153,7 +153,7 @@ class MainActivity : Activity(), MVPView {
         val key = text[0]
         log.d("onBtnClick() btn=$key")
         scope.launch {
-            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromChar(key)))
         }
     }
 
@@ -162,10 +162,10 @@ class MainActivity : Activity(), MVPView {
             log.e("onKeyDown:event is null!")
             return false
         }
-        val num = event.unicodeChar.toChar()
-        log.d("onKeyDown:$keyCode,$event,num=$num")
+        val char = event.unicodeChar.toChar()
+        log.d("onKeyDown:$keyCode,$event,num=$char")
         scope.launch {
-            eventSink.send(Event.KEY_PRESS.withData(Key.fromNum(num)))
+            eventSink.send(Event.KEY_PRESS.withData(Key.fromChar(char)))
         }
         return true
     }

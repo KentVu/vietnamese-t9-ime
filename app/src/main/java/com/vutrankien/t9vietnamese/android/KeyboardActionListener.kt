@@ -1,6 +1,7 @@
 package com.vutrankien.t9vietnamese.android
 
 import android.inputmethodservice.KeyboardView
+import android.view.KeyEvent
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
 import com.vutrankien.t9vietnamese.lib.Key
@@ -41,6 +42,14 @@ internal class KeyboardActionListener(
 
     override fun onKey(primaryCode: Int, keyCodes: IntArray?) {
         log.d("onKey:$primaryCode,${keyCodes?.joinToString()}")
+        if (primaryCode == KeyEvent.KEYCODE_DEL) {
+            scope.launch {
+                eventSink.send(
+                    Event.KEY_PRESS.withData(
+                            Key.fromCode(primaryCode)
+                    ))
+            }
+        }
     }
 
     override fun onText(text: CharSequence?) {
@@ -52,7 +61,7 @@ internal class KeyboardActionListener(
         scope.launch {
             eventSink.send(
                 Event.KEY_PRESS.withData(
-                    Key.fromNum(text[0])
+                    Key.fromChar(text[0])
                 ))
         }
     }

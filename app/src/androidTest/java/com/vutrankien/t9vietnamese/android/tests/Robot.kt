@@ -31,7 +31,7 @@ class Robot(
 
     private suspend fun pressAndCheck(key: Char) {
         //onView(withText(startsWith("$it"))).perform(click())
-        uiEventSink.send(Event.KEY_PRESS.withData(Key.fromNum(key)))
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.fromChar(key)))
         // TODO wait for completion
         //testingHook.waitNewCandidates()
         delay(500)
@@ -81,5 +81,9 @@ class Robot(
 
     internal fun checkInsertedTextIs(s: String) = apply {
         onView(withId(R.id.editText)).check(matches(withText(s)))
+    }
+
+    fun backspace() {
+        TODO("Not yet implemented")
     }
 }

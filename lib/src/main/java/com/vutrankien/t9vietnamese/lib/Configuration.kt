@@ -105,31 +105,39 @@ enum class Key(
     /**
      * The character that represents this [Key], usually a digit.
      */
-    val char: Char
+    val keycode: Int
 ) {
-    num0('0'),
-    num1('1'),
-    num2('2'),
-    num3('3'),
-    num4('4'),
-    num5('5'),
-    num6('6'),
-    num7('7'),
-    num8('8'),
-    num9('9'),
-    star('*'),
-    keySharp('#'),
-    left('<');
+
+    num0('0'.toInt()),
+    num1('1'.toInt()),
+    num2('2'.toInt()),
+    num3('3'.toInt()),
+    num4('4'.toInt()),
+    num5('5'.toInt()),
+    num6('6'.toInt()),
+    num7('7'.toInt()),
+    num8('8'.toInt()),
+    num9('9'.toInt()),
+    star('*'.toInt()),
+    keySharp('#'.toInt()),
+    left('<'.toInt()),
+    backspace(67);
+    val char: Char
+        get() = keycode.toChar()
 
     companion object {
-        fun fromNum(num: Char): Key {
-            return values().first { it.char == num }
+        fun fromCode(code: Int): Key {
+            return values().first { it.keycode == code }
             //values().forEach {
             //    if (it.char == num) {
             //        return it
             //    }
             //}
             //throw IllegalArgumentException("Key(char=${key.char})")
+        }
+
+        fun fromChar(c: Char): Key {
+            return values().first { it.keycode == c.toInt() }
         }
     }
 }

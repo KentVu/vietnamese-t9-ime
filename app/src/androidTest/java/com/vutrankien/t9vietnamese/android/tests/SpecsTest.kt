@@ -27,4 +27,17 @@ class SpecsTest: MainActivityTestsBase(
                 .checkInsertedTextIs(" ")
         // wait if necessary
     }
+
+    @Test
+    fun deletePreviousWordWhenNotTyping(): Unit = runBlocking {
+        with(robot) {
+            pressSequentially("24236")
+            checkCandidateDisplayed("chào")
+            browseTo("chào")
+            confirm()
+            backspace()
+            checkInsertedTextIs("chà")
+        }
+        // wait if necessary
+    }
 }
