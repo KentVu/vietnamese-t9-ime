@@ -60,6 +60,9 @@ class DefaultT9Engine(
                 _currentNumSeq.clear()
                 _selectedCandidate = 0
             }
+            KeyType.Backspace -> {
+                TODO("Implement!")
+            }
             else -> {
                 // Numeric keys
                 _currentNumSeq.add(key)

@@ -89,13 +89,16 @@ val VnPad = PadConfiguration(
         ),
         Key.left to KeyConfig(
             PrevCandidate
+        ),
+        Key.backspace to KeyConfig(
+            Backspace
         )
     )
 )
 
 enum class KeyType(val isConfirmationKey: Boolean) {
     Normal(false), Symbol(false), NextCandidate(false),
-    Confirm(true), ToNum(false), PrevCandidate(false);
+    Confirm(true), ToNum(false), PrevCandidate(false), Backspace(false);
 }
 
 data class KeyConfig(val type: KeyType, val chars: Set<Char> = emptySet()) {

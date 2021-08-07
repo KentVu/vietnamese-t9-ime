@@ -83,7 +83,7 @@ class Robot(
         onView(withId(R.id.editText)).check(matches(withText(s)))
     }
 
-    fun backspace() {
-        TODO("Not yet implemented")
+    suspend fun backspace() {
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.backspace))
     }
 }
