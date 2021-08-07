@@ -76,7 +76,7 @@ class DefaultT9Engine(
     }
 
     override suspend fun init() {
-        db.initOrLoad(engineSeed.sequence()) { bytes ->
+        db.initOrLoad(engineSeed) { bytes ->
             eventSource.send(T9Engine.Event.LoadProgress(bytes))
         }
         eventSource.send(T9Engine.Event.Initialized)

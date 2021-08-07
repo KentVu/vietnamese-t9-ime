@@ -103,16 +103,9 @@ class EngineTests: FunSpec() {
     private val lg: LogFactory = JavaLogFactory
     private val log: LogFactory.Log = lg.newLog("EngineTests")
 
-    class EmptySeed : Seed {
-        override fun sequence(): Sequence<String> {
-            return emptySequence()
-        }
-
-    }
-
     private fun prepareEngine(
         pad: PadConfiguration,
-        seed: Seed = EmptySeed(),
+        seed: Seed = Seed.EmptySeed,
         env: Env = JvmEnv,
         dawgFile: String = "TestT9Engine.dawg",
         overwriteDawgFile: Boolean = true
@@ -236,7 +229,7 @@ class EngineTests: FunSpec() {
             lg, "5.2.engineFunction_noCandidates",
             prepareEngine(
                 padConfig,
-                EmptySeed()
+                Seed.EmptySeed
             ),
             arrayOf(Key.num1, Key.num2, Key.num0),
             arrayOf(

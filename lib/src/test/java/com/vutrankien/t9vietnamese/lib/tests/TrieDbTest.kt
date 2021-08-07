@@ -1,12 +1,7 @@
 package com.vutrankien.t9vietnamese.lib.tests
 
-import com.vutrankien.t9vietnamese.lib.Env
-import com.vutrankien.t9vietnamese.lib.JavaLogFactory
-import com.vutrankien.t9vietnamese.lib.JvmEnv
-import com.vutrankien.t9vietnamese.lib.TrieDb
-import io.kotest.core.spec.Spec
+import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.core.test.TestCase
 import io.mockk.*
 
 class TrieDbTest: FunSpec() {
@@ -20,12 +15,12 @@ class TrieDbTest: FunSpec() {
     init {
         test("Load if dawg file already created") {
             every { env.fileExists(match {it.contains(DAWG_FILE)}) } returns true
-            trieDb.initOrLoad(emptySequence()) {}
+            trieDb.initOrLoad(Seed.EmptySeed) {}
             verify { trieDb.load() }
         }
         test("init if no dawg file exists") {
             every { env.fileExists(match {it.contains(DAWG_FILE)}) } returns false
-            trieDb.initOrLoad(emptySequence()) {}
+            trieDb.initOrLoad(Seed.EmptySeed) {}
             coVerify { trieDb.init(any(), any()) }
         }
     }
