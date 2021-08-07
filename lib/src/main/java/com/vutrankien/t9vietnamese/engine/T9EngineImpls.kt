@@ -32,7 +32,6 @@ class DefaultT9Engine(
     private var _selectedCandidate = 0
 
     override suspend fun push(key: Key) {
-        _currentNumSeq.add(key)
         when (pad[key].type) {
             KeyType.NextCandidate -> {
                 _selectedCandidate++
@@ -63,6 +62,7 @@ class DefaultT9Engine(
             }
             else -> {
                 // Numeric keys
+                _currentNumSeq.add(key)
                 val numSeqStr = _currentNumSeq.joinNum()
                 log.d("push:$numSeqStr")
                 val candidates = findCandidates(_currentNumSeq).toMutableList()

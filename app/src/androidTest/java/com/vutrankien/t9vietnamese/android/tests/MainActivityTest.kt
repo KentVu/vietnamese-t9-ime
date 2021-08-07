@@ -64,12 +64,12 @@ class MainActivityTest {
         // wait if necessary
     }
 
-    @Test fun selectCandidateBackwardWhenNotTyping(): Unit = runBlocking {
+    @Test fun selectPrevCandidateWhenNotTyping(): Unit = runBlocking {
         robot.selectPrev()
             .selectPrev()
             .checkNoCandidatesDisplayed()
             .confirm()
-            .checkNoWordConfirmed()
+            .checkConfirmedWord(" ")
         // wait if necessary
     }
 
