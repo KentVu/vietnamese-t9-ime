@@ -50,7 +50,7 @@ class MainActivityTest {
             .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .confirm()
-            .checkWordConfirmed("chào")
+            .checkConfirmedWordContains("chào")
     }
 
     @Test fun selectCandidateBackward(): Unit = runBlocking {
@@ -60,7 +60,16 @@ class MainActivityTest {
             .selectNext()
             .selectPrev()
             .confirm()
-            .checkWordConfirmed("chào")
+            .checkConfirmedWordContains("chào")
+        // wait if necessary
+    }
+
+    @Test fun selectPrevCandidateWhenNotTyping(): Unit = runBlocking {
+        robot.selectPrev()
+            .selectPrev()
+            .checkNoCandidatesDisplayed()
+            .confirm()
+            .checkInsertedTextIs(" ")
         // wait if necessary
     }
 

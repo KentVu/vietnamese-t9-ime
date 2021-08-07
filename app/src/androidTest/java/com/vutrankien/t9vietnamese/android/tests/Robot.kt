@@ -1,8 +1,10 @@
 package com.vutrankien.t9vietnamese.android.tests
 
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.vutrankien.t9vietnamese.android.MainActivity
 import com.vutrankien.t9vietnamese.android.R
 import com.vutrankien.t9vietnamese.lib.Event
@@ -13,6 +15,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
+import org.junit.Assert.assertTrue
 
 class Robot(
         private val log: LogFactory.Log,
@@ -35,11 +38,11 @@ class Robot(
     }
 
     fun checkCandidateDisplayed(candidate: String): Robot = apply {
-        TestHelpers.waitUntilViewFound(ViewMatchers.withText(candidate), 1000)
+        TestHelpers.waitUntilViewFound(withText(candidate), 1000)
     }
 
-    fun checkCandidateDisplayed(stringCondition: Matcher<String>) {
-        Espresso.onView(ViewMatchers.withText(stringCondition)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+    fun checkCandidateDisplayed(stringCrit: Matcher<String>) {
+        onView(withText(stringCrit)).check(matches(ViewMatchers.isDisplayed()))
     }
 
     suspend fun browseTo(targetWord: String): Robot = apply {
@@ -51,8 +54,8 @@ class Robot(
         }
     }
 
-    fun checkWordConfirmed(word: String) {
-        TestHelpers.waitUntilViewFound(CoreMatchers.allOf(ViewMatchers.withId(R.id.editText), ViewMatchers.withText(CoreMatchers.containsString(word))), 1000)
+    fun checkConfirmedWordContains(word: String) {
+        TestHelpers.waitUntilViewFound(CoreMatchers.allOf(withId(R.id.editText), withText(CoreMatchers.containsString(word))), 1000)
         //onView(allOf(withId(R.id.editText), withText(containsString(word)))).check(matches(isDisplayed()))
     }
 
@@ -66,5 +69,17 @@ class Robot(
 
     suspend fun confirm() = apply {
         uiEventSink.send(Event.KEY_PRESS.withData(Key.num0))
+    }
+
+    fun checkNoCandidatesDisplayed() = apply {
+        assertTrue(testingHook.candidatesAdapter.itemCount == 0)
+    }
+
+    fun checkNoTextInserted() = apply {
+        checkInsertedTextIs("")
+    }
+
+    internal fun checkInsertedTextIs(s: String) = apply {
+        onView(withId(R.id.editText)).check(matches(withText(s)))
     }
 }
