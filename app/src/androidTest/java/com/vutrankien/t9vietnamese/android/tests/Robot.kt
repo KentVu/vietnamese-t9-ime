@@ -54,7 +54,7 @@ class Robot(
         }
     }
 
-    fun checkWordConfirmed(word: String) {
+    fun checkConfirmedWordContains(word: String) {
         TestHelpers.waitUntilViewFound(CoreMatchers.allOf(withId(R.id.editText), withText(CoreMatchers.containsString(word))), 1000)
         //onView(allOf(withId(R.id.editText), withText(containsString(word)))).check(matches(isDisplayed()))
     }
@@ -75,11 +75,11 @@ class Robot(
         assertTrue(testingHook.candidatesAdapter.itemCount == 0)
     }
 
-    fun checkNoWordConfirmed() = apply {
-        checkConfirmedWord("")
+    fun checkNoTextInserted() = apply {
+        checkInsertedTextIs("")
     }
 
-    internal fun checkConfirmedWord(s: String) = apply {
+    internal fun checkInsertedTextIs(s: String) = apply {
         onView(withId(R.id.editText)).check(matches(withText(s)))
     }
 }
