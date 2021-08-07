@@ -3,7 +3,7 @@ package com.vutrankien.t9vietnamese.android
 import android.util.Log
 import com.vutrankien.t9vietnamese.lib.LogFactory
 
-class AndroidLogFactory: LogFactory {
+object AndroidLogFactory: LogFactory {
     override fun newLog(tag: String): LogFactory.Log {
         return object : LogFactory.Log {
             override fun v(msg: String) {

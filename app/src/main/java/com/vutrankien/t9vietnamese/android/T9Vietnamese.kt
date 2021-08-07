@@ -14,7 +14,7 @@ import com.vutrankien.t9vietnamese.lib.View as MVPView
  * Created by vutrankien on 17/05/02.
  */
 class T9Vietnamese : InputMethodService(), MVPView {
-    private val logFactory: LogFactory = AndroidLogFactory()
+    private val logFactory: LogFactory = AndroidLogFactory
     private val log = logFactory.newLog("T9IMService")
     private lateinit var presenter: Presenter
     override val scope = CoroutineScope(Dispatchers.Main + Job())

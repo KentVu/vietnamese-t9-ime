@@ -30,7 +30,7 @@ import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
 class MainActivity : Activity(), MVPView {
-    val logFactory: LogFactory = AndroidLogFactory()
+    val logFactory: LogFactory = AndroidLogFactory
     private val log = logFactory.newLog("MainActivity")
     lateinit var presenter: Presenter
 
