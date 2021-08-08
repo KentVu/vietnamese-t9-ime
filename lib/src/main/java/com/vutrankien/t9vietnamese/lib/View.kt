@@ -12,6 +12,7 @@ interface View {
     fun showCandidates(candidates: Collection<String>)
     fun candidateSelected(selectedCandidate: Int)
     fun confirmInput(word: String)
+    fun deleteBackward()
 }
 
 enum class Event {

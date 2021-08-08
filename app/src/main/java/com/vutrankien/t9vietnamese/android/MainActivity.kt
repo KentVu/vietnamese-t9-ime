@@ -7,6 +7,7 @@ import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.Editable
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -73,8 +74,20 @@ class MainActivity : Activity(), MVPView {
     override fun confirmInput(word: String) {
         log.d("View: confirmInput($word)")
         // XXX Is inserting a space here a right place?
-        findViewById<EditText>(R.id.editText).append(" $word")
+        findViewById<EditText>(R.id.editText).apply {
+            if (length() > 0)
+                append(" ")
+            append(word)
+        }
         logic.clearCandidates()
+    }
+
+    override fun deleteBackward() {
+        log.d("deleteBackward")
+        findViewById<EditText>(R.id.editText).apply {
+            setText(text.removeRange(text.length - 1, text.length))
+        }
+//        findViewById<EditText>(R.id.editText).onCreateInputConnection()
     }
 
     private lateinit var wakelock: PowerManager.WakeLock

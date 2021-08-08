@@ -74,12 +74,12 @@ class PresenterTest: FunSpec() {
         test("whenTypeOneNumberThenDisplayResult") {
             getPresenter().attachView(view)
             val cand = setOf("4")
-            setupEngine(mapOf(Key.num0 to T9Engine.Event.Confirm("4"))) {T9Engine.Event.NewCandidates(cand)}
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num4))
+            setupEngine(mapOf(Key.Num0 to T9Engine.Event.Confirm("4"))) {T9Engine.Event.NewCandidates(cand)}
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num4))
             verify(timeout = 10) { view.showCandidates(cand) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num2))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num2))
             verify(timeout = 1000) { view.showCandidates(cand) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num0))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num0))
             verify(timeout = 100) { view.confirmInput("4") }
         }
 
@@ -88,31 +88,31 @@ class PresenterTest: FunSpec() {
             val candidates = setOf("5", "6")
             val selectedCandidate = 1
             setupEngine(
-                mapOf(Key.num0 to T9Engine.Event.Confirm("5"),
-                    Key.num1 to T9Engine.Event.SelectCandidate(selectedCandidate)),
+                mapOf(Key.Num0 to T9Engine.Event.Confirm("5"),
+                    Key.Num1 to T9Engine.Event.SelectCandidate(selectedCandidate)),
                 {T9Engine.Event.NewCandidates(candidates)})
 
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num4))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num4))
             verify(timeout = 10) { view.showCandidates(candidates) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num2))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num2))
             verify(timeout = 1000) { view.showCandidates(candidates) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num1))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num1))
             verify { view.candidateSelected(selectedCandidate) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num0))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num0))
             verify(timeout = 500) { view.confirmInput("5") }
         }
 
         test("Confirm input") {
             getPresenter().attachView(view)
             val candidates = setOf("5")
-            setupEngine(mapOf(Key.num0 to T9Engine.Event.Confirm("5")),
+            setupEngine(mapOf(Key.Num0 to T9Engine.Event.Confirm("5")),
                 {T9Engine.Event.NewCandidates(candidates)})
 
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num4))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num4))
             verify(timeout = 10) { view.showCandidates(candidates) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num2))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num2))
             verify(timeout = 1000) { view.showCandidates(candidates) }
-            view.eventSink.send(Event.KEY_PRESS.withData(Key.num0))
+            view.eventSink.send(Event.KEY_PRESS.withData(Key.Num0))
             verify(timeout = 100) { view.confirmInput("5") }
         }
     }

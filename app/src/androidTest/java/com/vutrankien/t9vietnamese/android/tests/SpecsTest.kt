@@ -24,7 +24,7 @@ class SpecsTest: MainActivityTestsBase(
                 .selectPrev()
                 .checkNoCandidatesDisplayed()
                 .confirm()
-                .checkInsertedTextIs(" ")
+                .checkNoTextInserted()
         // wait if necessary
     }
 

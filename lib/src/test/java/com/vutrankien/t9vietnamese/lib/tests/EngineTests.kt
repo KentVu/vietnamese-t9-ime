@@ -5,7 +5,6 @@ import com.vutrankien.t9vietnamese.lib.Seed
 import com.vutrankien.t9vietnamese.engine.T9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import io.kotest.assertions.assertSoftly
-import io.kotest.core.plan.Descriptor.EngineDescriptor.name
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.channels.toList
@@ -37,44 +36,44 @@ class EngineTests: FunSpec() {
 
     private val padConfig = PadConfiguration(
         mapOf(
-            Key.num1 to KeyConfig(
+            Key.Num1 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('a')
             ),
-            Key.num2 to KeyConfig(
+            Key.Num2 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('b')
             ),
-            Key.num3 to KeyConfig(
+            Key.Num3 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('c')
             ),
-            Key.num0 to KeyConfig(
+            Key.Num0 to KeyConfig(
                 KeyType.Confirm
             )
         )
     )
     private val padConfigStd = PadConfiguration(
         mapOf(
-            Key.num1 to KeyConfig(
+            Key.Num1 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('a', 'b', 'c')
             ),
-            Key.num2 to KeyConfig(
+            Key.Num2 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('d', 'e', 'f')
             ),
-            Key.num3 to KeyConfig(
+            Key.Num3 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('g', 'h', 'i')
             ),
-            Key.star to KeyConfig(
+            Key.Star to KeyConfig(
                 KeyType.NextCandidate
             ),
-            Key.left to KeyConfig(
+            Key.Left to KeyConfig(
                 KeyType.PrevCandidate
             ),
-            Key.num0 to KeyConfig(
+            Key.Num0 to KeyConfig(
                 KeyType.Confirm
             )
         )
@@ -82,19 +81,19 @@ class EngineTests: FunSpec() {
 
     private val vnPad = PadConfiguration(
         mapOf(
-            Key.num1 to KeyConfig(
+            Key.Num1 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('a', '́')
             ),
-            Key.num2 to KeyConfig(
+            Key.Num2 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('b', 'ă')
             ),
-            Key.num3 to KeyConfig(
+            Key.Num3 to KeyConfig(
                 KeyType.Normal,
                 linkedSetOf('c')
             ),
-            Key.num0 to KeyConfig(
+            Key.Num0 to KeyConfig(
                 KeyType.Confirm
             )
         )
@@ -152,7 +151,7 @@ class EngineTests: FunSpec() {
                 padConfig,
                 MockSeed("a", "b", "c")
             ),
-            arrayOf(Key.num1, Key.num0),
+            arrayOf(Key.Num1, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("a")),
                 T9Engine.Event.Confirm("a")
@@ -171,7 +170,7 @@ class EngineTests: FunSpec() {
                     "ac"
                 )
             ),
-            arrayOf(Key.num1, Key.num0),
+            arrayOf(Key.Num1, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
                 T9Engine.Event.Confirm("a")
@@ -192,7 +191,7 @@ class EngineTests: FunSpec() {
                     "ba"
                 )
             ),
-            arrayOf(Key.num1, Key.num1, Key.num0),
+            arrayOf(Key.Num1, Key.Num1, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
                 T9Engine.Event.NewCandidates(setOf("aa")),
@@ -215,7 +214,7 @@ class EngineTests: FunSpec() {
                     "cf"
                 )
             ),
-            arrayOf(Key.num1, Key.num2, Key.num0),
+            arrayOf(Key.Num1, Key.Num2, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
                 T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
@@ -231,7 +230,7 @@ class EngineTests: FunSpec() {
                 padConfig,
                 Seed.EmptySeed
             ),
-            arrayOf(Key.num1, Key.num2, Key.num0),
+            arrayOf(Key.Num1, Key.Num2, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(emptySet()),
                 T9Engine.Event.NewCandidates(emptySet()),
@@ -250,7 +249,7 @@ class EngineTests: FunSpec() {
                     "ba"
                 )
             ),
-            arrayOf(Key.num1, Key.num3, Key.num0),
+            arrayOf(Key.Num1, Key.Num3, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                 T9Engine.Event.NewCandidates(setOf("13")),
@@ -270,7 +269,7 @@ class EngineTests: FunSpec() {
                     "bá"
                 )
             ),
-            arrayOf(Key.num1, Key.num1, Key.num3, Key.num0),
+            arrayOf(Key.Num1, Key.Num1, Key.Num3, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "1")),
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "11")),
@@ -295,7 +294,7 @@ class EngineTests: FunSpec() {
                     padConfigStd,
                     seeds
                 ),
-                arrayOf(Key.num1, Key.num1, Key.star, Key.num0),
+                arrayOf(Key.Num1, Key.Num1, Key.Star, Key.Num0),
                 arrayOf(
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
@@ -311,8 +310,8 @@ class EngineTests: FunSpec() {
                     seeds
                 ),
                 arrayOf(
-                    Key.num1, Key.num1, Key.star, Key.num0,
-                    Key.num1, Key.num1, Key.star, Key.num0
+                    Key.Num1, Key.Num1, Key.Star, Key.Num0,
+                    Key.Num1, Key.Num1, Key.Star, Key.Num0
                 ),
                 arrayOf(
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
@@ -332,7 +331,7 @@ class EngineTests: FunSpec() {
                     padConfigStd,
                     seeds
                 ),
-                arrayOf(Key.num1, Key.num1, Key.star, Key.left, Key.num0),
+                arrayOf(Key.Num1, Key.Num1, Key.Star, Key.Left, Key.Num0),
                 arrayOf(
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
@@ -359,7 +358,7 @@ class EngineTests: FunSpec() {
                     padConfigStd,
                     seeds
                 ),
-                arrayOf(Key.num1, Key.star, Key.left, Key.left, Key.num0),
+                arrayOf(Key.Num1, Key.Star, Key.Left, Key.Left, Key.Num0),
                 arrayOf(
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.SelectCandidate(1),

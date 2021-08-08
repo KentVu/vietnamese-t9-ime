@@ -50,7 +50,7 @@ class Robot(
         val distance = testingHook.candidatesAdapter.findItem(targetWord) - testingHook.candidatesAdapter.selectedWord
         log.d("browseTo:distance=$distance")
         repeat(distance) {
-            uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
+            uiEventSink.send(Event.KEY_PRESS.withData(Key.Star))
         }
     }
 
@@ -60,15 +60,15 @@ class Robot(
     }
 
     suspend fun selectNext() = apply {
-        uiEventSink.send(Event.KEY_PRESS.withData(Key.star))
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.Star))
     }
 
     suspend fun selectPrev() = apply {
-        uiEventSink.send(Event.KEY_PRESS.withData(Key.left))
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.Left))
     }
 
     suspend fun confirm() = apply {
-        uiEventSink.send(Event.KEY_PRESS.withData(Key.num0))
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.Num0))
     }
 
     fun checkNoCandidatesDisplayed() = apply {
@@ -84,6 +84,6 @@ class Robot(
     }
 
     suspend fun backspace() {
-        uiEventSink.send(Event.KEY_PRESS.withData(Key.backspace))
+        uiEventSink.send(Event.KEY_PRESS.withData(Key.Backspace))
     }
 }

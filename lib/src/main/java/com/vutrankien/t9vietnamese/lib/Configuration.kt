@@ -41,56 +41,56 @@ object VNConfiguration: Configuration {
 // TODO match case-insensitively
 val VnPad = PadConfiguration(
     mapOf(
-        Key.num0 to KeyConfig(
+        Key.Num0 to KeyConfig(
             Confirm,
             linkedSetOf(' ')
         ),
-        Key.num1 to KeyConfig(
+        Key.Num1 to KeyConfig(
             Symbol,
             linkedSetOf('.', ',', '?', '!', '-')
         ),
-        Key.num2 to KeyConfig(
+        Key.Num2 to KeyConfig(
             Normal,
             linkedSetOf('a', 'ă', 'â', 'b', 'c', '́' /*sắc*/)
         ),
-        Key.num3 to KeyConfig(
+        Key.Num3 to KeyConfig(
             Normal,
             linkedSetOf('d', 'đ', 'e', 'ê', 'f', '̀' /*huyền*/)
         ),
-        Key.num4 to KeyConfig(
+        Key.Num4 to KeyConfig(
             Normal,
             linkedSetOf('g', 'h', 'i', '̉' /*hỏi*/)
         ),
-        Key.num5 to KeyConfig(
+        Key.Num5 to KeyConfig(
             Normal,
             linkedSetOf('j', 'k', 'l', '̃' /*ngã*/)
         ),
-        Key.num6 to KeyConfig(
+        Key.Num6 to KeyConfig(
             Normal,
             linkedSetOf('m', 'n', 'o', 'ô', 'ơ', '̣' /*nặng*/)
         ),
-        Key.num7 to KeyConfig(
+        Key.Num7 to KeyConfig(
             Normal,
             linkedSetOf('p', 'q', 'r', 's')
         ),
-        Key.num8 to KeyConfig(
+        Key.Num8 to KeyConfig(
             Normal,
             linkedSetOf('t', 'u', 'ư', 'v')
         ),
-        Key.num9 to KeyConfig(
+        Key.Num9 to KeyConfig(
             Normal,
             linkedSetOf('w', 'x', 'y', 'z')
         ),
-        Key.star to KeyConfig(
+        Key.Star to KeyConfig(
             NextCandidate
         ),
-        Key.keySharp to KeyConfig(
+        Key.KeySharp to KeyConfig(
             ToNum
         ),
-        Key.left to KeyConfig(
+        Key.Left to KeyConfig(
             PrevCandidate
         ),
-        Key.backspace to KeyConfig(
+        Key.Backspace to KeyConfig(
             Backspace
         )
     )
@@ -111,20 +111,20 @@ enum class Key(
     val keycode: Int
 ) {
 
-    num0('0'.toInt()),
-    num1('1'.toInt()),
-    num2('2'.toInt()),
-    num3('3'.toInt()),
-    num4('4'.toInt()),
-    num5('5'.toInt()),
-    num6('6'.toInt()),
-    num7('7'.toInt()),
-    num8('8'.toInt()),
-    num9('9'.toInt()),
-    star('*'.toInt()),
-    keySharp('#'.toInt()),
-    left('<'.toInt()),
-    backspace(67);
+    Num0('0'.toInt()),
+    Num1('1'.toInt()),
+    Num2('2'.toInt()),
+    Num3('3'.toInt()),
+    Num4('4'.toInt()),
+    Num5('5'.toInt()),
+    Num6('6'.toInt()),
+    Num7('7'.toInt()),
+    Num8('8'.toInt()),
+    Num9('9'.toInt()),
+    Star('*'.toInt()),
+    KeySharp('#'.toInt()),
+    Left('<'.toInt()),
+    Backspace(67);
     val char: Char
         get() = keycode.toChar()
 

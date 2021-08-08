@@ -18,7 +18,7 @@
             android:keyOutputText="@string/btn_3"
             android:popupCharacters="@string/btn_3" />
         <Key
-            android:codes="@string/enable_ime"
+            android:codes="@integer/keycode_backspace"
             android:keyIcon="@drawable/sym_keyboard_delete" />
     </Row>
     <Row>

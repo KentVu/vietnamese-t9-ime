@@ -100,6 +100,11 @@ class T9Vietnamese : InputMethodService(), MVPView {
         //wordListAdapter.clear()
     }
 
+    override fun deleteBackward() {
+        log.d("deleteBackward")
+        currentInputConnection.deleteSurroundingText(1, 0)
+    }
+
     fun onBtnClick(view: View) {
         log.d("onBtnClick() btn=" + (view as Button).text)
     }

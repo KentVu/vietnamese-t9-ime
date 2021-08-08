@@ -28,6 +28,7 @@ interface T9Engine {
         class LoadProgress(val bytes: Int) : Event()
         object Initialized : Event()
         data class SelectCandidate(val selectedCandidate: Int) : Event()
+        object Backspace : Event()
     }
 
     val engineSeed: Seed

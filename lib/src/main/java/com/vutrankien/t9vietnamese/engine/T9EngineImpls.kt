@@ -61,7 +61,7 @@ class DefaultT9Engine(
                 _selectedCandidate = 0
             }
             KeyType.Backspace -> {
-                TODO("Implement!")
+                eventSource.send(T9Engine.Event.Backspace)
             }
             else -> {
                 // Numeric keys
