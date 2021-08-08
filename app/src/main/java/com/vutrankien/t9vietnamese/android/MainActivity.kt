@@ -12,6 +12,8 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -31,7 +33,7 @@ import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
 class MainActivity : Activity(), MVPView {
-    val logFactory: LogFactory = AndroidLogFactory
+    private val logFactory: LogFactory = AndroidLogFactory
     private val log = logFactory.newLog("MainActivity")
     lateinit var presenter: Presenter
 
@@ -84,13 +86,15 @@ class MainActivity : Activity(), MVPView {
 
     override fun deleteBackward() {
         log.d("deleteBackward")
-        findViewById<EditText>(R.id.editText).apply {
-            setText(text.removeRange(text.length - 1, text.length))
-        }
+        inputConnection.deleteSurroundingText(1, 0)
+//        findViewById<MyEditText>(R.id.editText).apply {
+//            inputConnection!!.deleteSurroundingText(1, 0)
+//        }
 //        findViewById<EditText>(R.id.editText).onCreateInputConnection()
     }
 
     private lateinit var wakelock: PowerManager.WakeLock
+    internal lateinit var inputConnection: InputConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,6 +125,8 @@ class MainActivity : Activity(), MVPView {
                 "${BuildConfig.APPLICATION_ID}:MainActivity")
 
         wakelock.acquire(WAKELOCK_TIMEOUT)
+
+        inputConnection = findViewById<EditText>(R.id.editText).onCreateInputConnection(EditorInfo())
 
         presenter.attachView(this)
         scope.launch {
