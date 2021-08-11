@@ -44,7 +44,7 @@ class MainActivityTest : MainActivityTestsBase(
             .checkCandidateDisplayed("chào")
             .browseTo("chào")
             .confirm()
-            .checkConfirmedWordContains("chào")
+            .checkInsertedTextIs("chào ")
     }
 
     @Test fun selectPrevCandidate(): Unit = runBlocking {
@@ -54,7 +54,7 @@ class MainActivityTest : MainActivityTestsBase(
             .selectNext()
             .selectPrev()
             .confirm()
-            .checkConfirmedWordContains("chào")
+            .checkInsertedTextIs("chào ")
         // wait if necessary
     }
 }
