@@ -95,12 +95,8 @@ class T9Vietnamese : InputMethodService(), MVPView {
      */
     override fun confirmInput(word: String) {
         log.d("View: confirmInput:$word")
-        // XXX Is inserting a space here a right place?
-        currentInputConnection.commitText("$word ", 1)
-        //setCandidatesViewShown(false)
+        currentInputConnection.commitText(word, 1)
         logic.clearCandidates()
-        //findViewById<EditText>(R.id.editText).append(" $word")
-        //wordListAdapter.clear()
     }
 
     override fun deleteBackward() {

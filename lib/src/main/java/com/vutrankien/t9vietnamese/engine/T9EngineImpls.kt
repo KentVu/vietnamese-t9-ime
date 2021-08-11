@@ -57,7 +57,8 @@ class DefaultT9Engine(
                 } else {
                     _currentCandidates.elementAt(_selectedCandidate)
                 }
-                eventSource.send(T9Engine.Event.Confirm(selected))
+                // XXX Insert space based on situation.
+                eventSource.send(T9Engine.Event.Confirm("$selected "))
                 _currentCandidates.clear()
                 _currentNumSeq.clear()
                 _selectedCandidate = 0

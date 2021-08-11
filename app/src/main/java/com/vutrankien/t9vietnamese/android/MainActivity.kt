@@ -75,9 +75,8 @@ class MainActivity : Activity(), MVPView {
 
     override fun confirmInput(word: String) {
         log.d("View: confirmInput($word)")
-        // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).apply {
-            append("$word ")
+            append(word)
         }
         logic.clearCandidates()
     }
