@@ -8,23 +8,23 @@ import kotlin.system.measureTimeMillis
 
 class Presenter(
     lg: LogFactory,
-    private val engine: T9Engine
+    private val engine: T9Engine,
+    private val view: View
 ) {
     private val log = lg.newLog("Presenter")
-    private lateinit var view: View
 
-    fun attachView(view: View) {
+    fun receiveEvents() {
         view.scope.launch {
-            receiveUiEvents(view)
+            receiveUiEvents()
         }
         view.scope.launch {
             receiveEngineEvents()
         }
     }
 
-    private suspend fun receiveUiEvents(view: View) {
-        this.view = view
+    private suspend fun receiveUiEvents() {
         for (eventWithData in view.eventSource) {
+            //log.d("receiveEvents:$eventWithData")
             when (eventWithData.event) {
                 Event.START -> {
                     log.i("Start initializing")

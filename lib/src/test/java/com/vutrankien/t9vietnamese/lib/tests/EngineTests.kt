@@ -154,7 +154,7 @@ class EngineTests: FunSpec() {
             arrayOf(Key.Num1, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("a")),
-                T9Engine.Event.Confirm("a")
+                T9Engine.Event.Confirm("a ")
             )
         ).runTest()
 
@@ -173,7 +173,7 @@ class EngineTests: FunSpec() {
             arrayOf(Key.Num1, Key.Num0),
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("a", "ab", "ac", "aa")),
-                T9Engine.Event.Confirm("a")
+                T9Engine.Event.Confirm("a ")
             )
         ).runTest()
 
@@ -195,7 +195,7 @@ class EngineTests: FunSpec() {
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
                 T9Engine.Event.NewCandidates(setOf("aa")),
-                T9Engine.Event.Confirm("aa")
+                T9Engine.Event.Confirm("aa ")
             )
         ).runTest()
         //}
@@ -218,7 +218,7 @@ class EngineTests: FunSpec() {
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac", "ad", "bd")),
                 T9Engine.Event.NewCandidates(setOf("ad", "bd", "ce", "cf")),
-                T9Engine.Event.Confirm("ad")
+                T9Engine.Event.Confirm("ad ")
             )
         ).run {
             test(name).config(timeout = (180).toDuration(TimeUnit.SECONDS)) { go() }
@@ -234,7 +234,7 @@ class EngineTests: FunSpec() {
             arrayOf(
                 T9Engine.Event.NewCandidates(emptySet()),
                 T9Engine.Event.NewCandidates(emptySet()),
-                T9Engine.Event.Confirm("12")
+                T9Engine.Event.Confirm("12 ")
             )
         ).run {
             test(name).config(timeout = Duration.seconds(180)) { go() }
@@ -253,7 +253,7 @@ class EngineTests: FunSpec() {
             arrayOf(
                 T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                 T9Engine.Event.NewCandidates(setOf("13")),
-                T9Engine.Event.Confirm("13")
+                T9Engine.Event.Confirm("13 ")
             )
         ).runTest()
 
@@ -274,7 +274,7 @@ class EngineTests: FunSpec() {
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "1")),
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "11")),
                 T9Engine.Event.NewCandidates(setOf("ác", "ách", "113")),
-                T9Engine.Event.Confirm("ác")
+                T9Engine.Event.Confirm("ác ")
             )
         ).run { test(name) { go() } }
 
@@ -299,7 +299,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                     T9Engine.Event.SelectCandidate(1),
-                    T9Engine.Event.Confirm("ab")
+                    T9Engine.Event.Confirm("ab ")
                 )
             ).run { test(name) { go() } }
 
@@ -317,11 +317,11 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                     T9Engine.Event.SelectCandidate(1),
-                    T9Engine.Event.Confirm("ab"),
+                    T9Engine.Event.Confirm("ab "),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "1")),
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                     T9Engine.Event.SelectCandidate(1),
-                    T9Engine.Event.Confirm("ab")
+                    T9Engine.Event.Confirm("ab ")
                 )
             ).run { test(name) { go() } }
 
@@ -337,7 +337,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.NewCandidates(setOf("aa", "ab", "11")),
                     T9Engine.Event.SelectCandidate(1),
                     T9Engine.Event.SelectCandidate(0),
-                    T9Engine.Event.Confirm("aa")
+                    T9Engine.Event.Confirm("aa ")
                 )
             ).run { test(name) { go() } }
         }
@@ -364,7 +364,7 @@ class EngineTests: FunSpec() {
                     T9Engine.Event.SelectCandidate(1),
                     T9Engine.Event.SelectCandidate(0),
                     T9Engine.Event.SelectCandidate(0),
-                    T9Engine.Event.Confirm("aa")
+                    T9Engine.Event.Confirm("aa ")
                 )
             ).run { test(name) { go() } }
 

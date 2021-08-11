@@ -11,14 +11,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.launch
 
 class PresenterTest: FunSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
-    private val seed: Sequence<String> = "a\nb\nc".lineSequence()
     private lateinit var engine: T9Engine
     private lateinit var env: Env
-    private lateinit var db: Db
 
     abstract class MockView : View {
         private val channel = Channel<EventWithData<Event, Key>>()
@@ -39,44 +38,41 @@ class PresenterTest: FunSpec() {
         engine = mockk(relaxUnitFun = true)
         every { engine.eventSource } returns Channel()
         //every { engine.canReuseDb() } returns false
+        view.scope.launch {
+            presenter.receiveEvents()
+        }
     }
 
-    //val logGenerator = daggerComponents.logGenerator()
-    private fun getPresenter(): Presenter {
-        return Presenter(JavaLogFactory, engine)
-    }
+    private val presenter: Presenter by lazy { Presenter(JavaLogFactory, engine, view) }
 
     init {
+//        context("Presenter") {
+
         test("showProgressIndicatorOnStart") {
-            getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
             verify(timeout = 100) { view.showProgress(any()) }
         }
 
         test("initializeEngineOnStart") {
-            getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
             coVerify { engine.init() }
         }
 
         test("6.ReuseBuiltDawg") {
-            getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
             coVerify { engine.init() }
         }
 
         test("showKeyboardWhenEngineLoadCompleted") {
-            getPresenter().attachView(view)
             view.eventSink.send(Event.START.noData())
             verify(timeout = 100) { view.showKeyboard() }
         }
 
         test("whenTypeOneNumberThenDisplayResult") {
-            getPresenter().attachView(view)
             val cand = setOf("4")
             setupEngine(mapOf(Key.Num0 to T9Engine.Event.Confirm("4"))) {T9Engine.Event.NewCandidates(cand)}
             view.eventSink.send(Event.KEY_PRESS.withData(Key.Num4))
-            verify(timeout = 10) { view.showCandidates(cand) }
+            verify(timeout = 100) { view.showCandidates(cand) }
             view.eventSink.send(Event.KEY_PRESS.withData(Key.Num2))
             verify(timeout = 1000) { view.showCandidates(cand) }
             view.eventSink.send(Event.KEY_PRESS.withData(Key.Num0))
@@ -84,7 +80,6 @@ class PresenterTest: FunSpec() {
         }
 
         test("Select candidate") {
-            getPresenter().attachView(view)
             val candidates = setOf("5", "6")
             val selectedCandidate = 1
             setupEngine(
@@ -103,7 +98,6 @@ class PresenterTest: FunSpec() {
         }
 
         test("Confirm input") {
-            getPresenter().attachView(view)
             val candidates = setOf("5")
             setupEngine(mapOf(Key.Num0 to T9Engine.Event.Confirm("5")),
                 {T9Engine.Event.NewCandidates(candidates)})
@@ -115,6 +109,7 @@ class PresenterTest: FunSpec() {
             view.eventSink.send(Event.KEY_PRESS.withData(Key.Num0))
             verify(timeout = 100) { view.confirmInput("5") }
         }
+//        }
     }
 
     private fun setupEngine(config: Map<Key, T9Engine.Event>, fallback: () -> T9Engine.Event) {

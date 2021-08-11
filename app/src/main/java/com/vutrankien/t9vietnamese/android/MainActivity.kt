@@ -7,7 +7,6 @@ import android.inputmethodservice.KeyboardView
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.text.Editable
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -103,7 +102,8 @@ class MainActivity : Activity(), MVPView {
                 VnPad,
                 logFactory,
                 TrieDb(logFactory, AndroidEnv(applicationContext))
-            )
+            ),
+            this
         )
         setContentView(R.layout.main)
         val kbView = findViewById<KeyboardView>(R.id.dialpad)
@@ -125,7 +125,7 @@ class MainActivity : Activity(), MVPView {
 
         inputConnection = findViewById<EditText>(R.id.editText).onCreateInputConnection(EditorInfo())
 
-        presenter.attachView(this)
+        presenter.receiveEvents()
         scope.launch {
             eventSink.send(Event.START.noData())
         }

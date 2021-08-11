@@ -32,7 +32,8 @@ class T9Vietnamese : InputMethodService(), MVPView {
                 VnPad,
                 logFactory,
                 TrieDb(logFactory, AndroidEnv(applicationContext))
-            )
+            ),
+            this
         )
         log.d("onCreate")
     }
@@ -53,7 +54,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
                 eventSource
             )
         )
-        presenter.attachView(this)
+        presenter.receiveEvents()
         scope.launch {
             eventSource.send(Event.START.noData())
         }
