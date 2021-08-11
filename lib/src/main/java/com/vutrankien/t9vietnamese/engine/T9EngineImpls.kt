@@ -46,12 +46,14 @@ class DefaultT9Engine(
                 eventSource.send(T9Engine.Event.SelectCandidate(_selectedCandidate))
             }
             KeyType.Confirm -> {
-                // TODO implement selecting feature
-                val selected = if (_currentCandidates.isEmpty()) {
+                if (!isComposing) {
+                    return
+                }
+                val selected: String = if (_currentCandidates.isEmpty()) {
                     // Return the number sequence if no match found.
                     _currentNumSeq
-                            .dropLast(1) // Drop the "confirm" key
-                            .joinNum()
+                        .dropLast(1) // Drop the "confirm" key
+                        .joinNum()
                 } else {
                     _currentCandidates.elementAt(_selectedCandidate)
                 }
@@ -77,6 +79,8 @@ class DefaultT9Engine(
             }
         }
     }
+
+    private val isComposing get() = _currentNumSeq.count() > 0
 
     override suspend fun init() {
         db.initOrLoad(engineSeed) { bytes ->
