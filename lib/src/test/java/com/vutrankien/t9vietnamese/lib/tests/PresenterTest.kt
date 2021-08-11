@@ -6,12 +6,10 @@ import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.test.TestCase
 import io.mockk.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.launch
 
 class PresenterTest: FunSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
@@ -25,7 +23,7 @@ class PresenterTest: FunSpec() {
             get() = channel
         override val eventSource: ReceiveChannel<EventWithData<Event, Key>>
             get() = channel
-        override val scope: CoroutineScope = GlobalScope
+        override val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job())
     }
     private lateinit var view: MockView
 

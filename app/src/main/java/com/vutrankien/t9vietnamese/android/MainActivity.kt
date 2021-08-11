@@ -21,13 +21,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.launch
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
@@ -144,6 +141,7 @@ class MainActivity : Activity(), MVPView {
 
     override fun onDestroy() {
         log.d("onDestroy")
+        scope.cancel("MainActivity#onDestroy")
         super.onDestroy()
     }
 
