@@ -90,10 +90,13 @@ class T9Vietnamese : InputMethodService(), MVPView {
         logic.selectCandidate(selectedCandidate)
     }
 
+    /**
+     * TODO: Match methods with [android.view.inputmethod.InputConnection].
+     */
     override fun confirmInput(word: String) {
         log.d("View: confirmInput:$word")
         // XXX Is inserting a space here a right place?
-        currentInputConnection.commitText(" $word", 1)
+        currentInputConnection.commitText("$word ", 1)
         //setCandidatesViewShown(false)
         logic.clearCandidates()
         //findViewById<EditText>(R.id.editText).append(" $word")

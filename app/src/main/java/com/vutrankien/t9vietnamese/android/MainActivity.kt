@@ -77,9 +77,7 @@ class MainActivity : Activity(), MVPView {
         log.d("View: confirmInput($word)")
         // XXX Is inserting a space here a right place?
         findViewById<EditText>(R.id.editText).apply {
-            if (length() > 0)
-                append(" ")
-            append(word)
+            append("$word ")
         }
         logic.clearCandidates()
     }
