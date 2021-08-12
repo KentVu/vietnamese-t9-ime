@@ -28,7 +28,7 @@ import kotlinx.coroutines.channels.SendChannel
 import com.vutrankien.t9vietnamese.lib.View as MVPView
 
 
-class MainActivity : Activity(), MVPView {
+class MainActivity : Activity() {
     private val logFactory: LogFactory = AndroidLogFactory
     private val log = logFactory.newLog("MainActivity")
     lateinit var presenter: Presenter
