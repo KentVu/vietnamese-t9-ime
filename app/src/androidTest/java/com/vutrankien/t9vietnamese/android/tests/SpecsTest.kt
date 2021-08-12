@@ -42,4 +42,18 @@ class SpecsTest: MainActivityTestsBase(
         }
         // wait if necessary
     }
+
+    @Test
+    fun deletePreviousWordWhenTyping(): Unit = runBlocking {
+        with(robot) {
+            pressSequentially("24236")
+            checkCandidateDisplayed("chào")
+            browseTo("chào")
+            backspace()
+            checkCandidateDisplayed("chà")
+            browseTo("chà")
+            checkInsertedTextIs("chà")
+        }
+        // wait if necessary
+    }
 }
