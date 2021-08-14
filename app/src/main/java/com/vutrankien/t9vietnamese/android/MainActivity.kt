@@ -47,12 +47,11 @@ class MainActivity : Activity() {
         override val scope: CoroutineScope,
         channel: Channel<EventWithData<Event, Key>>,
         private val textView: TextView,
-        inputConnection: InputConnection
+        override val inputConnection: InputConnection
     ) : AndroidView(
         logFactory, logFactory.newLog("MainActivity.V"),
         context, scope,
-        channel, channel,
-        inputConnection
+        channel, channel
     ) {
 
         companion object {

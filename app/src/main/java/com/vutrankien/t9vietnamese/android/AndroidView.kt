@@ -19,9 +19,9 @@ abstract class AndroidView(
     override val scope: CoroutineScope,
     override val eventSource: ReceiveChannel<EventWithData<Event, Key>>,
     protected val eventSink: SendChannel<EventWithData<Event, Key>>,
-    internal val inputConnection: InputConnection
 ) : View {
 
+    internal abstract val inputConnection: InputConnection
     private val preferences by lazy { Preferences(context.applicationContext) }
     protected val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
 
@@ -63,6 +63,9 @@ abstract class AndroidView(
         logic.selectCandidate(selectedCandidate)
     }
 
+    /**
+     * TODO: Match methods with [android.view.inputmethod.InputConnection] (commitText etc).
+     */
     override fun confirmInput(word: String) {
         log.d("View: confirmInput($word)")
         inputConnection.commitText(word, 1)
