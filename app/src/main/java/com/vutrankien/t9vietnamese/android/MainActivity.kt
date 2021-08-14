@@ -121,7 +121,7 @@ class MainActivity : Activity() {
         val testingHook = object: TestingHook {
             override val candidatesAdapter: WordListAdapter
                 //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
-                get() = (this@MainActivityView.logic as UiLogic.DefaultUiLogic).wordListAdapter
+                get() = (this@MainActivityView).wordListAdapter
             override val eventSink = this@MainActivityView.eventSink
             //override fun waitNewCandidates() {
             //    this@MainActivity.

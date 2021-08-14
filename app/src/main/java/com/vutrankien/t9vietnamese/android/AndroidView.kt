@@ -4,6 +4,8 @@ import android.content.Context
 import android.inputmethodservice.KeyboardView
 import android.os.PowerManager
 import android.view.inputmethod.InputConnection
+import androidx.annotation.VisibleForTesting
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +15,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
 
 abstract class AndroidView(
-    val logFactory: LogFactory,
+    private val logFactory: LogFactory,
     protected val log: LogFactory.Log,
     protected val context: Context,
     override val scope: CoroutineScope,
@@ -23,7 +25,15 @@ abstract class AndroidView(
 
     internal abstract val inputConnection: InputConnection
     private val preferences by lazy { Preferences(context.applicationContext) }
-    protected val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(preferences) }
+    private lateinit var candidatesView: RecyclerView
+    protected val wordListAdapter = WordListAdapter()
+
+    private fun initializeCandidatesView(recyclerView: RecyclerView) {
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(recyclerView.context, RecyclerView.HORIZONTAL, false)
+            adapter = wordListAdapter
+        }
+    }
 
     open fun init(kbView: KeyboardView, candidatesView: RecyclerView) {
         kbView.keyboard = T9Keyboard(context)
@@ -34,7 +44,8 @@ abstract class AndroidView(
                 eventSink
             )
         )
-        logic.initializeCandidatesView(candidatesView)
+        this.candidatesView = candidatesView
+        initializeCandidatesView(candidatesView)
         scope.launch {
             eventSink.send(Event.START.noData())
         }
@@ -47,9 +58,13 @@ abstract class AndroidView(
         displayInfo(R.string.engine_loading, bytes)
     }
 
+     private fun updateCandidates(candidates: Collection<String>) {
+        wordListAdapter.update(candidates)
+    }
+
     override fun showCandidates(candidates: Collection<String>) {
         log.d("View: showCandidates:$candidates")
-        logic.updateCandidates(candidates)
+        updateCandidates(candidates)
         //testingHook.onShowCandidates()
     }
 
@@ -59,8 +74,27 @@ abstract class AndroidView(
         //defaultSharedPreferences.edit().putLong("load_time", loadTime).apply()
     }
 
+     private fun selectCandidate(selectedCandidate: Int) {
+        wordListAdapter.select(selectedCandidate)
+        @Suppress("ConstantConditionIf")
+        if (preferences.autoScroll) {
+            //candidatesView.scrollToPosition(wordListAdapter.selectedWord)
+            // check candidates_view.xml
+            (candidatesView.layoutManager as LinearLayoutManager).run {
+                val selectedWord = wordListAdapter.selectedWord
+                if (selectedWord !in findFirstCompletelyVisibleItemPosition()..findLastCompletelyVisibleItemPosition()) {
+                    scrollToPositionWithOffset(selectedWord, 20)
+                }
+            }
+        }
+    }
+
     override fun candidateSelected(selectedCandidate: Int) {
-        logic.selectCandidate(selectedCandidate)
+        selectCandidate(selectedCandidate)
+    }
+
+     private fun clearCandidates() {
+        wordListAdapter.clear()
     }
 
     /**
@@ -69,7 +103,7 @@ abstract class AndroidView(
     override fun confirmInput(word: String) {
         log.d("View: confirmInput($word)")
         inputConnection.commitText(word, 1)
-        logic.clearCandidates()
+        clearCandidates()
     }
 
     override fun deleteBackward() {
