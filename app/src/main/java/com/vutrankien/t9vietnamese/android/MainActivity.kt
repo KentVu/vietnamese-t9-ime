@@ -1,19 +1,25 @@
 package com.vutrankien.t9vietnamese.android
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.inputmethodservice.KeyboardView
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
@@ -34,6 +40,96 @@ class MainActivity : Activity() {
 
     @VisibleForTesting
     lateinit var view: MainActivityView
+
+    class MainActivityView(
+        logFactory: LogFactory,
+        context: Context,
+        override val scope: CoroutineScope,
+        channel: Channel<EventWithData<Event, Key>>,
+        private val textView: TextView,
+        inputConnection: InputConnection
+    ) : AndroidView(
+        logFactory, logFactory.newLog("MainActivity.V"),
+        context, scope,
+        channel, channel,
+        inputConnection
+    ) {
+
+        companion object {
+            private const val WAKELOCK_TIMEOUT = 60000L
+        }
+
+        private lateinit var wakelock: PowerManager.WakeLock
+
+        override fun init(kbView: KeyboardView, candidatesView: RecyclerView) {
+            super.init(kbView, candidatesView)
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            wakelock = powerManager.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK,
+                "${BuildConfig.APPLICATION_ID}:MainActivity")
+
+            wakelock.acquire(WAKELOCK_TIMEOUT)
+        }
+
+        fun onBtnClick(key: Char) {
+            log.d("onBtnClick() key=$key")
+            scope.launch {
+                eventSink.send(Event.KEY_PRESS.withData(Key.fromChar(key)))
+            }
+        }
+
+        fun onKeyDown(event: KeyEvent?) {
+            if (event == null) {
+                log.e("onKeyDown:event is null!")
+                return
+            }
+            val char = event.unicodeChar.toChar()
+            log.d("onKeyDown:num=$char")
+            scope.launch {
+                eventSink.send(Event.KEY_PRESS.withData(Key.fromChar(char)))
+            }
+        }
+
+        override fun displayInfo(resId: Int, vararg formatArgs: Any) {
+            textView.setTextColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
+            textView.text = context.getString(resId, *formatArgs)
+        }
+
+        private fun displayError(msg: String) {
+            val color = ContextCompat.getColor(context, android.R.color.holo_red_dark)
+            textView.setTextColor(color)
+            textView.text = context.getString(R.string.oops, msg)
+        }
+
+        private fun displayError(e: Exception) {
+            displayError(e.message ?: "")
+        }
+
+        override fun showKeyboard() {
+            super.showKeyboard()
+            wakelock.run { if(isHeld) release() }
+        }
+
+        interface TestingHook {
+            val candidatesAdapter: WordListAdapter
+            val eventSink: SendChannel<EventWithData<Event, Key>>
+
+            //fun waitNewCandidates()
+        }
+
+        /** For integration testing. */
+        @VisibleForTesting
+        val testingHook = object: TestingHook {
+            override val candidatesAdapter: WordListAdapter
+                //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
+                get() = (this@MainActivityView.logic as UiLogic.DefaultUiLogic).wordListAdapter
+            override val eventSink = this@MainActivityView.eventSink
+            //override fun waitNewCandidates() {
+            //    this@MainActivity.
+            //}
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
