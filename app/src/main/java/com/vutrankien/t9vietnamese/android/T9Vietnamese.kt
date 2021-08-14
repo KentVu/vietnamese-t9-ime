@@ -54,7 +54,7 @@ class T9Vietnamese : InputMethodService(), MVPView {
                 eventSource
             )
         )
-        presenter.receiveEvents()
+        presenter.start()
         scope.launch {
             eventSource.send(Event.START.noData())
         }

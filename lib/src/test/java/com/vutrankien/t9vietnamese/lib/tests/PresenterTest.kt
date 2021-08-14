@@ -37,7 +37,7 @@ class PresenterTest: FunSpec() {
         every { engine.eventSource } returns Channel()
         //every { engine.canReuseDb() } returns false
         view.scope.launch {
-            presenter.receiveEvents()
+            presenter.start()
         }
     }
 

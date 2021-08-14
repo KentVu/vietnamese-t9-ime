@@ -13,7 +13,7 @@ class Presenter(
 ) {
     private val log = lg.newLog("Presenter")
 
-    fun receiveEvents() {
+    fun start() {
         view.scope.launch {
             receiveUiEvents()
         }
