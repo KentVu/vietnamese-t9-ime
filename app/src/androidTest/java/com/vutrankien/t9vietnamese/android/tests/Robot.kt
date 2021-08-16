@@ -6,6 +6,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.vutrankien.t9vietnamese.android.MainActivity
+import com.vutrankien.t9vietnamese.android.MainActivityView
 import com.vutrankien.t9vietnamese.android.R
 import com.vutrankien.t9vietnamese.lib.Event
 import com.vutrankien.t9vietnamese.lib.EventWithData
@@ -19,7 +20,7 @@ import org.junit.Assert.assertTrue
 
 class Robot(
         private val log: LogFactory.Log,
-        private val testingHook: MainActivity.TestingHook
+        private val testingHook: MainActivityView.TestingHook
 ) {
     private val uiEventSink: SendChannel<EventWithData<Event, Key>> = testingHook.eventSink
 

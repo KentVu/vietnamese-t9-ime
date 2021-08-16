@@ -8,5 +8,5 @@ abstract class MainActivityTestsBase(log: LogFactory.Log)
     : ActivityTestsBase<MainActivity>(
         log, ActivityTestRule(MainActivity::class.java)
 ) {
-    protected val robot by lazy { Robot(log, mActivityRule.activity.testingHook) }
+    protected val robot by lazy { Robot(log, mActivityRule.activity.view.testingHook) }
 }

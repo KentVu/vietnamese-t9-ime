@@ -32,7 +32,8 @@ class MainActivity : Activity() {
 
     private val preferences by lazy { Preferences(applicationContext) }
 
-    private lateinit var view: MainActivityView
+    @VisibleForTesting
+    lateinit var view: MainActivityView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
