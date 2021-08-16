@@ -89,7 +89,7 @@ abstract class AndroidView(
         }
     }
 
-    override fun candidateSelected(selectedCandidate: Int) {
+    override fun highlightCandidate(selectedCandidate: Int) {
         selectCandidate(selectedCandidate)
     }
 

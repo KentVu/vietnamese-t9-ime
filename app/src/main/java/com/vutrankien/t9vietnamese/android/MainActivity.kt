@@ -47,7 +47,8 @@ class MainActivity : Activity() {
         override val scope: CoroutineScope,
         channel: Channel<EventWithData<Event, Key>>,
         private val textView: TextView,
-        override val inputConnection: InputConnection
+        override val inputConnection: InputConnection,
+        private val txtSeq: TextView
     ) : AndroidView(
         logFactory, logFactory.newLog("MainActivity.V"),
         context, scope,
@@ -94,19 +95,14 @@ class MainActivity : Activity() {
             textView.text = context.getString(resId, *formatArgs)
         }
 
-        private fun displayError(msg: String) {
-            val color = ContextCompat.getColor(context, android.R.color.holo_red_dark)
-            textView.setTextColor(color)
-            textView.text = context.getString(R.string.oops, msg)
-        }
-
-        private fun displayError(e: Exception) {
-            displayError(e.message ?: "")
-        }
-
         override fun showKeyboard() {
             super.showKeyboard()
             wakelock.run { if(isHeld) release() }
+        }
+
+        override fun showCandidates(candidates: Collection<String>) {
+            super.showCandidates(candidates)
+            candidates.lastOrNull()?.let { txtSeq.text = it }
         }
 
         interface TestingHook {
@@ -141,7 +137,8 @@ class MainActivity : Activity() {
             scope,
             channel,
             findViewById(R.id.text),
-            findViewById<EditText>(R.id.editText).onCreateInputConnection(EditorInfo())
+            findViewById<EditText>(R.id.editText).onCreateInputConnection(EditorInfo()),
+            findViewById(R.id.dbg_seq)
         )
         presenter = Presenter(
             logFactory,

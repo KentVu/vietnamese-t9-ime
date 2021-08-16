@@ -51,7 +51,7 @@ class Presenter(
                 is T9Engine.Event.LoadProgress -> view.showProgress(event.bytes)
                 is T9Engine.Event.Confirm -> view.confirmInput(event.word)
                 is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
-                is T9Engine.Event.SelectCandidate -> view.candidateSelected(event.selectedCandidate)
+                is T9Engine.Event.SelectCandidate -> view.highlightCandidate(event.selectedCandidate)
                 is T9Engine.Event.Backspace -> view.deleteBackward()
             }
         }
