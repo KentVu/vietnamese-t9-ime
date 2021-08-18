@@ -105,6 +105,11 @@ class MainActivity : Activity() {
             candidates.lastOrNull()?.let { txtSeq.text = it }
         }
 
+        override fun confirmInput(word: String) {
+            super.confirmInput(word)
+            txtSeq.text = ""
+        }
+
         interface TestingHook {
             val candidatesAdapter: WordListAdapter
             val eventSink: SendChannel<EventWithData<Event, Key>>

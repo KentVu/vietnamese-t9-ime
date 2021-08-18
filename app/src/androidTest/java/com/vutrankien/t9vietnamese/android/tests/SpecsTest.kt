@@ -52,7 +52,8 @@ class SpecsTest: MainActivityTestsBase(
             backspace()
             checkCandidateDisplayed("chà")
             browseTo("chà")
-            checkInsertedTextIs("chà")
+            confirm()
+            checkInsertedTextIs("chà ")
         }
         // wait if necessary
     }
