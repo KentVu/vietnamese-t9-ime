@@ -183,8 +183,7 @@ class EngineTests: FunSpec() {
             "engineFunction_2keys",
             prepareEngine(
                 padConfig,
-                MockSeed
-                    (
+                MockSeed(
                     "aa",
                     "ab",
                     "ac",
@@ -193,7 +192,7 @@ class EngineTests: FunSpec() {
             ),
             arrayOf(Key.Num1, Key.Num1, Key.Num0),
             arrayOf(
-                T9Engine.Event.NewCandidates(setOf("ab", "ac", "aa")),
+                T9Engine.Event.NewCandidates(setOf("aa", "ab", "ac")),
                 T9Engine.Event.NewCandidates(setOf("aa")),
                 T9Engine.Event.Confirm("aa ")
             )
@@ -445,7 +444,7 @@ class EngineTests: FunSpec() {
         private val expectedEvents: Array<T9Engine.Event>
     ): Test {
 
-        private val log: LogFactory.Log = lg.newLog("name")
+        private val log: LogFactory.Log = lg.newLog(name)
 
         override suspend fun go() = coroutineScope<Unit> {
             engine.apply {
@@ -460,7 +459,7 @@ class EngineTests: FunSpec() {
                         if (event is T9Engine.Event.NewCandidates) {
                             assertTrue(expectedEvt is T9Engine.Event.NewCandidates, "evt($event) is not expected exp($expectedEvt)")
                             //event should containAll (expectedEvt as T9Engine.Event.NewCandidates)
-                            assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates))
+                            assertTrue(event.contains(expectedEvt as T9Engine.Event.NewCandidates), "evt($event) not containing exp($expectedEvt)")
                         } else {
                             event shouldBe expectedEvt
                         }

@@ -14,7 +14,20 @@ import kotlinx.coroutines.channels.SendChannel
 class PresenterTest: FunSpec() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
-    private lateinit var engine: T9Engine
+    class MockT9Engine(private val engine: T9Engine = mockk(relaxUnitFun = true)) : T9Engine by engine {
+        private val channel = Channel<T9Engine.Event>()
+        override val eventSource: ReceiveChannel<T9Engine.Event> = channel
+        val eventSink: SendChannel<T9Engine.Event> = channel
+        init {
+            every { engine.eventSource } returns Channel()
+        }
+
+        internal fun verifyInitCalled() {
+            coVerify { engine.init() }
+        }
+    }
+
+    private lateinit var engine: MockT9Engine
     private lateinit var env: Env
 
     abstract class MockView : View {
@@ -33,9 +46,7 @@ class PresenterTest: FunSpec() {
         env = mockk()
         //every { env.... } returns ...
 
-        engine = mockk(relaxUnitFun = true)
-        every { engine.eventSource } returns Channel()
-        //every { engine.canReuseDb() } returns false
+        engine = MockT9Engine()
         view.scope.launch {
             presenter.start()
         }
@@ -53,12 +64,12 @@ class PresenterTest: FunSpec() {
 
         test("initializeEngineOnStart") {
             view.eventSink.send(Event.START.noData())
-            coVerify { engine.init() }
+            engine.verifyInitCalled()
         }
 
         test("6.ReuseBuiltDawg") {
             view.eventSink.send(Event.START.noData())
-            coVerify { engine.init() }
+            engine.verifyInitCalled()
         }
 
         test("showKeyboardWhenEngineLoadCompleted") {
@@ -114,7 +125,7 @@ class PresenterTest: FunSpec() {
         coEvery {
             engine.push(any())
         } coAnswers {
-            engine.eventSource.send(config[firstArg()] ?: fallback())
+            engine.eventSink.send(config[firstArg()] ?: fallback())
         }
     }
 }

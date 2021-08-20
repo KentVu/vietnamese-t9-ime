@@ -47,6 +47,7 @@ class Presenter(
 
     private suspend fun receiveEngineEvents() {
         for (event in engine.eventSource) {
+            log.v("receiveEngineEvents:$event")
             when(event) {
                 is T9Engine.Event.LoadProgress -> view.showProgress(event.bytes)
                 is T9Engine.Event.Confirm -> view.confirmInput(event.word)

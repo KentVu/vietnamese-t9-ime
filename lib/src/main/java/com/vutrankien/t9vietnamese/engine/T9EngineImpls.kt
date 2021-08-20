@@ -41,10 +41,10 @@ class DefaultT9Engine(
 
         fun update(candidates: Collection<String>, numSeq: MutableList<Key>) {
             val numSeqStr = numSeq.joinNum()
-            log.d("Candidates:update:$numSeqStr")
             // XXX: don't update _currentCandidates directly because it is being used on multiple threads
             clear()
             this.candidates.addAll(candidates.toMutableList().apply { add(numSeqStr) })
+            log.d("Candidates:update:$candidates:$numSeqStr:out ${this.candidates}")
         }
 
         fun next() {
@@ -60,6 +60,10 @@ class DefaultT9Engine(
         }
 
         fun selected(): String = candidates.elementAt(selectedCandidate)
+
+        override fun toString(): String {
+            return "DefaultT9Engine.Candidates:$candidates"
+        }
     }
 
     private val _currentNumSeq = mutableListOf<Key>()
@@ -102,7 +106,9 @@ class DefaultT9Engine(
                 // Numeric keys
                 _currentNumSeq.add(key)
                 _candidates.update(findCandidates(_currentNumSeq), _currentNumSeq)
-                eventSource.send(T9Engine.Event.NewCandidates(_candidates))
+                log.v("push:$key:out $_candidates")
+                // XXX clone _candidates or event get dropped (I don't know why :( )
+                eventSource.send(T9Engine.Event.NewCandidates(_candidates.toList()))
             }
         }
     }
@@ -147,17 +153,23 @@ class DefaultT9Engine(
         ): Set<String> {
             // find all combinations:
             val possibleCombinations = possibleCombinations("", keySeq)
+            log.v("FindCandidates:possibleCombinations:$possibleCombinations")
             return possibleCombinations.fold(sortedSetOf<String>()) { acc, next ->
-                acc.apply { addAll(db.search(next).keys.map { it.composeVietnamese() }) }
-            }
+                acc.apply {
+                    addAll(db.search(next).keys.map { it.composeVietnamese() })
+                    log.v("FindCandidates:acc=$acc,next=${next},$this")
+                }
+            }.also { log.v("FindCandidates:return $it") }
         }
 
         private fun possibleCombinations(currentPrefix: String, keySeq: List<Key>): Set<String> {
+            //log.v("possibleCombinations:currentPrefix=$currentPrefix,keySeq=${keySeq.joinNum()}")
             val possibleChars = linkedSetOf<Char>()
             pad[keySeq[0]].chars.fillCase().forEach { c ->
                 val newCombination = "$currentPrefix$c"
-                if (dbContainsPrefix(newCombination))
+                if (dbContainsPrefix(newCombination)) {
                     possibleChars.add(c)
+                }
             }
             if (keySeq.size == 1) {
                 return possibleChars.map {

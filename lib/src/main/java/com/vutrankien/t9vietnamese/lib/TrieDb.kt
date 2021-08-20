@@ -40,7 +40,9 @@ class TrieDb(
         trie = DawgTrie.load(dawgPath)
     }
 
-    override fun search(prefix: String): Map<String, Int> = trie.search(prefix)
+    override fun search(prefix: String): Map<String, Int> = trie.search(prefix).also {
+        log.v("search:$prefix:return $it")
+    }
 
     override suspend fun initOrLoad(
             seed: Seed,

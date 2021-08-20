@@ -80,7 +80,7 @@ class Robot(
     }
 
     internal fun checkInsertedTextIs(s: String) = apply {
-        onView(withId(R.id.editText)).check(matches(withText(s)))
+        onView(withId(R.id.editText)).perform(TestHelpers.waitUiAction(withText(s), 1000))
     }
 
     suspend fun backspace() {

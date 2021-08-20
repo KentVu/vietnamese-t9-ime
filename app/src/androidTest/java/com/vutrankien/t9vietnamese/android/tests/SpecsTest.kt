@@ -36,7 +36,7 @@ class SpecsTest: MainActivityTestsBase(
             browseTo("chào")
             confirm()
             checkInsertedTextIs("chào ")
-            backspace()
+            backspace() // delete space
             backspace()
             checkInsertedTextIs("chà")
         }
@@ -55,6 +55,5 @@ class SpecsTest: MainActivityTestsBase(
             confirm()
             checkInsertedTextIs("chà ")
         }
-        // wait if necessary
     }
 }
