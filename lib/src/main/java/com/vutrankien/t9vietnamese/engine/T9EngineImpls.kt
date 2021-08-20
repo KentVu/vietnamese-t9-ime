@@ -44,7 +44,7 @@ class DefaultT9Engine(
             // XXX: don't update _currentCandidates directly because it is being used on multiple threads
             clear()
             this.candidates.addAll(candidates.toMutableList().apply { add(numSeqStr) })
-            log.d("Candidates:update:$candidates:$numSeqStr:out ${this.candidates}")
+            //log.d("Candidates:update:$candidates:$numSeqStr:out ${this.candidates}")
         }
 
         fun next() {
@@ -106,7 +106,7 @@ class DefaultT9Engine(
                 // Numeric keys
                 _currentNumSeq.add(key)
                 _candidates.update(findCandidates(_currentNumSeq), _currentNumSeq)
-                log.v("push:$key:out $_candidates")
+                //log.v("push:$key:out $_candidates")
                 // XXX clone _candidates or event get dropped (I don't know why :( )
                 eventSource.send(T9Engine.Event.NewCandidates(_candidates.toList()))
             }
@@ -153,17 +153,16 @@ class DefaultT9Engine(
         ): Set<String> {
             // find all combinations:
             val possibleCombinations = possibleCombinations("", keySeq)
-            log.v("FindCandidates:possibleCombinations:$possibleCombinations")
+            //log.v("FindCandidates:possibleCombinations:$possibleCombinations")
             return possibleCombinations.fold(sortedSetOf<String>()) { acc, next ->
                 acc.apply {
                     addAll(db.search(next).keys.map { it.composeVietnamese() })
-                    log.v("FindCandidates:acc=$acc,next=${next},$this")
+                    //log.v("FindCandidates:acc=$acc,next=${next},$this")
                 }
-            }.also { log.v("FindCandidates:return $it") }
+            }/*.also { log.v("FindCandidates:return $it") }*/
         }
 
         private fun possibleCombinations(currentPrefix: String, keySeq: List<Key>): Set<String> {
-            //log.v("possibleCombinations:currentPrefix=$currentPrefix,keySeq=${keySeq.joinNum()}")
             val possibleChars = linkedSetOf<Char>()
             pad[keySeq[0]].chars.fillCase().forEach { c ->
                 val newCombination = "$currentPrefix$c"
