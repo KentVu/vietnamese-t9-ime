@@ -69,6 +69,8 @@ jobs:
           arch: x86
           emulator-build: 7425822 # https://github.com/ReactiveCircus/android-emulator-runner/issues/160
           script: |
+            adb logcat -c
+            adb logcat *:E -v color &
             ./gradlew -Plint.output.console=true --info connectedCheck
 
       - name: Persist test result
