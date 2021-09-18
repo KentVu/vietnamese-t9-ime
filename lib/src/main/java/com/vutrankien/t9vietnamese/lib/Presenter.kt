@@ -8,23 +8,23 @@ import kotlin.system.measureTimeMillis
 
 class Presenter(
     lg: LogFactory,
-    private val engine: T9Engine
+    private val engine: T9Engine,
+    private val view: View
 ) {
     private val log = lg.newLog("Presenter")
-    private lateinit var view: View
 
-    fun attachView(view: View) {
+    fun start() {
         view.scope.launch {
-            receiveUiEvents(view)
+            receiveUiEvents()
         }
         view.scope.launch {
             receiveEngineEvents()
         }
     }
 
-    private suspend fun receiveUiEvents(view: View) {
-        this.view = view
+    private suspend fun receiveUiEvents() {
         for (eventWithData in view.eventSource) {
+            //log.d("receiveEvents:$eventWithData")
             when (eventWithData.event) {
                 Event.START -> {
                     log.i("Start initializing")
@@ -47,11 +47,13 @@ class Presenter(
 
     private suspend fun receiveEngineEvents() {
         for (event in engine.eventSource) {
+            log.v("receiveEngineEvents:$event")
             when(event) {
                 is T9Engine.Event.LoadProgress -> view.showProgress(event.bytes)
                 is T9Engine.Event.Confirm -> view.confirmInput(event.word)
                 is T9Engine.Event.NewCandidates -> view.showCandidates(event.candidates)
-                is T9Engine.Event.SelectCandidate -> view.candidateSelected(event.selectedCandidate)
+                is T9Engine.Event.SelectCandidate -> view.highlightCandidate(event.selectedCandidate)
+                is T9Engine.Event.Backspace -> view.deleteBackward()
             }
         }
     }

@@ -1,40 +1,64 @@
 package com.vutrankien.t9vietnamese.android
 
+import android.content.Context
 import android.inputmethodservice.InputMethodService
 import android.view.View
-import android.widget.Button
+import android.view.inputmethod.InputConnection
 import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.engine.DefaultT9Engine
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import com.vutrankien.t9vietnamese.lib.View as MVPView
+import kotlinx.coroutines.sync.Semaphore
 
 /**
  * Created by vutrankien on 17/05/02.
  */
-class T9Vietnamese : InputMethodService(), MVPView {
-    private val logFactory: LogFactory = AndroidLogFactory()
+class T9Vietnamese : InputMethodService() {
+    private val logFactory: LogFactory = AndroidLogFactory
     private val log = logFactory.newLog("T9IMService")
+
+    lateinit var view: InputMethodServiceView
     private lateinit var presenter: Presenter
-    override val scope = CoroutineScope(Dispatchers.Main + Job())
-    override val eventSource: Channel<EventWithData<Event, Key>> =
-        Channel()
-    private val logic: UiLogic by lazy { UiLogic.DefaultUiLogic(Preferences(applicationContext)) }
-    //private val wordListAdapter = WordListAdapter()
+    private val scope = CoroutineScope(Dispatchers.Main + Job())
+    private val channel: Channel<EventWithData<Event, Key>> = Channel()
+
+    class InputMethodServiceView(
+        logFactory: LogFactory,
+        context: Context,
+        override val scope: CoroutineScope,
+        channel: Channel<EventWithData<Event, Key>>,
+        private val inputMethodService: InputMethodService
+    ) : AndroidView(
+        logFactory, logFactory.newLog("T9Vietnamese.V"),
+        context, scope,
+        channel, channel
+    ) {
+        private var lastInputConnection: InputConnection? = null
+        override val inputConnection: InputConnection
+            get() {
+                val newInputConnection = inputMethodService.currentInputConnection
+                if (lastInputConnection != newInputConnection) {
+                    log.d("inputConnection#get():new $newInputConnection")
+                }
+                lastInputConnection = newInputConnection
+                return newInputConnection
+            }
+
+        override fun displayInfo(resId: Int, vararg formatArgs: Any) {
+            log.i(context.getString(resId, *formatArgs))
+        }
+    }
+
+    private lateinit var inputView: T9KeyboardView
+    lateinit var candidatesView: RecyclerView
 
     override fun onCreate() {
         super.onCreate()
-        presenter = Presenter(
-            logFactory,
-            DefaultT9Engine(
-                DecomposedSeed(resources),
-                VnPad,
-                logFactory,
-                TrieDb(logFactory, AndroidEnv(applicationContext))
-            )
-        )
         log.d("onCreate")
+        inputView = layoutInflater.inflate(
+            R.layout.input, null) as (T9KeyboardView)
+        candidatesView = (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView)
     }
 
     override fun onDestroy() {
@@ -43,64 +67,50 @@ class T9Vietnamese : InputMethodService(), MVPView {
     }
 
     override fun onCreateInputView(): View {
-        val inputView = layoutInflater.inflate(
-            R.layout.input, null) as (T9KeyboardView)
         inputView.keyboard = T9Keyboard(this)
         inputView.setOnKeyboardActionListener(
             KeyboardActionListener(
                 logFactory,
                 scope,
-                eventSource
+                channel
             )
         )
-        presenter.attachView(this)
-        scope.launch {
-            eventSource.send(Event.START.noData())
-        }
+        view = InputMethodServiceView(
+            logFactory,
+            this,
+            scope,
+            channel,
+            this
+        )
+        presenter = Presenter(
+            logFactory,
+            DefaultT9Engine(
+                DecomposedSeed(resources),
+                VnPad,
+                logFactory,
+                TrieDb(logFactory, AndroidEnv(applicationContext))
+            ),
+            view
+        )
+//        scope.launch {
+//            repeat(2) { semaphore.acquire() }
+//        }
+        view.init(inputView, candidatesView)
+        presenter.start()
         return inputView
         //return layoutInflater.inflate(
         //    R.layout.dialpad_table_old, null
         //) as ConstraintLayout
     }
 
-    override fun onCreateCandidatesView(): View {
-        setCandidatesViewShown(true)
-        return (layoutInflater.inflate(R.layout.candidates_view, null) as RecyclerView).also {
-            log.d("onCreateCandidatesView:$it")
-            logic.initializeCandidatesView(it)
+    object waitViews {
+        fun start() {
+            val semaphore = Semaphore(1, 1)
         }
     }
-
-    override fun showProgress(bytes: Int) {
-        //log.w("TODO: showProgress")
-        //displayInfo(R.string.engine_loading, bytes)
-    }
-
-    override fun showKeyboard() {
-        log.w("View: TODO: showKeyboard")
-        //displayInfo(R.string.notify_initialized)
-    }
-
-    override fun showCandidates(candidates: Collection<String>) {
-        log.d("View: TODO: showCandidates:$candidates")
-        logic.updateCandidates(candidates)
-    }
-
-    override fun candidateSelected(selectedCandidate: Int) {
-        logic.selectCandidate(selectedCandidate)
-    }
-
-    override fun confirmInput(word: String) {
-        log.d("View: confirmInput:$word")
-        // XXX Is inserting a space here a right place?
-        currentInputConnection.commitText(" $word", 1)
-        //setCandidatesViewShown(false)
-        logic.clearCandidates()
-        //findViewById<EditText>(R.id.editText).append(" $word")
-        //wordListAdapter.clear()
-    }
-
-    fun onBtnClick(view: View) {
-        log.d("onBtnClick() btn=" + (view as Button).text)
+    override fun onCreateCandidatesView(): View {
+        setCandidatesViewShown(true)
+        log.d("onCreateCandidatesView:$candidatesView")
+        return candidatesView
     }
 }

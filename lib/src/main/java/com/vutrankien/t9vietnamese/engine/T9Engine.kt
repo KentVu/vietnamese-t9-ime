@@ -3,7 +3,7 @@ package com.vutrankien.t9vietnamese.engine
 import com.vutrankien.t9vietnamese.lib.Key
 import com.vutrankien.t9vietnamese.lib.PadConfiguration
 import com.vutrankien.t9vietnamese.lib.Seed
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface T9Engine {
 
@@ -28,6 +28,7 @@ interface T9Engine {
         class LoadProgress(val bytes: Int) : Event()
         object Initialized : Event()
         data class SelectCandidate(val selectedCandidate: Int) : Event()
+        object Backspace : Event()
     }
 
     val engineSeed: Seed
@@ -36,7 +37,7 @@ interface T9Engine {
      * This NEED to be set before pushing anything to the engine!
      */
     val pad: PadConfiguration
-    val eventSource: Channel<Event>
+    val eventSource: ReceiveChannel<Event>
 
     suspend fun push(key: Key)
     suspend fun init()

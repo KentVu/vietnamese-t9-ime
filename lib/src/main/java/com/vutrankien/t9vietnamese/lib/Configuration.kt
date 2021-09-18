@@ -41,61 +41,64 @@ object VNConfiguration: Configuration {
 // TODO match case-insensitively
 val VnPad = PadConfiguration(
     mapOf(
-        Key.num0 to KeyConfig(
+        Key.Num0 to KeyConfig(
             Confirm,
             linkedSetOf(' ')
         ),
-        Key.num1 to KeyConfig(
+        Key.Num1 to KeyConfig(
             Symbol,
             linkedSetOf('.', ',', '?', '!', '-')
         ),
-        Key.num2 to KeyConfig(
+        Key.Num2 to KeyConfig(
             Normal,
             linkedSetOf('a', 'ă', 'â', 'b', 'c', '́' /*sắc*/)
         ),
-        Key.num3 to KeyConfig(
+        Key.Num3 to KeyConfig(
             Normal,
             linkedSetOf('d', 'đ', 'e', 'ê', 'f', '̀' /*huyền*/)
         ),
-        Key.num4 to KeyConfig(
+        Key.Num4 to KeyConfig(
             Normal,
             linkedSetOf('g', 'h', 'i', '̉' /*hỏi*/)
         ),
-        Key.num5 to KeyConfig(
+        Key.Num5 to KeyConfig(
             Normal,
             linkedSetOf('j', 'k', 'l', '̃' /*ngã*/)
         ),
-        Key.num6 to KeyConfig(
+        Key.Num6 to KeyConfig(
             Normal,
             linkedSetOf('m', 'n', 'o', 'ô', 'ơ', '̣' /*nặng*/)
         ),
-        Key.num7 to KeyConfig(
+        Key.Num7 to KeyConfig(
             Normal,
             linkedSetOf('p', 'q', 'r', 's')
         ),
-        Key.num8 to KeyConfig(
+        Key.Num8 to KeyConfig(
             Normal,
             linkedSetOf('t', 'u', 'ư', 'v')
         ),
-        Key.num9 to KeyConfig(
+        Key.Num9 to KeyConfig(
             Normal,
             linkedSetOf('w', 'x', 'y', 'z')
         ),
-        Key.star to KeyConfig(
+        Key.Star to KeyConfig(
             NextCandidate
         ),
-        Key.keySharp to KeyConfig(
+        Key.KeySharp to KeyConfig(
             ToNum
         ),
-        Key.left to KeyConfig(
+        Key.Left to KeyConfig(
             PrevCandidate
+        ),
+        Key.Backspace to KeyConfig(
+            Backspace
         )
     )
 )
 
 enum class KeyType(val isConfirmationKey: Boolean) {
     Normal(false), Symbol(false), NextCandidate(false),
-    Confirm(true), ToNum(false), PrevCandidate(false);
+    Confirm(true), ToNum(false), PrevCandidate(false), Backspace(false);
 }
 
 data class KeyConfig(val type: KeyType, val chars: Set<Char> = emptySet()) {
@@ -105,31 +108,39 @@ enum class Key(
     /**
      * The character that represents this [Key], usually a digit.
      */
-    val char: Char
+    val keycode: Int
 ) {
-    num0('0'),
-    num1('1'),
-    num2('2'),
-    num3('3'),
-    num4('4'),
-    num5('5'),
-    num6('6'),
-    num7('7'),
-    num8('8'),
-    num9('9'),
-    star('*'),
-    keySharp('#'),
-    left('<');
+
+    Num0('0'.toInt()),
+    Num1('1'.toInt()),
+    Num2('2'.toInt()),
+    Num3('3'.toInt()),
+    Num4('4'.toInt()),
+    Num5('5'.toInt()),
+    Num6('6'.toInt()),
+    Num7('7'.toInt()),
+    Num8('8'.toInt()),
+    Num9('9'.toInt()),
+    Star('*'.toInt()),
+    KeySharp('#'.toInt()),
+    Left('<'.toInt()),
+    Backspace(67);
+    val char: Char
+        get() = keycode.toChar()
 
     companion object {
-        fun fromNum(num: Char): Key {
-            return values().first { it.char == num }
+        fun fromCode(code: Int): Key {
+            return values().first { it.keycode == code }
             //values().forEach {
             //    if (it.char == num) {
             //        return it
             //    }
             //}
             //throw IllegalArgumentException("Key(char=${key.char})")
+        }
+
+        fun fromChar(c: Char): Key {
+            return values().first { it.keycode == c.toInt() }
         }
     }
 }

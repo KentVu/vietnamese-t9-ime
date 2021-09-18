@@ -40,12 +40,14 @@ class TrieDb(
         trie = DawgTrie.load(dawgPath)
     }
 
-    override fun search(prefix: String): Map<String, Int> = trie.search(prefix)
+    override fun search(prefix: String): Map<String, Int> = trie.search(prefix)/*.also {
+        log.v("search:$prefix:return $it")
+    }*/
 
     override suspend fun initOrLoad(
             seed: Seed,
             onBytes: suspend (Int) -> Unit
-    ) = coroutineScope {
+    ) {
         if (overwriteDawgFile || !canReuse()) {
             log.i("init: initialized=$initialized from seed")
             init(seed, onBytes)
