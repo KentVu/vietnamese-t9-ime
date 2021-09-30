@@ -46,6 +46,10 @@ jobs:
             lib/build/test-results/**/*.xml
             app/build/test-results/**/*.xml
 
+      - name: Upload DeployGate
+        run: |
+          ./gradlew :app:uploadDeployGateDebug
+
   android-test:
     runs-on: macOS-latest # macos-11.0 is not public for now
     steps:
