@@ -77,6 +77,21 @@ kotlin {
 //    }
 }
 
+// https://github.com/DeployGate/gradle-deploygate-plugin#how-configure-your-deployments
+deploygate {
+    appOwnerName = "KentVu"
+    //apiToken = "[your or app owner's API token]" -> envvar
+
+    deployments {
+        debug {
+            def hash = "git rev-parse --short HEAD".execute([], project.rootDir).in.text.trim()
+            def branch = "git rev-parse --abbrev-ref HEAD".execute([], project.rootDir).in.text.trim()
+            // Set a text which is associated with an application file on DeployGate
+            message = "debug build ${hash} on $branch" // null by default
+        }
+    }
+}
+
 //bintray {
 //    user = System.getenv('BINTRAY_USER') ?: property('bintray_user')
 //    key = System.getenv('BINTRAY_KEY') ?: property('bintray_user')
