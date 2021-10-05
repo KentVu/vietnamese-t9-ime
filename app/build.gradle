@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'deploygate'
 
 android {
     compileSdkVersion 28
@@ -74,6 +75,21 @@ kotlin {
 //    experimental {
 //        coroutines "enable"
 //    }
+}
+
+// https://github.com/DeployGate/gradle-deploygate-plugin#how-configure-your-deployments
+deploygate {
+    appOwnerName = "KentVu"
+    //apiToken = "[your or app owner's API token]" -> envvar
+
+    deployments {
+        debug {
+            def hash = "git rev-parse --short HEAD".execute([], project.rootDir).in.text.trim()
+            def branch = "git rev-parse --abbrev-ref HEAD".execute([], project.rootDir).in.text.trim()
+            // Set a text which is associated with an application file on DeployGate
+            message = "debug build ${hash} on $branch" // null by default
+        }
+    }
 }
 
 //bintray {
