@@ -111,7 +111,7 @@ class MainActivity : Activity() {
         }
 
         interface TestingHook {
-            val candidatesAdapter: WordListAdapter
+            val candidatesAdapter: CandidatesAdapter
             val eventSink: SendChannel<EventWithData<Event, Key>>
 
             //fun waitNewCandidates()
@@ -120,9 +120,9 @@ class MainActivity : Activity() {
         /** For integration testing. */
         @VisibleForTesting
         val testingHook = object: TestingHook {
-            override val candidatesAdapter: WordListAdapter
+            override val candidatesAdapter: CandidatesAdapter
                 //get() = this@MainActivity.findViewById<RecyclerView>(R.id.candidates_view).adapter as WordListAdapter
-                get() = (this@MainActivityView).wordListAdapter
+                get() = (this@MainActivityView).candidatesAdapter
             override val eventSink = this@MainActivityView.eventSink
             //override fun waitNewCandidates() {
             //    this@MainActivity.

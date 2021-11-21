@@ -56,4 +56,17 @@ class SpecsTest: MainActivityTestsBase(
             checkInsertedTextIs("chà ")
         }
     }
+
+    @Test
+    fun candidateBeenChosenDisplayedFirst(): Unit = runBlocking {
+        // clear db
+        with(robot) {
+            pressSequentially("24236")
+            checkCandidateDisplayed("chào")
+            browseTo("chào")
+            confirm()
+            pressSequentially("24236")
+            checkCandidatePosition("chào", 1)
+        }
+    }
 }
