@@ -2,14 +2,11 @@ package com.vutrankien.t9vietnamese.android
 
 import android.content.Context
 import android.inputmethodservice.KeyboardView
-import android.os.PowerManager
 import android.view.inputmethod.InputConnection
-import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vutrankien.t9vietnamese.lib.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.launch
@@ -26,12 +23,12 @@ abstract class AndroidView(
     internal abstract val inputConnection: InputConnection
     private val preferences by lazy { Preferences(context.applicationContext) }
     private lateinit var candidatesView: RecyclerView
-    protected val wordListAdapter = WordListAdapter()
+    protected val candidatesAdapter = CandidatesAdapter()
 
-    private fun initializeCandidatesView(recyclerView: RecyclerView) {
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(recyclerView.context, RecyclerView.HORIZONTAL, false)
-            adapter = wordListAdapter
+    private fun initializeCandidatesView(candidatesView: RecyclerView) {
+        candidatesView.apply {
+            layoutManager = LinearLayoutManager(candidatesView.context, RecyclerView.HORIZONTAL, false)
+            adapter = candidatesAdapter
         }
     }
 
@@ -59,7 +56,7 @@ abstract class AndroidView(
     }
 
      private fun updateCandidates(candidates: Collection<String>) {
-        wordListAdapter.update(candidates)
+        candidatesAdapter.update(candidates)
     }
 
     override fun showCandidates(candidates: Collection<String>) {
@@ -75,13 +72,13 @@ abstract class AndroidView(
     }
 
      private fun selectCandidate(selectedCandidate: Int) {
-        wordListAdapter.select(selectedCandidate)
+        candidatesAdapter.select(selectedCandidate)
         @Suppress("ConstantConditionIf")
         if (preferences.autoScroll) {
             //candidatesView.scrollToPosition(wordListAdapter.selectedWord)
             // check candidates_view.xml
             (candidatesView.layoutManager as LinearLayoutManager).run {
-                val selectedWord = wordListAdapter.selectedWord
+                val selectedWord = candidatesAdapter.selectedWord
                 if (selectedWord !in findFirstCompletelyVisibleItemPosition()..findLastCompletelyVisibleItemPosition()) {
                     scrollToPositionWithOffset(selectedWord, 20)
                 }
@@ -94,7 +91,7 @@ abstract class AndroidView(
     }
 
      private fun clearCandidates() {
-        wordListAdapter.clear()
+        candidatesAdapter.clear()
     }
 
     /**

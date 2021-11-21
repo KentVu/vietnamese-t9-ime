@@ -9,7 +9,7 @@ import androidx.cardview.widget.CardView
 /**
  * Created by user on 2018/03/21.
  */
-class WordListAdapter() : RecyclerView.Adapter<WordListAdapter.ViewHolder>() {
+class CandidatesAdapter : RecyclerView.Adapter<CandidatesAdapter.ViewHolder>() {
 
     private val words = mutableListOf<String>()
 

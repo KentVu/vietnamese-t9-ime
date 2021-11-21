@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 
 class Robot(
@@ -85,5 +86,9 @@ class Robot(
 
     suspend fun backspace() {
         uiEventSink.send(Event.KEY_PRESS.withData(Key.Backspace))
+    }
+
+    fun checkCandidatePosition(candidate: String, pos: Int): Robot = apply {
+        assertEquals(pos, testingHook.candidatesAdapter.findItem(candidate))
     }
 }
