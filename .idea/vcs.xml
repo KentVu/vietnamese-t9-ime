@@ -13,6 +13,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/DAWG" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dawg-java" vcs="Git" />
   </component>
 </project>

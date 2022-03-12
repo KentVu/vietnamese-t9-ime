@@ -2,7 +2,6 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 test {
-    systemProperty "java.library.path", file("${project(":dawg-jni").buildDir}/lib/main/debug").absolutePath
     // For TrieTest.kt
     //systemProperty "word_list_file", "$rootDir/data/vi-DauMoi.dic"
     useJUnitPlatform()
@@ -14,8 +13,6 @@ test {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':dawg-java')  // remember to enable dawg-java & executeSwig below
-    //implementation "kentvu.dawgjava:dawg-java:$dawgjava_version"  // remember to set personal token to fetch
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
 
@@ -27,7 +24,6 @@ dependencies {
 
 //tasks.withType(KotlinCompile).configureEach
 compileKotlin {
-    dependsOn ':dawg-jni:linkDebug' // -> executeSwig
     kotlinOptions {
         jvmTarget = "1.8"
     }

@@ -2,9 +2,5 @@ include ':app', ':lib'
 
 include ':console'
 
-include ':dawg-jni'
-project(':dawg-jni').projectDir = new File(rootDir, 'dawg-java/dawg-jni')
-include ':dawg-java'
-project(':dawg-java').projectDir = new File(rootDir, 'dawg-java/dawg-java')
-include ':dawg-android'
-project(':dawg-android').projectDir = new File(rootDir, 'dawg-java/dawg-android')
+include ':DAWG'
+project(':DAWG').projectDir = new File(rootDir, 'DAWG')
