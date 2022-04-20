@@ -7,10 +7,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,26 +21,38 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            T9VietnameseTheme {
-                Keypad()
-            }
+            MainActivityView()
         }
 
     }
 
     @Composable
-    fun Keypad() {
+    private fun MainActivityView() {
+        T9VietnameseTheme {
+            Scaffold(topBar = {
+                TopAppBar(title = {
+                    Text("T9Vietnamese")
+                })
+            }) { innerPadding ->
+                Keypad(Modifier.padding(innerPadding))
+            }
+        }
+    }
+
+    @Composable
+    fun Keypad(modifier: Modifier = Modifier) {
         Surface(
             shape = MaterialTheme.shapes.medium,
             //color = MaterialTheme.colors.secondary,
             elevation = 1.dp,
-            modifier = Modifier
+            modifier = modifier
                 .animateContentSize()
                 .padding(1.dp)
         ) {
             Column {
                 KeyboardRow(StandardKeys.key1, StandardKeys.key2, StandardKeys.key3)
                 KeyboardRow(StandardKeys.key4, StandardKeys.key5, StandardKeys.key6)
+                KeyboardRow(StandardKeys.key7, StandardKeys.key8, StandardKeys.key9)
             }
         }
     }
@@ -76,8 +85,6 @@ class MainActivity : ComponentActivity() {
     @Preview
     @Composable
     fun PreviewKeyboard() {
-        T9VietnameseTheme {
-            Keypad()
-        }
+        MainActivityView()
     }
 }
