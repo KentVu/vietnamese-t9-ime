@@ -15,7 +15,7 @@ internal class SequencerTest {
             input('2')
             input('3')
         }
-        inOrder {
+        inOrder(listener) {
             verify(listener).output("1")
             verify(listener).output("12")
             verify(listener).output("123")
