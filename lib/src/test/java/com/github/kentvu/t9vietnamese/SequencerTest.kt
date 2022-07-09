@@ -8,8 +8,9 @@ import org.mockito.kotlin.verify
 internal class SequencerTest {
     @Test
     fun sequencerTest() {
+        val sequencer = Sequencer.DefaultSequencer()
         val listener = mock<Sequencer.SequencerListener>()
-        val sequencer = Sequencer(listener)
+        sequencer.listen(listener)
         with(sequencer) {
             input('1')
             input('2')

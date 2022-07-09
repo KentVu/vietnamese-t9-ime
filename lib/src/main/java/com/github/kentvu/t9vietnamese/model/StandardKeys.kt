@@ -1,15 +1,20 @@
 package com.github.kentvu.t9vietnamese.model
 
 object StandardKeys {
+    fun fromChar(c: Char): Key {
+        return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
+    }
 
-    val key1: Key = Key('1', ".,?")
-    val key2: Key = Key('2', "abc")
-    val key3: Key = Key('3', "def")
-    val key4: Key = Key('4', "ghi")
-    val key5: Key = Key('5', "jkl")
-    val key6: Key = Key('6', "mno")
-    val key7: Key = Key('7', "pqrs")
-    val key8: Key = Key('8', "tuv")
-    val key9: Key = Key('9', "wyz")
-    val key0: Key = Key('0', " ")
+    private val sym2Key = mutableMapOf<Char, Key>()
+    val key1: Key = Key('1', ".,?").apply { sym2Key[symbol] = this }
+    val key2: Key = Key('2', "abc").apply { sym2Key[symbol] = this }
+    val key3: Key = Key('3', "def").apply { sym2Key[symbol] = this }
+    val key4: Key = Key('4', "ghi").apply { sym2Key[symbol] = this }
+    val key5: Key = Key('5', "jkl").apply { sym2Key[symbol] = this }
+    val key6: Key = Key('6', "mno").apply { sym2Key[symbol] = this }
+    val key7: Key = Key('7', "pqrs").apply { sym2Key[symbol] = this }
+    val key8: Key = Key('8', "tuv").apply { sym2Key[symbol] = this }
+    val key9: Key = Key('9', "wxyz").apply { sym2Key[symbol] = this }
+    val key0: Key = Key('0', " ").apply { sym2Key[symbol] = this }
+
 }
