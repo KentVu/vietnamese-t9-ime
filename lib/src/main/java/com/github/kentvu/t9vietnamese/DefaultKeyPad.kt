@@ -2,7 +2,7 @@ package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.t9vietnamese.model.Key
 
-class DefaultKeyPad() : KeyPad {
+class DefaultKeyPad(override val keyEvents: KeyPad.KeyEvent) : KeyPad {
     object SequencerListener: Sequencer.SequencerListener
     {
         override fun output(s: String) {
@@ -12,7 +12,7 @@ class DefaultKeyPad() : KeyPad {
 
     private val sequencer: Sequencer = Sequencer.DefaultSequencer().apply { listen(SequencerListener) }
 
-    override fun type(key: Key) {
+    fun type(key: Key) {
         type(key.symbol)
     }
 

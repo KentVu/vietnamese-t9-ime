@@ -8,9 +8,10 @@ import org.junit.Before
 import org.junit.Test
 
 class TypingTest() {
+
     private val app: T9Vietnamese = T9Vietnamese(
-        DefaultKeyPad(),
-        DummyView()
+        keyPad,
+        view
     )
 
     @Before
@@ -19,9 +20,7 @@ class TypingTest() {
 
     @Test
     fun typingTest() {
-        KeySequence('2', '4','2','3','6').forEach {
-            app.keyPad.type(it)
-        }
+        app.type('2', '4','2','3','6')
         assertTrue(app.view.candidates.has("chào"))
     }
 
