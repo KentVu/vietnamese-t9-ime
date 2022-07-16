@@ -1,6 +1,8 @@
-package com.github.kentvu.t9vietnamese
+package com.github.kentvu.t9vietnamese.model
 
-interface View {
+import com.github.kentvu.t9vietnamese.T9Engine
+
+abstract class View(t9: T9Engine.Output) {
 
     val candidates: Candidates
 

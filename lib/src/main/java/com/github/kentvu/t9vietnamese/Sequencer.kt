@@ -1,5 +1,7 @@
 package com.github.kentvu.t9vietnamese
 
+import com.github.kentvu.t9vietnamese.model.KeyPadOutput
+
 abstract class Sequencer {
     abstract fun input(key: Char)
 
@@ -8,7 +10,7 @@ abstract class Sequencer {
 
     abstract val output: Output
 
-    class DefaultSequencer(): Sequencer {
+    class DefaultSequencer(private val input: KeyPadOutput): Sequencer {
         private val sequence = mutableListOf<Char>()
 
         override fun input(c: Char) {
