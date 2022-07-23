@@ -1,16 +1,11 @@
 package com.github.kentvu.t9vietnamese
 
-import com.github.kentvu.t9vietnamese.jvm.DummyView
 import com.github.kentvu.t9vietnamese.model.KeyPad
+import com.github.kentvu.t9vietnamese.model.View
 
-class T9Vietnamese(private val keyPad: KeyPad) {
-    private val view: DummyView
+abstract class T9Vietnamese() {
+    abstract val view: View
+    abstract val keyPad: KeyPad
 
-    init {
-        view = DummyView(
-            DawgT9Engine(
-                Sequencer.DefaultSequencer(keyPad.output).output
-            ).output
-        )
-    }
+    abstract suspend fun type(vararg cs: Char)
 }

@@ -1,15 +1,14 @@
 package com.github.kentvu.t9vietnamese.model
 
-import com.github.kentvu.t9vietnamese.T9Engine
+import kotlinx.coroutines.flow.StateFlow
 
-abstract class View(t9: T9Engine.Output) {
+interface View {
 
-    val candidates: Candidates
+    val candidates: StateFlow<Candidates>
 
     interface Candidates {
         fun has(word: String): Boolean
-        class CandidatesImpl: Candidates {
-            private val candidates = setOf<String>()
+        class CandidatesImpl(private val candidates: Set<String> = setOf()) : Candidates {
             override fun has(word: String): Boolean {
                 return candidates.contains(word)
             }

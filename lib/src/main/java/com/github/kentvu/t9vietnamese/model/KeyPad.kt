@@ -1,11 +1,12 @@
 package com.github.kentvu.t9vietnamese.model
 
-import com.github.kentvu.t9vietnamese.model.Key
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
 
-interface KeyPad {
-    val keyEvents: KeyPadOutput
+abstract class KeyPad {
+    abstract val keyEvents: Flow<Key>
 
+    protected open suspend fun type(vararg cs: Char) {
+        cs.forEach { type(it) }
+    }
+    protected abstract suspend fun type(c: Char)
 }
-
-typealias KeyPadOutput = ReceiveChannel<Key>
