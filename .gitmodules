@@ -1,0 +1,3 @@
+[submodule "DAWG"]
+	path = DAWG
+	url = git@github.com:KentVu/DAWG.git
