@@ -7,11 +7,11 @@ object StandardKeys {
 
     private val sym2Key = mutableMapOf<Char, Key>()
     val key1: Key = Key('1', ".,?").apply { sym2Key[symbol] = this }
-    val key2: Key = Key('2', "abc").apply { sym2Key[symbol] = this }
-    val key3: Key = Key('3', "def").apply { sym2Key[symbol] = this }
-    val key4: Key = Key('4', "ghi").apply { sym2Key[symbol] = this }
-    val key5: Key = Key('5', "jkl").apply { sym2Key[symbol] = this }
-    val key6: Key = Key('6', "mno").apply { sym2Key[symbol] = this }
+    val key2: Key = Key('2', "abć").apply { sym2Key[symbol] = this }
+    val key3: Key = Key('3', "def̀").apply { sym2Key[symbol] = this }
+    val key4: Key = Key('4', "ghỉ").apply { sym2Key[symbol] = this }
+    val key5: Key = Key('5', "jkl̃").apply { sym2Key[symbol] = this }
+    val key6: Key = Key('6', "mnọ").apply { sym2Key[symbol] = this }
     val key7: Key = Key('7', "pqrs").apply { sym2Key[symbol] = this }
     val key8: Key = Key('8', "tuv").apply { sym2Key[symbol] = this }
     val key9: Key = Key('9', "wxyz").apply { sym2Key[symbol] = this }

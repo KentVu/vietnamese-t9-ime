@@ -14,7 +14,7 @@ class JvmT9Vietnamese(): T9Vietnamese() {
 
     private val trie = DawgTrie(
         DecomposedVietnameseWords(
-            javaClass.classLoader.getResourceAsStream("decomposed.dic.sorted")!!
+            javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
         )
     )
     private val _view = DummyView(

@@ -8,7 +8,7 @@ internal class DawgTrieTest {
     @Test
     fun trieTest() {
         val trie: Trie =
-            DawgTrie(DecomposedVietnameseWords(javaClass.classLoader.getResourceAsStream("decomposed.dic.sorted")!!))
+            DawgTrie(DecomposedVietnameseWords(javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!))
         trie.load()
         val search = trie.prefixSearch("chà")
         search.forEach { println(it) }
