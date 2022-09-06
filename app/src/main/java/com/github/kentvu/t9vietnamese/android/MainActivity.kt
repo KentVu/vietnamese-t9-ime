@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese.android
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateContentSize
@@ -39,14 +40,19 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     CandidatesView()
-                    Keypad(Modifier.padding(innerPadding))
+                    Keypad(Modifier.padding(innerPadding)) {
+                        Log.d(
+                            "MainActivity",
+                            "KeyClicked: $it"
+                        )
+                    }
                 }
             }
         }
     }
 
     @Composable
-    fun Keypad(modifier: Modifier = Modifier) {
+    fun Keypad(modifier: Modifier = Modifier, onKeyClick: (key: Key) -> Unit) {
         Surface(
             shape = MaterialTheme.shapes.medium,
             //color = MaterialTheme.colors.secondary,
@@ -56,9 +62,9 @@ class MainActivity : ComponentActivity() {
                 .padding(1.dp)
         ) {
             Column {
-                KeyboardRow(StandardKeys.key1, StandardKeys.key2, StandardKeys.key3)
-                KeyboardRow(StandardKeys.key4, StandardKeys.key5, StandardKeys.key6)
-                KeyboardRow(StandardKeys.key7, StandardKeys.key8, StandardKeys.key9)
+                KeyboardRow(StandardKeys.key1, StandardKeys.key2, StandardKeys.key3, onKeyClick)
+                KeyboardRow(StandardKeys.key4, StandardKeys.key5, StandardKeys.key6, onKeyClick)
+                KeyboardRow(StandardKeys.key7, StandardKeys.key8, StandardKeys.key9, onKeyClick)
             }
         }
     }
@@ -71,20 +77,20 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun KeyboardRow(key1: Key, key2: Key, key3: Key) {
+    private fun KeyboardRow(key1: Key, key2: Key, key3: Key, onKeyClick: (key: Key) -> Unit) {
         Row {
             val mod = Modifier
                 .padding(1.dp)
                 .weight(1F)
-            ComposableKey(key1, mod)
-            ComposableKey(key2, mod)
-            ComposableKey(key3, mod)
+            ComposableKey(key1, mod, onKeyClick)
+            ComposableKey(key2, mod, onKeyClick)
+            ComposableKey(key3, mod, onKeyClick)
         }
     }
 
     @Composable
-    private fun ComposableKey(key: Key, modifier: Modifier) {
-        Button(modifier = modifier, onClick = { /*TODO*/ }) {
+    private fun ComposableKey(key: Key, modifier: Modifier, onKeyClick: (key: Key) -> Unit) {
+        Button(modifier = modifier, onClick = { onKeyClick(key) }) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "${key.symbol}",
