@@ -6,8 +6,9 @@ import com.github.kentvu.t9vietnamese.T9Vietnamese
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.View
+import kotlinx.coroutines.CoroutineScope
 
-class JvmT9Vietnamese(): T9Vietnamese() {
+class JvmT9Vietnamese(scope: CoroutineScope) : T9Vietnamese() {
 
     private val _keyPad = DummyKeyPad()
     override val keyPad: KeyPad = _keyPad
@@ -21,9 +22,12 @@ class JvmT9Vietnamese(): T9Vietnamese() {
         DawgT9Engine(
             trie,
             Sequencer.DefaultSequencer(
-                _keyPad.keyEvents
-            ).output
-        ).output
+                _keyPad.keyEvents,
+                scope
+            ).output,
+            scope
+        ).output,
+        scope
     )
     override val view: View = _view
 

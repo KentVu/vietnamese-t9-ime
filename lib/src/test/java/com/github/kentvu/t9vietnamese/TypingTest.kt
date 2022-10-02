@@ -6,7 +6,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertContains
-import kotlin.test.assertTrue
 
 class TypingTest() {
 
@@ -15,7 +14,7 @@ class TypingTest() {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun typingTest() = runTest {
-        val app = JvmT9Vietnamese()
+        val app = JvmT9Vietnamese(this)
         app.view.candidates.test {
             app.type("24236") // Emissions to hot flows that don't have active consumers are dropped.
             assertContains(app.view.candidates.value.asSet(), "chào")

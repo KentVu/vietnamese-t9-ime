@@ -5,7 +5,9 @@ import com.github.kentvu.t9vietnamese.KeySequence
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.StandardKeys
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
@@ -17,7 +19,8 @@ internal class DawgT9EngineTest {
         DawgT9Engine(
             DawgTrie(DecomposedVietnameseWords(
                 javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!)),
-            flowOf(KeySequence(listOf(element)))
+            flowOf(KeySequence(listOf(element))).shareIn(this, SharingStarted.Eagerly),
+            this
         ).output.test {
             awaitItem().candidates.containsAll(listOf(element.subtext))
         }

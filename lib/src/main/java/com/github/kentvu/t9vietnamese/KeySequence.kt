@@ -28,5 +28,9 @@ class KeySequence(keys: List<Key>) {
         return true
     }
 
+    fun asString(): String {
+        return keyString
+    }
+
     //private val keySeq: List<Key> = chars.map { StandardKeys.fromChar(it) }
 }
