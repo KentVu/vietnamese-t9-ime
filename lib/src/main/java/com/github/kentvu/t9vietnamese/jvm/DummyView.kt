@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 class DummyView(input: Flow<T9Engine.T9EngineOutput>) : View {
     override val candidates: StateFlow<View.Candidates> =
-        MutableStateFlow(View.Candidates.CandidatesImpl())
+        MutableStateFlow(View.Candidates())
 }

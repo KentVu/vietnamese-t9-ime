@@ -5,6 +5,7 @@ import com.github.kentvu.t9vietnamese.jvm.JvmT9Vietnamese
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class TypingTest() {
@@ -16,8 +17,8 @@ class TypingTest() {
     fun typingTest() = runTest {
         val app = JvmT9Vietnamese()
         app.view.candidates.test {
-            app.type('2', '4','2','3','6')
-            assertTrue(app.view.candidates.value.has("chào"))
+            app.type("24236") // Emissions to hot flows that don't have active consumers are dropped.
+            assertContains(app.view.candidates.value.asSet(), "chào")
         }
     }
 

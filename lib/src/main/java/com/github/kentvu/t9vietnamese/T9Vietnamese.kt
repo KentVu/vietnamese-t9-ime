@@ -7,5 +7,5 @@ abstract class T9Vietnamese() {
     abstract val view: View
     abstract val keyPad: KeyPad
 
-    abstract suspend fun type(vararg cs: Char)
+    abstract suspend fun type(cs: String)
 }

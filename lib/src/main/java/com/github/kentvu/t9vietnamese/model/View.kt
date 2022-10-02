@@ -6,13 +6,13 @@ interface View {
 
     val candidates: StateFlow<Candidates>
 
-    interface Candidates {
-        fun has(word: String): Boolean
-        class CandidatesImpl(private val candidates: Set<String> = setOf()) : Candidates {
-            override fun has(word: String): Boolean {
-                return candidates.contains(word)
-            }
+    class Candidates(private val candidates: Set<String> = setOf()) {
+        fun has(word: String): Boolean {
+            return candidates.contains(word)
+        }
 
+        fun asSet(): Set<String> {
+            return candidates
         }
     }
 }

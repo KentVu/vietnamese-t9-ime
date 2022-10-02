@@ -34,8 +34,8 @@ class JvmT9Vietnamese(): T9Vietnamese() {
         trie.load()
     }
 
-    override suspend fun type(vararg cs: Char) {
-        _keyPad.simulateTyping(*cs)
+    override suspend fun type(cs: String) {
+        _keyPad.simulateTyping(cs)
     }
 
 }
