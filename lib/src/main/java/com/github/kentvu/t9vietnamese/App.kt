@@ -4,15 +4,22 @@ import com.github.kentvu.t9vietnamese.model.Keyboard
 import com.github.kentvu.t9vietnamese.model.WordList
 
 class App(private val keyboard: Keyboard, private val wordlist: WordList) {
-    private val _candidates = mutableSetOf<String>()
-    val candidates: Set<String> = _candidates
+    private var candidates: Set<String> = emptySet()
+        get() = field
+        private set
+    private val engine = Engine(keyboard, wordlist)
 
     fun type(c: Char) {
-        Engine(keyboard, wordlist).type("${keyboard.findKey(c)}")
+        engine.type("${keyboard.findKey(c)}")
+        candidates = engine.candidates
     }
 
-    fun verifyCandidatesContainOnly(s: String) {
+    fun isCandidatesContainOnly(s: String): Boolean {
+        return candidates.contains(s)
+    }
 
+    fun init() {
+        engine.init()
     }
 
 }

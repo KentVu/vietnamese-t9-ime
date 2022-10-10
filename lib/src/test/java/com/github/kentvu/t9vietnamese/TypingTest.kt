@@ -6,6 +6,9 @@ import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
+import kotlin.test.DefaultAsserter.assertTrue
+import kotlin.test.assertContains
+import kotlin.test.assertTrue
 
 class TypingTest() {
 
@@ -21,8 +24,9 @@ class TypingTest() {
             Keyboard(Key('1', "a")),
             WordList.Default(setOf("aa", "bb2", "cc1", "dd2"))
         )
+        app.init()
         app.type('1')
-        app.verifyCandidatesContainOnly("aa")
+        assertContains(app.candidates, "aa")
     }
 
 }
