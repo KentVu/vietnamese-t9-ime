@@ -2,9 +2,7 @@ package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
-import com.github.kentvu.t9vietnamese.model.StandardKeys
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import com.github.kentvu.t9vietnamese.model.KeysCollection
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,6 +19,6 @@ class DummyKeyPad(): KeyPad() {
     private val _keyEvent = MutableSharedFlow<Key>()
     override val keyEvents: SharedFlow<Key> = _keyEvent.asSharedFlow()
     override suspend fun onType(c: Char) {
-        _keyEvent.emit(StandardKeys.fromChar(c))
+        _keyEvent.emit(KeysCollection.fromChar(c))
     }
 }

@@ -1,11 +1,11 @@
 package com.github.kentvu.t9vietnamese
 
-import app.cash.turbine.test
-import com.github.kentvu.t9vietnamese.jvm.JvmT9Vietnamese
+import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.Keyboard
+import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
-import kotlin.test.assertContains
 
 class TypingTest() {
 
@@ -14,11 +14,15 @@ class TypingTest() {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun typingTest() = runTest {
-        val app = JvmT9Vietnamese(this)
-        app.view.candidates.test {
-            app.type("24236") // Emissions to hot flows that don't have active consumers are dropped.
-            assertContains(app.view.candidates.value.asSet(), "chào")
-        }
+        //val robot = Robot(App())
+        //robot.type('1')
+        //robot.checkCandidateHas('a', 'b', 'c')
+        val app = App(
+            Keyboard(Key('1', "a")),
+            WordList.Default(setOf("aa", "bb2", "cc1", "dd2"))
+        )
+        app.type('1')
+        app.verifyCandidatesContainOnly("aa")
     }
 
 }

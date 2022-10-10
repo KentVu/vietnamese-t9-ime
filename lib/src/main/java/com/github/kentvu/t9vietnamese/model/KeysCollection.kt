@@ -1,6 +1,6 @@
 package com.github.kentvu.t9vietnamese.model
 
-object StandardKeys {
+object KeysCollection {
     fun fromChar(c: Char): Key {
         return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
     }

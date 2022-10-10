@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.android.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.StandardKeys
+import com.github.kentvu.t9vietnamese.model.KeysCollection
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +62,9 @@ class MainActivity : ComponentActivity() {
                 .padding(1.dp)
         ) {
             Column {
-                KeyboardRow(StandardKeys.key1, StandardKeys.key2, StandardKeys.key3, onKeyClick)
-                KeyboardRow(StandardKeys.key4, StandardKeys.key5, StandardKeys.key6, onKeyClick)
-                KeyboardRow(StandardKeys.key7, StandardKeys.key8, StandardKeys.key9, onKeyClick)
+                KeyboardRow(KeysCollection.key1, KeysCollection.key2, KeysCollection.key3, onKeyClick)
+                KeyboardRow(KeysCollection.key4, KeysCollection.key5, KeysCollection.key6, onKeyClick)
+                KeyboardRow(KeysCollection.key7, KeysCollection.key8, KeysCollection.key9, onKeyClick)
             }
         }
     }

@@ -3,7 +3,7 @@ package com.github.kentvu.t9vietnamese.jvm
 import app.cash.turbine.test
 import com.github.kentvu.t9vietnamese.KeySequence
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
-import com.github.kentvu.t9vietnamese.model.StandardKeys
+import com.github.kentvu.t9vietnamese.model.KeysCollection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOf
@@ -15,7 +15,7 @@ import kotlin.test.Test
 internal class DawgT9EngineTest {
     @Test
     fun `1Char`() = runTest {
-        val element = StandardKeys.key2
+        val element = KeysCollection.key2
         DawgT9Engine(
             DawgTrie(DecomposedVietnameseWords(
                 javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!)),

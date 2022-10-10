@@ -7,15 +7,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.android.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.StandardKeys
+import com.github.kentvu.t9vietnamese.model.KeysCollection
 
 @Composable
 fun MainActivityView() {
@@ -45,10 +41,10 @@ fun Keypad(modifier: Modifier = Modifier) {
     ) {
         Column(verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End,) {
-            KeyboardRow(StandardKeys.key1, StandardKeys.key2, StandardKeys.key3)
-            KeyboardRow(StandardKeys.key4, StandardKeys.key5, StandardKeys.key6)
-            KeyboardRow(StandardKeys.key7, StandardKeys.key8, StandardKeys.key9)
-            KeyboardRow(StandardKeys.key0)
+            KeyboardRow(KeysCollection.key1, KeysCollection.key2, KeysCollection.key3)
+            KeyboardRow(KeysCollection.key4, KeysCollection.key5, KeysCollection.key6)
+            KeyboardRow(KeysCollection.key7, KeysCollection.key8, KeysCollection.key9)
+            KeyboardRow(KeysCollection.key0)
         }
     }
 }

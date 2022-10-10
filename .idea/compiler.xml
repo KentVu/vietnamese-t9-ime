@@ -4,6 +4,8 @@
     <bytecodeTargetLevel target="1.7">
       <module name="T9_Vietnamese.app" target="11" />
       <module name="T9_Vietnamese.lib" target="1.8" />
+      <module name="T9_Vietnamese.lib.main" target="1.8" />
+      <module name="T9_Vietnamese.lib.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
