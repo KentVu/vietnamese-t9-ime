@@ -22,7 +22,7 @@ internal class DawgT9EngineTest {
             flowOf(KeySequence(listOf(element))).shareIn(this, SharingStarted.Eagerly),
             this
         ).output.test {
-            awaitItem().candidates.containsAll(listOf(element.subtext))
+            awaitItem().candidates.containsAll(listOf(element.subChars))
         }
     }
 }
