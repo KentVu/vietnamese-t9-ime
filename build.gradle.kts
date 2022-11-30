@@ -10,6 +10,9 @@ plugins {
     id("org.jetbrains.compose") apply false
 }
 
+group = "github.kentvu"
+version = "1.0"
+
 subprojects {
     repositories {
         google()
