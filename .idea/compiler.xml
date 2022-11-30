@@ -19,6 +19,15 @@
       <module name="T9Vietnamese-v2.lib" target="1.8" />
       <module name="T9Vietnamese-v2.lib.main" target="1.8" />
       <module name="T9Vietnamese-v2.lib.test" target="1.8" />
+      <module name="T9Vietnamese.app" target="11" />
+      <module name="T9Vietnamese.common" target="11" />
+      <module name="T9Vietnamese.desktop" target="11" />
+      <module name="T9Vietnamese.desktop.main" target="11" />
+      <module name="T9Vietnamese.desktop.test" target="11" />
+      <module name="T9Vietnamese.lib" target="1.8" />
+      <module name="T9Vietnamese.lib.main" target="1.8" />
+      <module name="T9Vietnamese.lib.test" target="1.8" />
+      <module name="T9Vietnamese.web" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

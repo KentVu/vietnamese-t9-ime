@@ -16,5 +16,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "T9 Vietnamese"
+rootProject.name = "T9Vietnamese"
 include(":DAWG", ":lib", ":common", ":app", ":desktop", ":web")
