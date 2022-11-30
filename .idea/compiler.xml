@@ -3,12 +3,21 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
       <module name="T9_Vietnamese.app" target="11" />
+      <module name="T9_Vietnamese.common" target="11" />
       <module name="T9_Vietnamese.desktop" target="11" />
       <module name="T9_Vietnamese.desktop.main" target="11" />
       <module name="T9_Vietnamese.desktop.test" target="11" />
       <module name="T9_Vietnamese.lib" target="1.8" />
       <module name="T9_Vietnamese.lib.main" target="1.8" />
       <module name="T9_Vietnamese.lib.test" target="1.8" />
+      <module name="T9Vietnamese-v2.app" target="11" />
+      <module name="T9Vietnamese-v2.common" target="11" />
+      <module name="T9Vietnamese-v2.desktop" target="11" />
+      <module name="T9Vietnamese-v2.desktop.main" target="11" />
+      <module name="T9Vietnamese-v2.desktop.test" target="11" />
+      <module name="T9Vietnamese-v2.lib" target="1.8" />
+      <module name="T9Vietnamese-v2.lib.main" target="1.8" />
+      <module name="T9Vietnamese-v2.lib.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
