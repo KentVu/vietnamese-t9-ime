@@ -6,10 +6,10 @@ import com.github.kentvu.t9vietnamese.model.KeysCollection
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import org.jetbrains.annotations.TestOnly
+//import org.jetbrains.annotations.TestOnly
 
 class DummyKeyPad(): KeyPad() {
-    @TestOnly
+//    @TestOnly
     suspend fun simulateTyping(cs: String) {
         for (c in cs) {
             onType(c)

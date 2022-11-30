@@ -19,13 +19,19 @@ kotlin {
                 api(compose.material)
                 implementation(project(mapOf("path" to ":lib")))
                 // Needed only for preview.
-                implementation(compose.preview)
+//                implementation(compose.preview)
             }
         }
         named("androidMain") {
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")
                 api("androidx.core:core-ktx:1.8.0")
+                implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
+            }
+        }
+        named("desktopMain") {
+            dependencies {
+                implementation(compose.preview)
             }
         }
     }

@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-
 kotlin {
     js(IR) {
         browser {
@@ -22,6 +21,7 @@ kotlin {
             dependencies {
                 implementation(compose.web.core)
                 implementation(compose.runtime)
+                implementation(project(":common"))
             }
         }
         val jsTest by getting {
