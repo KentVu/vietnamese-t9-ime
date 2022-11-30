@@ -10,6 +10,7 @@
       <module name="T9_Vietnamese.lib" target="1.8" />
       <module name="T9_Vietnamese.lib.main" target="1.8" />
       <module name="T9_Vietnamese.lib.test" target="1.8" />
+      <module name="T9_Vietnamese.web" target="11" />
       <module name="T9Vietnamese-v2.app" target="11" />
       <module name="T9Vietnamese-v2.common" target="11" />
       <module name="T9Vietnamese-v2.desktop" target="11" />
