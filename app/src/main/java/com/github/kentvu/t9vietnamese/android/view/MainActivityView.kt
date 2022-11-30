@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.kentvu.t9vietnamese.android.ui.theme.T9VietnameseTheme
+import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeysCollection
 

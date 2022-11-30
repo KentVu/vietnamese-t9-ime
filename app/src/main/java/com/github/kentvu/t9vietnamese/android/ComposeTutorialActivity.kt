@@ -24,7 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.compose.tutorial.SampleData
-import com.github.kentvu.t9vietnamese.android.ui.theme.T9VietnameseTheme
+import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 
 class ComposeTutorialActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

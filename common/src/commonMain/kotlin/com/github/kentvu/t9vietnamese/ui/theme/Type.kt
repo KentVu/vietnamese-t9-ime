@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese.android.ui.theme
+package com.github.kentvu.t9vietnamese.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

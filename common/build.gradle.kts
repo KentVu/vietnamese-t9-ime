@@ -14,6 +14,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation(project(mapOf("path" to ":lib")))
                 // Needed only for preview.
                 implementation(compose.preview)
             }
@@ -31,7 +32,7 @@ android {
     compileSdk = 32
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 21
         targetSdk = 32
     }
 
@@ -46,4 +47,6 @@ android {
             res.srcDirs("src/androidMain/res")
         }
     }
+}
+dependencies {
 }
