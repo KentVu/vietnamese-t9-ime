@@ -24,7 +24,11 @@ fun App() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 CandidatesView()
-                Keypad(Modifier.padding(innerPadding)) {
+                Keypad(
+                    Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
 //                    Log.d(
 //                        "MainActivity",
 //                        "KeyClicked: $it"
@@ -45,10 +49,12 @@ fun Keypad(modifier: Modifier = Modifier, onKeyClick: (key: Key) -> Unit) {
             .animateContentSize()
             .padding(1.dp)
     ) {
-        Column {
-            KeyboardRow(KeysCollection.key1, KeysCollection.key2, KeysCollection.key3, onKeyClick)
-            KeyboardRow(KeysCollection.key4, KeysCollection.key5, KeysCollection.key6, onKeyClick)
-            KeyboardRow(KeysCollection.key7, KeysCollection.key8, KeysCollection.key9, onKeyClick)
+        Column(verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End,) {
+            KeyboardRow(onKeyClick, KeysCollection.key1, KeysCollection.key2, KeysCollection.key3)
+            KeyboardRow(onKeyClick, KeysCollection.key4, KeysCollection.key5, KeysCollection.key6)
+            KeyboardRow(onKeyClick, KeysCollection.key7, KeysCollection.key8, KeysCollection.key9)
+            KeyboardRow(onKeyClick, KeysCollection.key0)
         }
     }
 }
@@ -61,20 +67,23 @@ private fun CandidatesView() {
 }
 
 @Composable
-private fun KeyboardRow(key1: Key, key2: Key, key3: Key, onKeyClick: (key: Key) -> Unit) {
+private fun KeyboardRow(onKeyClick: (key: Key) -> Unit, vararg keys: Key) {
     Row {
         val mod = Modifier
             .padding(1.dp)
             .weight(1F)
-        ComposableKey(key1, mod, onKeyClick)
-        ComposableKey(key2, mod, onKeyClick)
-        ComposableKey(key3, mod, onKeyClick)
+        for (key in keys) {
+            ComposableKey(key, mod, onKeyClick)
+        }
     }
 }
 
 @Composable
 private fun ComposableKey(key: Key, modifier: Modifier, onKeyClick: (key: Key) -> Unit) {
-    Button(modifier = modifier, onClick = { onKeyClick(key) }) {
+    Button(
+        modifier = modifier/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/,
+        onClick = { onKeyClick(key) }
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "${key.symbol}",
