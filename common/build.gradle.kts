@@ -7,6 +7,9 @@ plugins {
 kotlin {
     android()
     jvm("desktop")
+    js(IR) {
+        browser()
+    }
 
     sourceSets {
         named("commonMain") {
@@ -47,6 +50,4 @@ android {
             res.srcDirs("src/androidMain/res")
         }
     }
-}
-dependencies {
 }
