@@ -5,8 +5,8 @@ import com.github.kentvu.t9vietnamese.model.Keyboard
 import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Test
 import kotlin.test.DefaultAsserter.assertTrue
+import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
 

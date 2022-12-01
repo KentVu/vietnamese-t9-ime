@@ -17,4 +17,4 @@ pluginManagement {
 }
 
 rootProject.name = "T9Vietnamese"
-include(":DAWG", ":lib", ":common", ":app", ":desktop", ":web")
+include(":dawg-kotlin", ":lib", ":common", ":app", ":desktop", ":web")

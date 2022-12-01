@@ -39,7 +39,11 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 */
 
 kotlin {
-    jvm()
+    jvm() {
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+    }
     js(IR) {
         browser()
     }
@@ -47,19 +51,23 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                implementation(project(":DAWG"))
+                implementation(project(":dawg-kotlin"))
 //                implementation(kotlin("coroutines"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains:annotations:15.0")
             }
         }
-//        named("jvmTest") {
-//            dependencies {
-//                implementation("org.jetbrains.kotlin:kotlin-test")
-//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.1")
-//                implementation("app.cash.turbine:turbine:0.8.0")
-//            }
-//        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("app.cash.turbine:turbine:0.12.1")
+            }
+        }
+        named("jvmTest") {
+            dependencies {
+            }
+        }
     }
 }
 
