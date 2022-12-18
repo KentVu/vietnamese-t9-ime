@@ -9,7 +9,7 @@ internal class DawgTrieTest {
     fun trieTest() {
         val trie: Trie =
             DawgTrie(
-                com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords(
+                DecomposedVietnameseWords(
                     javaClass.classLoader.getResourceAsStream(
                         "vi-DauMoi.dic"
                     )!!

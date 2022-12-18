@@ -16,7 +16,6 @@ class DawgTrie(val source: WordList) : Trie {
 
     override fun prefixSearch(prefix: String): Set<String> =
     //return modifiableDAWGSet.prefixSet(prefix)
-        //TODO("Use dawg-kotlin.")
         dawg.prefixSearch(prefix).toSet()
 
 }

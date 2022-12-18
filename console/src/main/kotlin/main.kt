@@ -12,6 +12,13 @@ fun main(args: Array<String>) {
         WordList.Default(setOf("aa", "bb2", "cc1", "dd2"))
     )
     app.init()
-    app.type('1')
-    println(app.candidates)
+    do {
+        val line: String = readln()
+        line.forEach {
+            app.type(it)
+            print("$it: ")
+            println(app.candidates)
+        }
+
+    } while (line != "")
 }
