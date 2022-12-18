@@ -18,6 +18,10 @@ class DecomposedVietnameseWords(private val ins: InputStream) : WordList {
         return sortedWords
     }
 
+    override fun toSet(): Set<String> {
+        TODO("Not yet implemented")
+    }
+
     private fun String.decomposeVietnamese(): String {
         return Normalizer.normalize(
             this,

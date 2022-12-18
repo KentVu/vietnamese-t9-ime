@@ -17,8 +17,11 @@ internal class DawgT9EngineTest {
     fun `1Char`() = runTest {
         val element = KeysCollection.key2
         DawgT9Engine(
-            DawgTrie(DecomposedVietnameseWords(
-                javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!)),
+            DawgTrie(
+                com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords(
+                    javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
+                )
+            ),
             flowOf(KeySequence(listOf(element))).shareIn(this, SharingStarted.Eagerly),
             this
         ).output.test {

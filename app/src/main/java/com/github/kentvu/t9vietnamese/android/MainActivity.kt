@@ -1,6 +1,6 @@
 package com.github.kentvu.t9vietnamese.android
 
-import App
+import AppUi
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +12,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var candidates by remember { mutableStateOf(listOf<String>()) }
-            App()
+            AppUi()
         }
     }
 }
@@ -20,5 +20,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun PreviewKeyboard() {
-    App()
+    AppUi()
 }

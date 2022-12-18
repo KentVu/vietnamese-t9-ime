@@ -14,7 +14,7 @@ class JvmT9Vietnamese(scope: CoroutineScope) : T9Vietnamese() {
     override val keyPad: KeyPad = _keyPad
 
     private val trie = DawgTrie(
-        DecomposedVietnameseWords(
+        com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords(
             javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
         )
     )

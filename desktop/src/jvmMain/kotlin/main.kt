@@ -21,6 +21,6 @@ fun main() = application {
             }
         }
     ) {
-        App()
+        AppUi()
     }
 }

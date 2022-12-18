@@ -6,5 +6,5 @@ actual fun getPlatformName(): String = "Android"
 @Preview
 @Composable
 fun AppPreview() {
-    App()
+    AppUi()
 }

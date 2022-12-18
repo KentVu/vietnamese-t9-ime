@@ -39,7 +39,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 */
 
 kotlin {
-    jvm() {
+    jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
         }

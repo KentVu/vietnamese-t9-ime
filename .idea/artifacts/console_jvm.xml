@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="console-jvm">
+    <output-path>$PROJECT_DIR$/console/build/libs</output-path>
+    <root id="archive" name="console-jvm.jar">
+      <element id="module-output" name="T9Vietnamese.console.jvmMain" />
+    </root>
+  </artifact>
+</component>

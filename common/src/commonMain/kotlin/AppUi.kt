@@ -11,7 +11,7 @@ import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeysCollection
 
 @Composable
-fun App() {
+fun AppUi() {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {
