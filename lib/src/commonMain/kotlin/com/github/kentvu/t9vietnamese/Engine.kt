@@ -13,7 +13,8 @@ class Engine(private val keyboard: Keyboard, private val wordlist: WordList) {
 
     fun type(keySequence: String) {
         keySequence.forEach { k ->
-            keyboard.findKey(k).subChars.forEach { c ->
+            val key = keyboard.findKey(k)
+            key.subChars.forEach { c ->
                 candidates = trie.prefixSearch("$c")
             }
         }

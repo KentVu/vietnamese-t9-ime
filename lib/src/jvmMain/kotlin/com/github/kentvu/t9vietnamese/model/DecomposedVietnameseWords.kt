@@ -5,21 +5,24 @@ import java.text.Normalizer
 
 class DecomposedVietnameseWords(private val ins: InputStream) : WordList {
 
-    private val sortedWords = sortedSetOf<String>() // use String's "natural" ordering
-
-    override fun iterable(): Iterable<String> {
-        if (sortedWords.isEmpty())
+    private val sortedWords by lazy {
+        // use String's "natural" ordering
+        sortedSetOf<String>().apply {
             println("Building sortedWords...")
             ins.bufferedReader().useLines {
                 it.forEach { line ->
-                    sortedWords.add(line.decomposeVietnamese())
+                    add(line.decomposeVietnamese())
                 }
             }
+        }
+    }
+
+    override fun iterable(): Iterable<String> {
         return sortedWords
     }
 
     override fun toSet(): Set<String> {
-        TODO("Not yet implemented")
+        return sortedWords
     }
 
     private fun String.decomposeVietnamese(): String {

@@ -66,6 +66,7 @@ kotlin {
         }
         named("jvmTest") {
             dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

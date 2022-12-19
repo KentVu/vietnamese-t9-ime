@@ -18,7 +18,7 @@ internal class DawgT9EngineTest {
         val element = KeysCollection.key2
         DawgT9Engine(
             DawgTrie(
-                com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords(
+                DecomposedVietnameseWords(
                     javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
                 )
             ),
