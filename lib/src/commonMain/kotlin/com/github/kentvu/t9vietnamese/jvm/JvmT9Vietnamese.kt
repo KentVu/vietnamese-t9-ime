@@ -7,8 +7,11 @@ import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.View
 import kotlinx.coroutines.CoroutineScope
+import okio.FileSystem
 
-class JvmT9Vietnamese(scope: CoroutineScope) : T9Vietnamese() {
+class JvmT9Vietnamese(
+    scope: CoroutineScope, fileSystem: FileSystem
+) : T9Vietnamese() {
 
     private val _keyPad = DummyKeyPad()
     override val keyPad: KeyPad = _keyPad
@@ -16,7 +19,8 @@ class JvmT9Vietnamese(scope: CoroutineScope) : T9Vietnamese() {
     private val trie = DawgTrie(
         com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords(
             javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
-        )
+        ),
+        fileSystem
     )
     private val _view = DummyView(
         DawgT9Engine(

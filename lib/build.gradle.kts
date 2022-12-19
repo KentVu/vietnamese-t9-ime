@@ -55,6 +55,12 @@ kotlin {
 //                implementation(kotlin("coroutines"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains:annotations:15.0")
+                implementation("com.squareup.okio:okio:3.2.0")
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation("com.squareup.okio:okio:3.2.0")
             }
         }
         val commonTest by getting {
@@ -67,6 +73,7 @@ kotlin {
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("com.google.truth:truth:1.1.3")
             }
         }
     }
