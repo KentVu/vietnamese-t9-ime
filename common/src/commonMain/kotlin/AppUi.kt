@@ -29,10 +29,7 @@ fun AppUi() {
                         .padding(innerPadding)
                         .fillMaxSize()
                 ) {
-//                    Log.d(
-//                        "MainActivity",
-//                        "KeyClicked: $it"
-//                    )
+                    //Log.d("MainActivity", "KeyClicked: $it")
                 }
             }
         }

@@ -1,4 +1,5 @@
 plugins {
+    id("com.android.library")
     kotlin("multiplatform")
 }
 /*
@@ -39,6 +40,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 */
 
 kotlin {
+    android()
     jvm {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()

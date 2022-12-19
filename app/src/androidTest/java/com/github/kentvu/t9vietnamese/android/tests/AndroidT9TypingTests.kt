@@ -1,5 +1,6 @@
 package com.github.kentvu.t9vietnamese.android.tests
 
+import AppUi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -20,7 +21,7 @@ class AndroidT9TypingTests {
     fun setUp() {
         // Start the app
         composeTestRule.setContent {
-            MainActivityView()
+            AppUi()
         }
     }
 
