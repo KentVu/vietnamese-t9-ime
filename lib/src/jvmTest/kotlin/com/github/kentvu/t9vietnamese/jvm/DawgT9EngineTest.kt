@@ -9,18 +9,20 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.test.runTest
+import okio.FileSystem
 import kotlin.test.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DawgT9EngineTest {
-    @Test
+    //@Test
     fun `1Char`() = runTest {
         val element = KeysCollection.key2
         DawgT9Engine(
             DawgTrie(
                 DecomposedVietnameseWords(
                     javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
-                )
+                ),
+                FileSystem.SYSTEM
             ),
             flowOf(KeySequence(listOf(element))).shareIn(this, SharingStarted.Eagerly),
             this

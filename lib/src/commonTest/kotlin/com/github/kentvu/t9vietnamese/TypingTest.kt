@@ -1,10 +1,11 @@
 package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.Keyboard
+import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import okio.fakefilesystem.FakeFileSystem
 import kotlin.test.Test
 import kotlin.test.assertContains
 
@@ -19,10 +20,13 @@ class TypingTest() {
         //robot.type('1')
         //robot.checkCandidateHas('a', 'b', 'c')
         val app = DefaultApp(
-            Keyboard(listOf(Key('1', "a"))),
-            WordList.Default(setOf("aa", "bb2", "cc1", "dd2"))
+            KeyPad(listOf(Key('1', "a"))),
+            WordList.Default(setOf("aa", "bb2", "cc1", "dd2")),
+            FakeFileSystem()
         )
         app.init()
+        app.type('1')
+        assertContains(app.candidates, "a")
         app.type('1')
         assertContains(app.candidates, "aa")
     }

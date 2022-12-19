@@ -2,11 +2,14 @@ package com.github.kentvu.t9vietnamese.model
 
 import kotlinx.coroutines.flow.Flow
 
-abstract class KeyPad {
-    abstract val keyEvents: Flow<Key>
-
-    protected open fun type(vararg cs: Char) {
-        cs.forEach { type(it) }
+class KeyPad(private val keys: List<Key>) {
+    fun findKey(c: Char): Key {
+        return keys.firstOrNull { key ->
+            key.symbol == c
+        } ?: throw IllegalArgumentException("No key found for $c!")
     }
-    protected abstract suspend fun onType(c: Char)
+
+    fun describe(): String {
+        return keys.toString()
+    }
 }

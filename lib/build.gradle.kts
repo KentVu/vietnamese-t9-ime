@@ -68,6 +68,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
                 implementation("app.cash.turbine:turbine:0.12.1")
+                implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
             }
         }
         named("jvmTest") {

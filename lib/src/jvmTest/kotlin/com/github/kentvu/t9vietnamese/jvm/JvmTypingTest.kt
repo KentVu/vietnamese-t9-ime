@@ -3,6 +3,7 @@ package com.github.kentvu.t9vietnamese.jvm
 import com.github.kentvu.t9vietnamese.DefaultApp
 import com.github.kentvu.t9vietnamese.model.*
 import com.google.common.truth.Truth
+import okio.FileSystem
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertTrue
@@ -13,12 +14,13 @@ class JvmTypingTest() {
     @Test
     fun typingTest() {
         val app: App = DefaultApp(
-            Keyboard(listOf(
+            KeyPad(listOf(
                 KeysCollection.key2,
                 KeysCollection.key3,
                 KeysCollection.key4,
             )),
-            VietnameseWordList()
+            VietnameseWordList,
+            FileSystem.SYSTEM
         )
         app.init()
         app.type('2')

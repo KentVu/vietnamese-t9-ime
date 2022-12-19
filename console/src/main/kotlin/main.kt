@@ -7,7 +7,7 @@ import okio.FileSystem
 fun main(args: Array<String>) {
     //runBlocking {    }
     val app = DefaultApp(
-        Keyboard(listOf(
+        KeyPad(listOf(
             KeysCollection.key1,
             KeysCollection.key2,
             KeysCollection.key3,
@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
         VietnameseWordList,
         FileSystem.SYSTEM
     )
+    println(app.describe())
     println("App init...")
     app.init()
     println("Init done!")
