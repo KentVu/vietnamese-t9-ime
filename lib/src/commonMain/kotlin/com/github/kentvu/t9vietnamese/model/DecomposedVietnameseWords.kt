@@ -2,7 +2,6 @@ package com.github.kentvu.t9vietnamese.model
 
 import doist.x.normalize.Form
 import doist.x.normalize.normalize
-import okio.Sink
 import okio.Source
 import okio.buffer
 import okio.use
@@ -13,8 +12,12 @@ class DecomposedVietnameseWords(private val ins: Source) : WordList {
         // use String's "natural" ordering
         mutableSetOf<String>().apply {
             println("Building sortedWords...")
-            ins.buffer().use {
-                add(it.readUtf8Line()?.decomposeVietnamese() ?: return@use)
+            ins.use { ins ->
+                ins.buffer().use {
+                    while (true) {
+                        add(it.readUtf8Line()?.decomposeVietnamese() ?: break)
+                    }
+                }
             }
         }
     }
