@@ -1,18 +1,20 @@
 package com.github.kentvu.t9vietnamese.model
 
-import java.io.InputStream
-import java.text.Normalizer
+import doist.x.normalize.Form
+import doist.x.normalize.normalize
+import okio.Sink
+import okio.Source
+import okio.buffer
+import okio.use
 
-class DecomposedVietnameseWords(private val ins: InputStream) : WordList {
+class DecomposedVietnameseWords(private val ins: Source) : WordList {
 
     private val sortedWords by lazy {
         // use String's "natural" ordering
-        sortedSetOf<String>().apply {
+        mutableSetOf<String>().apply {
             println("Building sortedWords...")
-            ins.bufferedReader().useLines {
-                it.forEach { line ->
-                    add(line.decomposeVietnamese())
-                }
+            ins.buffer().use {
+                add(it.readUtf8Line()?.decomposeVietnamese() ?: return@use)
             }
         }
     }
@@ -26,21 +28,13 @@ class DecomposedVietnameseWords(private val ins: InputStream) : WordList {
     }
 
     private fun String.decomposeVietnamese(): String {
-        return Normalizer.normalize(
-            this,
-            Normalizer.Form.NFKD
-        )
+        return normalize(Form.NFKD)
             // rearrange intonation and vowel-mark order.
-            .replace("([eE])${DOT_BELOW}${CIRCUMFLEX_ACCENT}".toRegex(), "$1${CIRCUMFLEX_ACCENT}${DOT_BELOW}")
+            .replace("([eE])$DOT_BELOW$CIRCUMFLEX_ACCENT".toRegex(), "$1$CIRCUMFLEX_ACCENT$DOT_BELOW")
             // recombine specific vowels.
             .replace(
-                ("([aA][${BREVE}${CIRCUMFLEX_ACCENT}])|([uUoO]${HORN})|[oOeE]${CIRCUMFLEX_ACCENT}").toRegex()
-            ) {
-                Normalizer.normalize(
-                    it.value,
-                    Normalizer.Form.NFKC
-                )
-            }
+                "([aA][$BREVE$CIRCUMFLEX_ACCENT])|([uUoO]$HORN)|[oOeE]$CIRCUMFLEX_ACCENT".toRegex()
+            ) { it.value.normalize(Form.NFKC) }
     }
 
     companion object {

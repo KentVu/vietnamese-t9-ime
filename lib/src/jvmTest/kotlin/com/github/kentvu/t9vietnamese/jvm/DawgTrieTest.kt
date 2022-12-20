@@ -1,6 +1,5 @@
 package com.github.kentvu.t9vietnamese.jvm
 
-import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.Trie
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import okio.FileSystem

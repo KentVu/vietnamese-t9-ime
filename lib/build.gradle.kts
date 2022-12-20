@@ -58,6 +58,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains:annotations:15.0")
                 implementation("com.squareup.okio:okio:3.2.0")
+                implementation("com.doist.x:normalize:1.0.3")
             }
         }
         val jvmMain by getting {
