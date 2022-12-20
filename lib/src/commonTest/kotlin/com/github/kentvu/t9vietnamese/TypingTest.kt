@@ -11,7 +11,7 @@ import kotlin.test.assertContains
 
 class TypingTest() {
 
-    //private val app: T9Vietnamese = T9Vietnamese()
+    //private val app: T9App = T9App()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -19,7 +19,7 @@ class TypingTest() {
         //val robot = Robot(App())
         //robot.type('1')
         //robot.checkCandidateHas('a', 'b', 'c')
-        val app = DefaultApp(
+        val app = VNT9App(
             KeyPad(listOf(Key('1', "a"))),
             WordList.Default(setOf("aa", "bb2", "cc1", "dd2")),
             FakeFileSystem()

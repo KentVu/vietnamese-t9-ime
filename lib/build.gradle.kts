@@ -83,6 +83,30 @@ kotlin {
     }
 }
 
+android {
+    compileSdk = 32
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 32
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        named("main") {
+            // Share resources from commonMain
+            // https://luisramos.dev/how-to-share-resources-kmm
+            resources {
+                srcDir("src/commonMain/resources")
+            }
+        }
+    }
+}
+
 /*
 dependencies {
     implementation(project(":DAWG"))

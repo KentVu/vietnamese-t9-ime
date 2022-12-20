@@ -1,4 +1,4 @@
-import com.github.kentvu.t9vietnamese.DefaultApp
+import com.github.kentvu.t9vietnamese.VNT9App
 import com.github.kentvu.t9vietnamese.model.*
 import okio.FileSystem
 
@@ -6,13 +6,7 @@ import okio.FileSystem
 
 fun main(args: Array<String>) {
     //runBlocking {    }
-    val app = DefaultApp(
-        KeyPad(listOf(
-            KeysCollection.key1, KeysCollection.key2, KeysCollection.key3,
-            KeysCollection.key4, KeysCollection.key5, KeysCollection.key6,
-            KeysCollection.key7, KeysCollection.key8, KeysCollection.key9,
-            KeysCollection.key0,
-        )),
+    val app = VNT9App(
         VietnameseWordList,
         FileSystem.SYSTEM
     )

@@ -1,6 +1,6 @@
 package com.github.kentvu.t9vietnamese.model
 
-object KeysCollection {
+object VNKeys {
     fun fromChar(c: Char): Key {
         return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
     }
@@ -16,5 +16,12 @@ object KeysCollection {
     val key8: Key = Key('8', "tuv").apply { sym2Key[symbol] = this }
     val key9: Key = Key('9', "wxyz").apply { sym2Key[symbol] = this }
     val key0: Key = Key('0', " ").apply { sym2Key[symbol] = this }
+
+    val all = listOf(
+        key1, key2, key3,
+        key4, key5, key6,
+        key7, key8, key9,
+        key0,
+    )
 
 }

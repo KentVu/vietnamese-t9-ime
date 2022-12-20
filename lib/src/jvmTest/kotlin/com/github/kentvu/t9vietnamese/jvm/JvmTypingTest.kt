@@ -1,23 +1,21 @@
 package com.github.kentvu.t9vietnamese.jvm
 
-import com.github.kentvu.t9vietnamese.DefaultApp
+import com.github.kentvu.t9vietnamese.VNT9App
 import com.github.kentvu.t9vietnamese.model.*
 import com.google.common.truth.Truth
 import okio.FileSystem
 import kotlin.test.Test
 import kotlin.test.assertContains
-import kotlin.test.assertTrue
-import kotlin.test.asserter
 
 class JvmTypingTest() {
 
     @Test
     fun typingTest() {
-        val app: App = DefaultApp(
+        val app: App = VNT9App(
             KeyPad(listOf(
-                KeysCollection.key2,
-                KeysCollection.key3,
-                KeysCollection.key4,
+                VNKeys.key2,
+                VNKeys.key3,
+                VNKeys.key4,
             )),
             VietnameseWordList,
             FileSystem.SYSTEM

@@ -1,22 +1,19 @@
 package com.github.kentvu.t9vietnamese
 
-import com.github.kentvu.t9vietnamese.model.App
-import com.github.kentvu.t9vietnamese.model.KeyPad
-import com.github.kentvu.t9vietnamese.model.WordList
+import com.github.kentvu.t9vietnamese.model.*
 import okio.FileSystem
 
-class DefaultApp(
-    private val keyPad: KeyPad,
+class VNT9App(
     wordlist: WordList,
     fileSystem: FileSystem
-): App {
+): T9App {
+    override val keyPad = KeyPad(VNKeys.all)
     override var candidates: Set<String> = emptySet()
-        get() = field
         private set
     private val engine = Engine(keyPad, wordlist, fileSystem)
 
-    override fun type(c: Char) {
-        engine.type(keyPad.findKey(c))
+    override fun type(key: Key) {
+        engine.type(key)
         candidates = engine.candidates
     }
 

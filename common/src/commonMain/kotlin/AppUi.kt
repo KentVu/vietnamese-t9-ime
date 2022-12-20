@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.KeysCollection
+import com.github.kentvu.t9vietnamese.model.VNKeys
 
 @Composable
-fun AppUi() {
+fun AppUi(keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {
@@ -27,17 +27,17 @@ fun AppUi() {
                 Keypad(
                     Modifier
                         .padding(innerPadding)
-                        .fillMaxSize()
-                ) {
-                    //Log.d("MainActivity", "KeyClicked: $it")
-                }
+                        .fillMaxSize(),
+                    keysEnabled,
+                    onKeyClick
+                )
             }
         }
     }
 }
 
 @Composable
-fun Keypad(modifier: Modifier = Modifier, onKeyClick: (key: Key) -> Unit) {
+fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
     Surface(
         shape = MaterialTheme.shapes.medium,
         //color = MaterialTheme.colors.secondary,
@@ -48,10 +48,12 @@ fun Keypad(modifier: Modifier = Modifier, onKeyClick: (key: Key) -> Unit) {
     ) {
         Column(verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End,) {
-            KeyboardRow(onKeyClick, KeysCollection.key1, KeysCollection.key2, KeysCollection.key3)
-            KeyboardRow(onKeyClick, KeysCollection.key4, KeysCollection.key5, KeysCollection.key6)
-            KeyboardRow(onKeyClick, KeysCollection.key7, KeysCollection.key8, KeysCollection.key9)
-            KeyboardRow(onKeyClick, KeysCollection.key0)
+            with(VNKeys) {
+                KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
+                KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
+                KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
+                KeyboardRow(onKeyClick, keysEnabled, key0)
+            }
         }
     }
 }
@@ -64,21 +66,27 @@ private fun CandidatesView() {
 }
 
 @Composable
-private fun KeyboardRow(onKeyClick: (key: Key) -> Unit, vararg keys: Key) {
+private fun KeyboardRow(onKeyClick: (key: Key) -> Unit, keysEnabled: Boolean, vararg keys: Key) {
     Row {
         val mod = Modifier
             .padding(1.dp)
             .weight(1F)
         for (key in keys) {
-            ComposableKey(key, mod, onKeyClick)
+            ComposableKey(key, mod, keysEnabled, onKeyClick)
         }
     }
 }
 
 @Composable
-private fun ComposableKey(key: Key, modifier: Modifier, onKeyClick: (key: Key) -> Unit) {
+private fun ComposableKey(
+    key: Key,
+    modifier: Modifier,
+    keysEnabled: Boolean,
+    onKeyClick: (key: Key) -> Unit
+) {
     Button(
         modifier = modifier/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/,
+        enabled = keysEnabled,
         onClick = { onKeyClick(key) }
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -93,5 +101,3 @@ private fun ComposableKey(key: Key, modifier: Modifier, onKeyClick: (key: Key) -
         }
     }
 }
-
-expect fun getPlatformName(): String
