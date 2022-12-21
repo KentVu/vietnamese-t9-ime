@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "gradle",
+			"id": "/workspaces/vietnamese-t9-imeconsole:runconsole",
+			"script": "console:run",
+			"description": "Runs this project as a JVM application",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"project": "console",
+			"buildFile": "/workspaces/vietnamese-t9-ime/console/build.gradle.kts",
+			"rootProject": "T9Vietnamese",
+			"projectFolder": "/workspaces/vietnamese-t9-ime",
+			"workspaceFolder": "/workspaces/vietnamese-t9-ime",
+			"args": "",
+			"javaDebug": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"label": "gradle: console:run"
+		},
+		{
+			"type": "shell",
+			"command": "./gradlew :console:run",
+			"label": "Command ./gradlew :console:run",
+			"problemMatcher": [
+				
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

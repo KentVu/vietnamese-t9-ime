@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="dawg-kotlin-jvm">
+    <output-path>$PROJECT_DIR$/dawg-kotlin/build/libs</output-path>
+    <root id="archive" name="dawg-kotlin-jvm.jar">
+      <element id="module-output" name="T9Vietnamese.dawg-kotlin.jvmMain" />
+    </root>
+  </artifact>
+</component>
