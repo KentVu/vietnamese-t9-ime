@@ -19,9 +19,9 @@ class TypingTest() {
         //val robot = Robot(App())
         //robot.type('1')
         //robot.checkCandidateHas('a', 'b', 'c')
-        val app = VNT9App(
+        val app = GenericT9App(
             KeyPad(listOf(Key('1', "a"))),
-            WordList.Default(setOf("aa", "bb2", "cc1", "dd2")),
+            WordList.Default(setOf("aa", "ab", "bb2", "cc1", "dd2")),
             FakeFileSystem()
         )
         app.init()
