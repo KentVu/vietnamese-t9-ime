@@ -1,5 +1,7 @@
 package com.github.kentvu.t9vietnamese
 
+import assertk.assertThat
+import assertk.assertions.containsAll
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.WordList
@@ -20,7 +22,7 @@ class TypingTest() {
         //robot.type('1')
         //robot.checkCandidateHas('a', 'b', 'c')
         val app = GenericT9App(
-            KeyPad(listOf(Key('1', "a"))),
+            KeyPad(listOf(Key('1', "ab"))),
             WordList.Default(setOf("aa", "ab", "bb2", "cc1", "dd2")),
             FakeFileSystem()
         )
@@ -28,7 +30,7 @@ class TypingTest() {
         app.type('1')
         assertContains(app.candidates, "a")
         app.type('1')
-        assertContains(app.candidates, "aa")
+        assertThat(app.candidates).containsAll("aa", "ab", "bb2")
     }
 
 }

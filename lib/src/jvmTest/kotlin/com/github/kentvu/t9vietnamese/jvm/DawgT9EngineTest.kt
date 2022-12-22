@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.test.runTest
 import okio.FileSystem
+import okio.source
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DawgT9EngineTest {
@@ -19,7 +20,7 @@ internal class DawgT9EngineTest {
         DawgT9Engine(
             DawgTrie(
                 DecomposedVietnameseWords(
-                    javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!
+                    javaClass.classLoader.getResourceAsStream("vi-DauMoi.dic")!!.source()
                 ),
                 FileSystem.SYSTEM
             ),

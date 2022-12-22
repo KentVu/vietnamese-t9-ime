@@ -72,12 +72,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
                 implementation("app.cash.turbine:turbine:0.12.1")
                 implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
+                implementation("com.willowtreeapps.assertk:assertk:0.25")
             }
         }
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("com.google.truth:truth:1.1.3")
             }
         }
     }
