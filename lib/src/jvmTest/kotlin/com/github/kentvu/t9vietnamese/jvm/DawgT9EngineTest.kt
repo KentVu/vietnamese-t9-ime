@@ -1,7 +1,9 @@
 package com.github.kentvu.t9vietnamese.jvm
 
 import app.cash.turbine.test
-import com.github.kentvu.t9vietnamese.KeySequence
+import com.github.kentvu.t9vietnamese.lib.DawgT9Engine
+import com.github.kentvu.t9vietnamese.lib.DawgTrie
+import com.github.kentvu.t9vietnamese.lib.KeySequence
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import kotlinx.coroutines.ExperimentalCoroutinesApi

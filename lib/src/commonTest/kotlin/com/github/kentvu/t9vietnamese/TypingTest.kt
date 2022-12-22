@@ -2,6 +2,7 @@ package com.github.kentvu.t9vietnamese
 
 import assertk.assertThat
 import assertk.assertions.containsAll
+import com.github.kentvu.t9vietnamese.lib.GenericT9App
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.WordList

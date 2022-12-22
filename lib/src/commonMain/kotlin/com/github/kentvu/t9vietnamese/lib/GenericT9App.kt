@@ -1,6 +1,10 @@
-package com.github.kentvu.t9vietnamese
+package com.github.kentvu.t9vietnamese.lib
 
-import com.github.kentvu.t9vietnamese.model.*
+import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.KeyPad
+import com.github.kentvu.t9vietnamese.model.T9AppEvent
+import com.github.kentvu.t9vietnamese.model.WordList
+import kotlinx.coroutines.flow.SharedFlow
 import okio.FileSystem
 
 class GenericT9App(

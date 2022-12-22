@@ -1,8 +1,10 @@
 package com.github.kentvu.t9vietnamese.jvm
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsAll
-import com.github.kentvu.t9vietnamese.VNT9App
+import com.github.kentvu.t9vietnamese.lib.T9App
+import com.github.kentvu.t9vietnamese.lib.VNT9App
 import com.github.kentvu.t9vietnamese.model.*
 import okio.FileSystem
 import kotlin.test.Test
@@ -25,6 +27,8 @@ class JvmTypingTest() {
         assertThat(app.candidates).containsAll(
             "cha", "chà", "chào"
         )
+        app.type("36")
+        assertThat(app.candidates).contains("chào")
     }
 
 }

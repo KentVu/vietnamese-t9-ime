@@ -1,6 +1,5 @@
-package com.github.kentvu.t9vietnamese
+package com.github.kentvu.t9vietnamese.lib
 
-import com.github.kentvu.t9vietnamese.jvm.DawgTrie
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.Trie

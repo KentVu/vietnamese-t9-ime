@@ -1,4 +1,4 @@
-import com.github.kentvu.t9vietnamese.VNT9App
+import com.github.kentvu.t9vietnamese.lib.VNT9App
 import com.github.kentvu.t9vietnamese.model.*
 import okio.FileSystem
 
