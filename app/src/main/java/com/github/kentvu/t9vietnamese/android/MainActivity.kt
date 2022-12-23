@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.kentvu.t9vietnamese.VNT9App
+import com.github.kentvu.t9vietnamese.lib.VNT9App
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,9 +19,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = VNT9App(
-            DecomposedVietnameseWords(
-                DecomposedVietnameseWords::class.java.classLoader?.getResourceAsStream("vi-DauMoi.dic")!!.source()
-            ),
+            VietnameseWordList,
             AndroidFileSystem(applicationContext)
         )
         setContent {

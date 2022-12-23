@@ -5,7 +5,6 @@ import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.T9AppEvent
 import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import okio.FileSystem
 
@@ -15,9 +14,7 @@ class GenericT9App(
     fileSystem: FileSystem
 ): T9App {
 
-    override val eventFlow = MutableSharedFlow<T9AppEvent>(1)
-
-    private val engine = Engine(keyPad, wordlist, fileSystem)
+    private val engine = Engine(wordlist, fileSystem)
 
     override fun type(key: Key): Flow<T9AppEvent> = flow {
         engine.type(key)

@@ -62,6 +62,12 @@ kotlin {
                 api("io.github.aakira:napier:2.6.1")//$napierVersion
             }
         }
+        named("androidMain") {
+            dependencies {
+                api("androidx.appcompat:appcompat:1.5.1")
+                api("androidx.core:core-ktx:1.8.0")
+            }
+        }
         val jvmMain by getting {
             dependencies {
                 implementation("com.squareup.okio:okio:3.2.0")
@@ -99,6 +105,8 @@ android {
 
     sourceSets {
         named("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res")
             // Share resources from commonMain
             // https://luisramos.dev/how-to-share-resources-kmm
             resources {

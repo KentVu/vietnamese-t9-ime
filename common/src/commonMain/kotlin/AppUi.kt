@@ -11,7 +11,7 @@ import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 
 @Composable
-fun AppUi(keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
+fun AppUi(keysEnabled: MutableState<Boolean>, onKeyClick: (key: Key) -> Unit) {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {
@@ -28,7 +28,7 @@ fun AppUi(keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
                     Modifier
                         .padding(innerPadding)
                         .fillMaxSize(),
-                    keysEnabled,
+                    keysEnabled.value,
                     onKeyClick
                 )
             }

@@ -5,22 +5,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.github.kentvu.t9vietnamese.desktop.DesktopT9App
+import com.github.kentvu.t9vietnamese.desktop.DesktopUI
 import com.github.kentvu.t9vietnamese.lib.VNT9App
-import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import com.github.kentvu.t9vietnamese.model.T9AppEvent
+import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
 import okio.FileSystem
-import okio.source
+
+fun main() {
+    val app = DesktopT9App()
+    app.start()
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
+fun old_main() = application {
     Napier.base(DebugAntilog())
+    DesktopUI()
     val app = VNT9App(
-        DecomposedVietnameseWords(
-            DecomposedVietnameseWords::class.java.classLoader?.getResourceAsStream("vi-DauMoi.dic")!!.source()
-        ),
+        VietnameseWordList,
         FileSystem.SYSTEM
     )
     var appInitialized by remember { mutableStateOf(false) }
@@ -45,7 +50,7 @@ fun main() = application {
             }
         }
     ) {
-        AppUi(appInitialized) { key ->
+        AppUi(mutableStateOf(true)) { key ->
             scope.launch {
                 Napier.d("type: ${key.symbol}")
                 app.type(key).collect {

@@ -1,13 +1,12 @@
 package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.Trie
+import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.model.WordList
 import okio.FileSystem
 
 class Engine(
-    private val keyPad: KeyPad,
     wordlist: WordList,
     fileSystem: FileSystem
 ) {
@@ -20,7 +19,7 @@ class Engine(
 
     fun type(keySequence: String) {
         keySequence.forEach { k ->
-            type(keyPad.findKey(k))
+            type(VNKeys.fromChar(k))
         }
     }
     fun type(keySequence: List<Key>) {

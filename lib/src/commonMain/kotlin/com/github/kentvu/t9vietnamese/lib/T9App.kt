@@ -7,13 +7,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
 interface T9App {
-    val eventFlow: SharedFlow<T9AppEvent>
     val keyPad: KeyPad
     fun init()
     fun describe(): String
+
     fun type(c: Char): Flow<T9AppEvent> {
         return type(keyPad.findKey(c))
     }
+
     @OptIn(FlowPreview::class)
     fun type(s: String): Flow<T9AppEvent> {
         return flowOf(*s.toCharArray().toTypedArray()).flatMapConcat { type(keyPad.findKey(it)) }

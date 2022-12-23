@@ -5,8 +5,6 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
 import okio.FileSystem
 
-//import kotlinx.coroutines.runBlocking
-
 fun main(args: Array<String>) {
     runBlocking {
         Napier.base(DebugAntilog("T9AppConsole"))
