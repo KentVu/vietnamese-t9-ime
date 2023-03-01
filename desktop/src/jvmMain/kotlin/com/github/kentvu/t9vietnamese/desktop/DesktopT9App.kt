@@ -1,12 +1,13 @@
 package com.github.kentvu.t9vietnamese.desktop
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.t9vietnamese.Backend
-import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -23,9 +24,14 @@ class DesktopT9App {
         FileSystem.SYSTEM
     )
     private val scope = CoroutineScope(Dispatchers.Default)
+    private lateinit var applicationScope: ApplicationScope
 
     private fun onKeyEvent(keyEvent: KeyEvent): Boolean {
-        return ui.publishEvent(keyEvent)
+        if (keyEvent.isCtrlQ()) {
+            applicationScope.exitApplication()
+            return true
+        }
+        return ui.onUserEvent(keyEvent)
     }
 
     fun start() {
@@ -34,6 +40,7 @@ class DesktopT9App {
             backend.init()
         }
         application {
+            applicationScope = this
             Window(
                 onCloseRequest = ::exitApplication,
                 title = "Compose for Desktop",
@@ -45,4 +52,9 @@ class DesktopT9App {
         }
     }
 
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun KeyEvent.isCtrlQ(): Boolean {
+    return type == KeyEventType.KeyUp && isCtrlPressed && key == Key.Q
 }

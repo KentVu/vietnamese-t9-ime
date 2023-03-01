@@ -3,9 +3,7 @@ package com.github.kentvu.t9vietnamese.desktop
 import AppUi
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.*
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.VNKeys
@@ -35,12 +33,14 @@ class DesktopUI : UI {
     /**
      * @return event handled.
      */
-    fun publishEvent(keyEvent: KeyEvent): Boolean {
-        if(Letter2Keypad.available(keyEvent.key)) {
-            eventSource.tryEmit(UIEvent.KeyPress(
-                VNKeys.fromChar(
-                    Letter2Keypad.numForLetter(keyEvent.key)!!)))
-            return true
+    fun onUserEvent(keyEvent: KeyEvent): Boolean {
+        if (keyEvent.type == KeyEventType.KeyUp) {
+            if (Letter2Keypad.available(keyEvent.key)) {
+                eventSource.tryEmit(UIEvent.KeyPress(
+                    VNKeys.fromChar(
+                        Letter2Keypad.numForKey(keyEvent.key)!!)))
+                return true
+            }
         }
         // let other handlers receive this event
         return false
@@ -66,13 +66,23 @@ class DesktopUI : UI {
             Key.Six to '6',
             Key.Seven to '7',
             Key.Eight to '8',
-            Key.Nine to '9'
+            Key.Nine to '9',
+            // Next is for simulating a keypad by left-side of the keyboard.
+            Key.Q to '1',
+            Key.W to '2',
+            Key.E to '3',
+            Key.A to '4',
+            Key.S to '5',
+            Key.D to '6',
+            Key.Z to '7',
+            Key.X to '8',
+            Key.C to '9',
         )
         fun available(key: Key): Boolean {
             return map.containsKey(key)
         }
 
-        fun numForLetter(key: Key): Char? {
+        fun numForKey(key: Key): Char? {
             return map[key]
         }
 
