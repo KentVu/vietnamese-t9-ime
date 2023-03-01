@@ -4,8 +4,9 @@ interface UI {
     fun subscribeEvents(block: (UIEvent) -> Unit)
     fun update(event: UpdateEvent)
 
-    enum class UpdateEvent {
-        Initialized
+    sealed class UpdateEvent {
+        object Initialized : UpdateEvent()
+        class NewCandidates(val candidates: Set<String>) : UpdateEvent()
     }
     //class DefaultUI: UI {}
 }

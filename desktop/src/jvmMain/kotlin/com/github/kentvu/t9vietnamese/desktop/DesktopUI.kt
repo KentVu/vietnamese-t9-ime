@@ -7,6 +7,7 @@ import androidx.compose.ui.input.key.*
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,7 +27,10 @@ class DesktopUI : UI {
 
     override fun update(event: UI.UpdateEvent) {
         when(event) {
-            UI.UpdateEvent.Initialized -> keysEnabled.value = true
+            is UI.UpdateEvent.Initialized -> keysEnabled.value = true
+            is UI.UpdateEvent.NewCandidates -> {
+                Napier.d("NewCandidates: ${event.candidates}")
+            }
         }
     }
 
@@ -68,6 +72,7 @@ class DesktopUI : UI {
             Key.Eight to '8',
             Key.Nine to '9',
             // Next is for simulating a keypad by left-side of the keyboard.
+            Key.Spacebar to '0',
             Key.Q to '1',
             Key.W to '2',
             Key.E to '3',
