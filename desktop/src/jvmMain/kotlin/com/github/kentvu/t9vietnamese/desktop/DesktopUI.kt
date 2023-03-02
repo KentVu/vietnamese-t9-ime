@@ -10,14 +10,29 @@ import com.github.kentvu.t9vietnamese.model.VNKeys
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
-class DesktopUI : UI {
-    private val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
-    private val scope = CoroutineScope(Dispatchers.Default)
-    private val keysEnabled = mutableStateOf(false)
+class DesktopUI(
+    private val exitApplication: () -> Unit,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+) : UI {
+    internal val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
+    private var keysEnabled = MutableStateFlow(false)
+
+    @Composable
+    internal fun buildUi() {
+        AppUi(keysEnabled) { key ->
+            eventSource.tryEmit(UIEvent.KeyPress(key))
+        }
+    }
+
+    internal fun onKeyEvent(keyEvent: KeyEvent): Boolean {
+        if (keyEvent.isCtrlQ()) {
+            exitApplication()
+            return true
+        }
+        return onUserEvent(keyEvent)
+    }
 
     override fun subscribeEvents(block: (UIEvent) -> Unit) {
         eventSource.onEach {
@@ -27,10 +42,13 @@ class DesktopUI : UI {
 
     override fun update(event: UI.UpdateEvent) {
         when(event) {
-            is UI.UpdateEvent.Initialized -> keysEnabled.value = true
+            is UI.UpdateEvent.Initialized -> {
+                keysEnabled.update { true }
+            }
             is UI.UpdateEvent.NewCandidates -> {
                 Napier.d("NewCandidates: ${event.candidates}")
             }
+            UI.UpdateEvent.Close -> exitApplication()
         }
     }
 
@@ -48,14 +66,6 @@ class DesktopUI : UI {
         }
         // let other handlers receive this event
         return false
-    }
-
-    @Composable
-    fun ui() {
-        AppUi(keysEnabled) { key ->
-            eventSource.tryEmit(UIEvent.KeyPress(key))
-        }
-
     }
 
     object Letter2Keypad {
@@ -93,4 +103,9 @@ class DesktopUI : UI {
 
     }
 
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun KeyEvent.isCtrlQ(): Boolean {
+    return type == KeyEventType.KeyUp && isCtrlPressed && key == Key.Q
 }

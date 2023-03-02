@@ -6,6 +6,8 @@ interface UI {
 
     sealed class UpdateEvent {
         object Initialized : UpdateEvent()
+        object Close : UpdateEvent()
+
         class NewCandidates(val candidates: Set<String>) : UpdateEvent()
     }
     //class DefaultUI: UI {}

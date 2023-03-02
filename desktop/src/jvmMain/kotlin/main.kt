@@ -13,6 +13,7 @@ import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import okio.FileSystem
 
 fun main() {
@@ -23,7 +24,7 @@ fun main() {
 @OptIn(ExperimentalComposeUiApi::class)
 fun old_main() = application {
     Napier.base(DebugAntilog())
-    DesktopUI()
+    DesktopUI({})
     val app = VNT9App(
         VietnameseWordList,
         FileSystem.SYSTEM
@@ -50,7 +51,7 @@ fun old_main() = application {
             }
         }
     ) {
-        AppUi(mutableStateOf(true)) { key ->
+        AppUi(MutableStateFlow(true)) { key ->
             scope.launch {
                 Napier.d("type: ${key.symbol}")
                 app.type(key).collect {

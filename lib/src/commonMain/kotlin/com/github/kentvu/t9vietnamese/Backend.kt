@@ -7,6 +7,7 @@ import io.github.aakira.napier.Napier
 import okio.FileSystem
 
 class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
+    private var initialized: Boolean = false
     private val engine = Engine(wordlist, fileSystem)
 
     fun init() {
@@ -16,9 +17,11 @@ class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
                 is UIEvent.KeyPress -> {
                     onKeyPress(ev.key)
                 }
+                UIEvent.CloseRequest -> ui.update(UI.UpdateEvent.Close)
             }
         }
         ui.update(UI.UpdateEvent.Initialized)
+        initialized = true
     }
 
     private fun onKeyPress(key: Key) {
@@ -26,5 +29,11 @@ class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
         engine.type(key)
         ui.update(UI.UpdateEvent.NewCandidates(engine.candidates))
     }
+
+    fun ensureInitialized() {
+        if(!initialized) throw Uninitialized()
+    }
+
+    class Uninitialized : Throwable()
 
 }

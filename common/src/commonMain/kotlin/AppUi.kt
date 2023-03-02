@@ -9,9 +9,10 @@ import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun AppUi(keysEnabled: MutableState<Boolean>, onKeyClick: (key: Key) -> Unit) {
+fun AppUi(keysEnabled: StateFlow<Boolean>, onKeyClick: (key: Key) -> Unit) {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {

@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -22,6 +23,14 @@ kotlin {
 //                implementation(compose.preview)
             }
         }
+        //@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+        //named("commonTest") {
+        //    dependencies {
+        //        implementation(kotlin("test")) // This brings all the platform dependencies automatically
+        //        // Test rules and transitive dependencies:
+        //        implementation(compose.uiTestJUnit4)
+        //    }
+        //}
         named("androidMain") {
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")

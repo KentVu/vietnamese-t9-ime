@@ -1,60 +1,62 @@
 package com.github.kentvu.t9vietnamese.desktop
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.t9vietnamese.Backend
+import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okio.FileSystem
 
-class DesktopT9App {
-    private val ui = DesktopUI()
+class DesktopT9App(
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+) {
+    private var applicationScope: ApplicationScope? = null
+    private val ui = DesktopUI({ applicationScope?.exitApplication() }, scope)
     private val backend = Backend(
         ui,
         VietnameseWordList,
         FileSystem.SYSTEM
     )
-    private val scope = CoroutineScope(Dispatchers.Default)
-    private lateinit var applicationScope: ApplicationScope
-
-    private fun onKeyEvent(keyEvent: KeyEvent): Boolean {
-        if (keyEvent.isCtrlQ()) {
-            applicationScope.exitApplication()
-            return true
-        }
-        return ui.onUserEvent(keyEvent)
-    }
 
     fun start() {
         Napier.base(DebugAntilog())
-        scope.launch {
-            backend.init()
-        }
         application {
             applicationScope = this
+            LaunchedEffect(1) {
+                backend.init()
+            }
             Window(
-                onCloseRequest = ::exitApplication,
+                onCloseRequest = {
+                    ui.eventSource.tryEmit(UIEvent.CloseRequest)
+                },
                 title = "Compose for Desktop",
-                state = rememberWindowState(width = 300.dp, height = 300.dp),
-                onKeyEvent = ::onKeyEvent
+                state = rememberWindowState(width = 300.dp, height = 600.dp),
+                onKeyEvent = ui::onKeyEvent
             ) {
-                ui.ui()
+                ui.buildUi()
             }
         }
     }
 
-}
+    @Composable
+    fun startForTest() {
+        Napier.base(DebugAntilog())
+        LaunchedEffect(1) {
+            backend.init()
+        }
+        ui.buildUi()
+    }
 
-@OptIn(ExperimentalComposeUiApi::class)
-private fun KeyEvent.isCtrlQ(): Boolean {
-    return type == KeyEventType.KeyUp && isCtrlPressed && key == Key.Q
+    fun ensureBackendInitialized() {
+        backend.ensureInitialized()
+    }
 }

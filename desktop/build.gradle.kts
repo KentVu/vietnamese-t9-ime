@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -15,6 +17,14 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":lib"))
+            }
+        }
+        named("commonTest") {
+            dependencies {
+                implementation(kotlin("test")) // This brings all the platform dependencies automatically
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                // Test rules and transitive dependencies:
+                implementation(compose.uiTestJUnit4)
             }
         }
     }
