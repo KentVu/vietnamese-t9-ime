@@ -14,10 +14,11 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import okio.FileSystem
 
 class DesktopT9App(
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 ) {
     private var applicationScope: ApplicationScope? = null
     private val ui = DesktopUI({ applicationScope?.exitApplication() }, scope)
@@ -49,7 +50,7 @@ class DesktopT9App(
 
     @Composable
     fun startForTest() {
-        Napier.base(DebugAntilog())
+        //Napier.base(DebugAntilog("T9Desktop"))
         LaunchedEffect(1) {
             backend.init()
         }
@@ -58,5 +59,10 @@ class DesktopT9App(
 
     fun ensureBackendInitialized() {
         backend.ensureInitialized()
+    }
+
+    fun stop() {
+        scope.cancel("App.Stop")
+        Napier.takeLogarithm()
     }
 }

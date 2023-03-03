@@ -36,6 +36,7 @@ class DesktopUI(
     }
 
     override fun subscribeEvents(block: (UIEvent) -> Unit) {
+        Napier.d("eventSource.subCount:${eventSource.subscriptionCount.value}")
         eventSource.onEach {
             block(it)
         }.launchIn(scope)
@@ -47,7 +48,8 @@ class DesktopUI(
                 uiState.update { it.copy(true)  }
             }
             is UI.UpdateEvent.NewCandidates -> {
-                Napier.d("NewCandidates: ${event.candidates}")
+                Napier.d("NewCandidates: ${event.candidates}", tag = "DesktopUI")
+                //println("NewCandidates: ${event.candidates}")
                 uiState.update { it.copy(candidates = event.candidates) }
             }
             UI.UpdateEvent.Close -> exitApplication()
