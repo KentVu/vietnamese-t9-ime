@@ -57,8 +57,12 @@ class DesktopUI(
     /**
      * @return event handled.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun onUserEvent(keyEvent: KeyEvent): Boolean {
         if (keyEvent.type == KeyEventType.KeyUp) {
+            if (keyEvent.isCtrlPressed && keyEvent.key == Key.C) {
+                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear))
+            }
             if (Letter2Keypad.available(keyEvent.key)) {
                 eventSource.tryEmit(UIEvent.KeyPress(
                     VNKeys.fromChar(

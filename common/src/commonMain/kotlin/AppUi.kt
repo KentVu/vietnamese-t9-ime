@@ -53,6 +53,7 @@ fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key
         Column(verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.End,) {
             with(VNKeys) {
+                KeyboardRow(onKeyClick, keysEnabled, Clear)
                 KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
                 KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
                 KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
@@ -65,16 +66,12 @@ fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key
 @Composable
 private fun CandidatesView(candidates: Set<String>) {
     LazyRow(
-        //horizontalArrangement = Arrangement.SpaceBetween,
-        //contentPadding = PaddingValues(start = 8.dp),
         modifier = Modifier.semantics {
             contentDescription = Semantic.candidates
         }) {
-        //var isFirst = true
         candidates.forEach {
             item(it) {
-                Text(it, Modifier.padding(start = if(/*!isFirst*/true) 4.dp else 0.dp))
-                //isFirst = false
+                Text(it, Modifier.padding(start = 4.dp))
             }
         }
     }

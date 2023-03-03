@@ -1,33 +1,27 @@
 import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.kentvu.t9vietnamese.desktop.DesktopT9App
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.nio.charset.Charset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppTests {
     @get:Rule
     val composeTestRule = createComposeRule()
+    private lateinit var app: DesktopT9App
 
     @Test
     fun testInitialization() = runTest {
-        val app = DesktopT9App()
-        composeTestRule.setContent {
-            app.startForTest()
-        }
-        //delay(3000)
-        println("${Charset.defaultCharset()}")
         composeTestRule.apply {
             app.ensureBackendInitialized()
             val key = VNKeys.key2
-            //Napier.d(onRoot().printToString())
-            onRoot().printToLog("Test")
-            //onNodeWithText("${key.symbol}${key.subChars}").assertIsEnabled()
+            //onRoot().printToLog("Test")
             onNode(hasText("${key.symbol}") and hasText(key.subChars))
                 .assertHasClickAction()
                 .assertIsEnabled()
@@ -37,35 +31,48 @@ class AppTests {
         }
     }
 
-    @Test
-    fun type24_candidatesNotEmpty() = runTest {
-        val app = DesktopT9App()
+    @Before
+    fun setUp() {
+        app = DesktopT9App()
         composeTestRule.setContent {
             app.startForTest()
         }
-        type(2)
-        type(4)
-        assertCandidatesNotEmpty()
-        //type(VNKeys.C)
-        //assertCandidatesEmpty()
     }
 
-    private suspend fun assertCandidatesNotEmpty() {
-        composeTestRule.apply {
-            awaitIdle()
-            onNodeWithContentDescription(Semantic.candidates).apply {
-                printToLog("type24")
-                onChildAt(0).assertExists()
-            }
+    @Test
+    fun type24_candidatesNotEmpty() = runTest {
+        //setUp()
+        type(24)
+        assertCandidatesNotEmpty()
+    }
+
+    @Test
+    fun typeClear_candidatesEmpty() = runTest {
+        type(24)
+        assertCandidatesNotEmpty()
+        type(VNKeys.Clear)
+        assertCandidatesEmpty()
+    }
+
+    private suspend fun assertCandidatesNotEmpty() = useComposeWhenIdle {
+        onCandidates().apply {
+            printToLog("type24")
+            onChildAt(0).assertExists()
         }
     }
 
-    private fun assertCandidatesEmpty() {
-        TODO("Not yet implemented")
+    private suspend fun assertCandidatesEmpty() = useComposeWhenIdle {
+        onCandidates().onChildren().assertCountEquals(0)
     }
 
-    private fun assertDisplayed(s: String) {
-        composeTestRule.onNodeWithText(s)
+    private fun ComposeContentTestRule.onCandidates() =
+        onNodeWithContentDescription(Semantic.candidates)
+
+    private suspend fun useComposeWhenIdle(block: ComposeContentTestRule.() -> Unit) {
+        composeTestRule.apply {
+            awaitIdle()
+            block()
+        }
     }
 
     private fun type(key: Key) {
@@ -76,7 +83,9 @@ class AppTests {
     }
 
     private fun type(n: Int) {
-        val key = VNKeys.fromChar(n.digitToChar())
-        type(key)
+        "$n".forEach {
+            val key = VNKeys.fromChar(it)
+            type(key)
+        }
     }
 }

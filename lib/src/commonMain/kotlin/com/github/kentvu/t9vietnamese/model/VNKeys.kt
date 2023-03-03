@@ -6,7 +6,7 @@ object VNKeys {
     }
 
     private val sym2Key = mutableMapOf<Char, Key>()
-    val C: Key = Key('C', "").apply { sym2Key[symbol] = this }
+    val Clear: Key = Key('C', "").apply { sym2Key[symbol] = this }
     val key1: Key = Key('1', ".,?").apply { sym2Key[symbol] = this }
     val key2: Key = Key('2', "abć").apply { sym2Key[symbol] = this }
     val key3: Key = Key('3', "def̀").apply { sym2Key[symbol] = this }

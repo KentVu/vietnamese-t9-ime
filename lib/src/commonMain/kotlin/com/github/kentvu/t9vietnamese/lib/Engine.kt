@@ -30,6 +30,12 @@ class Engine(
     }
 
     fun type(key: Key) {
+        if (key == VNKeys.Clear) {
+            prefixes = emptySet()
+            candidates = emptySet()
+            fullSequence.clear()
+            return
+        }
         fullSequence.append(key.symbol)
         val _candidates = mutableSetOf(fullSequence.toString())
         val _prefixes = mutableSetOf<String>()
