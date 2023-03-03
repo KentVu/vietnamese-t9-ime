@@ -2,17 +2,17 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
-import kotlinx.coroutines.flow.StateFlow
+import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 
 @Composable
-fun AppUi(keysEnabled: StateFlow<Boolean>, onKeyClick: (key: Key) -> Unit) {
+fun AppUi(keysEnabled: State<Boolean>, onKeyClick: (key: Key) -> Unit) {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {

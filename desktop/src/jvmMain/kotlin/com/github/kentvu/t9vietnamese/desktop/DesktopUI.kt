@@ -21,7 +21,7 @@ class DesktopUI(
 
     @Composable
     internal fun buildUi() {
-        AppUi(keysEnabled) { key ->
+        AppUi(keysEnabled.collectAsState()) { key ->
             eventSource.tryEmit(UIEvent.KeyPress(key))
         }
     }

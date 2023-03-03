@@ -13,7 +13,6 @@ import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
 import okio.FileSystem
 
 fun main() {
@@ -51,7 +50,7 @@ fun old_main() = application {
             }
         }
     ) {
-        AppUi(MutableStateFlow(true)) { key ->
+        AppUi(mutableStateOf(true)) { key ->
             scope.launch {
                 Napier.d("type: ${key.symbol}")
                 app.type(key).collect {

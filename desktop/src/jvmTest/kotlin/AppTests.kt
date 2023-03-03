@@ -25,8 +25,11 @@ class AppTests {
             //Napier.d(onRoot().printToString())
             onRoot().printToLog("Test")
             //onNodeWithText("${key.symbol}${key.subChars}").assertIsEnabled()
-            onNode(hasAnyChild(hasText("${key.symbol}"))).assertIsEnabled()
-            onNode(hasAnyChild(hasText("${key.symbol}"))).performClick()
+            onNode(hasText("${key.symbol}") and hasText(key.subChars))
+                .assertHasClickAction()
+                .assertIsEnabled()
+                .performClick()
+                .printToLog("Test")
             awaitIdle()
         }
     }
