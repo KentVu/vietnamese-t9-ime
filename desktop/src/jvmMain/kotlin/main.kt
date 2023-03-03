@@ -10,6 +10,7 @@ import com.github.kentvu.t9vietnamese.desktop.DesktopUI
 import com.github.kentvu.t9vietnamese.lib.VNT9App
 import com.github.kentvu.t9vietnamese.model.T9AppEvent
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
+import com.github.kentvu.t9vietnamese.ui.UIState
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
@@ -50,7 +51,7 @@ fun old_main() = application {
             }
         }
     ) {
-        AppUi(mutableStateOf(true)) { key ->
+        AppUi(mutableStateOf(UIState())) { key ->
             scope.launch {
                 Napier.d("type: ${key.symbol}")
                 app.type(key).collect {

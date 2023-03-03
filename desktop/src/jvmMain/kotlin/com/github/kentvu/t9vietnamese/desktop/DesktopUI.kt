@@ -7,6 +7,7 @@ import androidx.compose.ui.input.key.*
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import com.github.kentvu.t9vietnamese.ui.UIState
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,11 +18,11 @@ class DesktopUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 ) : UI {
     internal val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
-    private var keysEnabled = MutableStateFlow(false)
+    private val uiState = MutableStateFlow(UIState())
 
     @Composable
     internal fun buildUi() {
-        AppUi(keysEnabled.collectAsState()) { key ->
+        AppUi(uiState.collectAsState()) { key ->
             eventSource.tryEmit(UIEvent.KeyPress(key))
         }
     }
@@ -43,10 +44,11 @@ class DesktopUI(
     override fun update(event: UI.UpdateEvent) {
         when(event) {
             is UI.UpdateEvent.Initialized -> {
-                keysEnabled.update { true }
+                uiState.update { it.copy(true)  }
             }
             is UI.UpdateEvent.NewCandidates -> {
                 Napier.d("NewCandidates: ${event.candidates}")
+                uiState.update { it.copy(candidates = event.candidates) }
             }
             UI.UpdateEvent.Close -> exitApplication()
         }

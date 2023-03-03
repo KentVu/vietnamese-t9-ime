@@ -6,13 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import com.github.kentvu.t9vietnamese.ui.UIState
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 
 @Composable
-fun AppUi(keysEnabled: State<Boolean>, onKeyClick: (key: Key) -> Unit) {
+fun AppUi(uiState: State<UIState>, onKeyClick: (key: Key) -> Unit) {
     T9VietnameseTheme {
         Scaffold(topBar = {
             TopAppBar(title = {
@@ -24,12 +27,12 @@ fun AppUi(keysEnabled: State<Boolean>, onKeyClick: (key: Key) -> Unit) {
                 verticalArrangement = Arrangement.Bottom,
                 modifier = Modifier.fillMaxSize()
             ) {
-                CandidatesView()
+                CandidatesView(uiState.value.candidates)
                 Keypad(
                     Modifier
                         .padding(innerPadding)
                         .fillMaxSize(),
-                    keysEnabled.value,
+                    uiState.value.initialized,
                     onKeyClick
                 )
             }
@@ -60,10 +63,25 @@ fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key
 }
 
 @Composable
-private fun CandidatesView() {
-    LazyRow {
-
+private fun CandidatesView(candidates: Set<String>) {
+    LazyRow(
+        //horizontalArrangement = Arrangement.SpaceBetween,
+        //contentPadding = PaddingValues(start = 8.dp),
+        modifier = Modifier.semantics {
+            contentDescription = Semantic.candidates
+        }) {
+        //var isFirst = true
+        candidates.forEach {
+            item(it) {
+                Text(it, Modifier.padding(start = if(/*!isFirst*/true) 4.dp else 0.dp))
+                //isFirst = false
+            }
+        }
     }
+}
+
+object Semantic {
+    const val candidates = "Candidates"
 }
 
 @Composable
