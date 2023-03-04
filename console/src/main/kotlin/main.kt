@@ -1,4 +1,3 @@
-import com.github.kentvu.t9vietnamese.lib.VNT9App
 import com.github.kentvu.t9vietnamese.model.*
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -27,7 +26,7 @@ fun main(args: Array<String>) {
             }
         }
         do {
-            print("Type $")
+            print("Type $ ")
             val line: String = readln()
             line.forEach {
                 app.type(it)

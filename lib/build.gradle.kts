@@ -63,6 +63,7 @@ kotlin {
             }
         }
         named("androidMain") {
+            kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")
                 api("androidx.core:core-ktx:1.8.0")

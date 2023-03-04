@@ -51,11 +51,11 @@ dependencies {
     implementation(project(":lib"))
     implementation(project(":common"))
     implementation("androidx.activity:activity-compose:1.5.0")
-//    implementation(compose.preview)
+    //implementation(compose.preview)
     implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
     implementation("com.squareup.okio:okio:3.2.0")
 
-//    implementation "androidx.core:core-ktx:1.7.0"
+    //implementation "androidx.core:core-ktx:1.7.0"
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.material:material:$compose_version"
 //    implementation("androidx.compose.ui:ui-tooling-preview:${extra["compose.version"]}")

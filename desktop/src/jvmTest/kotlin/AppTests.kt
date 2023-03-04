@@ -83,7 +83,7 @@ class AppTests {
         //app.ui.locateCandidate("chào")
     }
 
-    private fun selectItem(s: String) {
+    private suspend fun selectItem(s: String) = useComposeWhenIdle {
         TODO("Not yet implemented")
     }
 

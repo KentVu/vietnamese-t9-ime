@@ -10,7 +10,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.t9vietnamese.Backend
 import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
-import io.github.aakira.napier.DebugAntilog
+import com.github.kentvu.t9vietnamese.ui.T9App
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,33 +19,30 @@ import okio.FileSystem
 
 class DesktopT9App(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-) {
+): T9App() {
     private var applicationScope: ApplicationScope? = null
-    private val ui = DesktopUI({ applicationScope?.exitApplication() }, scope)
-    private val backend = Backend(
-        ui,
-        VietnameseWordList,
-        FileSystem.SYSTEM
-    )
+    override val ui = DesktopUI { applicationScope?.exitApplication() }
+    override val backend = Backend(
+            ui,
+            VietnameseWordList,
+            FileSystem.SYSTEM
+        )
 
-    fun start() {
-        Napier.base(DebugAntilog())
+    override fun composeClosure(block: @Composable () -> Unit) {
         application {
             applicationScope = this
-            LaunchedEffect(1) {
-                backend.init()
-            }
             Window(
                 onCloseRequest = {
-                    ui.eventSource.tryEmit(UIEvent.CloseRequest)
+                    ui.injectEvent(UIEvent.CloseRequest)
                 },
                 title = "Compose for Desktop",
                 state = rememberWindowState(width = 300.dp, height = 600.dp),
                 onKeyEvent = ui::onKeyEvent
             ) {
-                ui.buildUi()
+                block()
             }
         }
+
     }
 
     @Composable
@@ -61,7 +58,7 @@ class DesktopT9App(
         backend.ensureInitialized()
     }
 
-    fun stop() {
+    override fun stop() {
         scope.cancel("App.Stop")
         Napier.takeLogarithm()
     }
