@@ -32,16 +32,12 @@ abstract class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : UI {
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
-    protected val uiState = MutableStateFlow(UIState()).apply {
-        onEach {
-            Napier.d("$it")
-        }
-    }
+    protected val uiState = MutableStateFlow(UIState())
     protected abstract val exitApplication: () -> Unit
 
     @Composable
     fun AppUi() {
-        val uiState by uiState.collectAsState(Dispatchers.Default)
+        val uiState by uiState.collectAsState()
         T9VietnameseTheme {
             Scaffold(topBar = {
                 TopAppBar(title = {

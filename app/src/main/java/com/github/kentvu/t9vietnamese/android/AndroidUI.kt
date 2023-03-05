@@ -12,13 +12,6 @@ import io.github.aakira.napier.Napier
 class AndroidUI(override val exitApplication: () -> Unit) : AppUI() {
     constructor(): this({})
 
-    override fun update(event: UI.UpdateEvent) {
-        super.update(event)
-        Napier.d("${event::class.simpleName}-Thread:${Thread.currentThread().name}")
-    }
-
-    override fun getThreadId(): String = Thread.currentThread().name
-
     @Preview
     @Composable
     fun AppPreview() {

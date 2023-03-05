@@ -19,7 +19,7 @@ import okio.FileSystem
 
 class DesktopT9App(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-): T9App() {
+): T9App(scope, Dispatchers.IO) {
     private var applicationScope: ApplicationScope? = null
     override val ui = DesktopUI { applicationScope?.exitApplication() }
     override val backend = Backend(
