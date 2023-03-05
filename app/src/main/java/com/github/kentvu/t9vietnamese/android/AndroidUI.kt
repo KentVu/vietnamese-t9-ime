@@ -8,13 +8,3 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.ui.AppUI
 import com.github.kentvu.t9vietnamese.ui.UIState
 import io.github.aakira.napier.Napier
-
-class AndroidUI(override val exitApplication: () -> Unit) : AppUI() {
-    constructor(): this({})
-
-    @Preview
-    @Composable
-    fun AppPreview() {
-        AppUi()
-    }
-}

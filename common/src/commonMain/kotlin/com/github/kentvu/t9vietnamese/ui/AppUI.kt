@@ -28,12 +28,12 @@ import kotlinx.coroutines.launch
 import kotlin.native.concurrent.ThreadLocal
 import androidx.compose.ui.input.key.Key as ComposeKey
 
-abstract class AppUI(
+class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val exitApplication: () -> Unit,
 ) : UI {
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
     protected val uiState = MutableStateFlow(UIState())
-    protected abstract val exitApplication: () -> Unit
 
     @Composable
     fun AppUi() {

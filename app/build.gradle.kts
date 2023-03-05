@@ -30,9 +30,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-//    kotlinOptions {
-//        jvmTarget = '1.8'
-//    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 //    buildFeatures {
 //        compose true
 //    }
@@ -70,4 +70,10 @@ dependencies {
 //    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     // Needed for createComposeRule, but not createAndroidComposeRule:
 //    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
