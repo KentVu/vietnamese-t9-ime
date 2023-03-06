@@ -16,4 +16,6 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":lib"))
     implementation(kotlin("test")) // This brings all the platform dependencies automatically
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    implementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.20")
 }

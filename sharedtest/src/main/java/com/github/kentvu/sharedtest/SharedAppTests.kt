@@ -3,6 +3,7 @@ package com.github.kentvu.sharedtest
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.window.ApplicationScope
 import com.github.kentvu.t9vietnamese.model.Key
@@ -23,13 +24,16 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AppTests {
+abstract class SharedAppTests {
     @get:Rule
-    val composeTestRule = createComposeRule()
-    private lateinit var app: T9App
+    abstract val composeTestRule: ComposeContentTestRule
+    protected lateinit var app: T9App
+
+    abstract fun setUpApp(): T9App
 
     @BeforeTest
     fun setUp() {
+        app = setUpApp()
         composeTestRule.setContent {
             app.ui.AppUi()
             rememberCoroutineScope { Dispatchers.Main }.launch {
