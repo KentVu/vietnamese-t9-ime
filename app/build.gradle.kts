@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -54,6 +56,9 @@ dependencies {
     //implementation(compose.preview)
     implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
     implementation("com.squareup.okio:okio:3.2.0")
+    androidTestImplementation(project(":common"))
+    //testImplementation(compose.uiTestJUnit4)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
 
     //implementation "androidx.core:core-ktx:1.7.0"
 //    implementation "androidx.compose.ui:ui:$compose_version"
