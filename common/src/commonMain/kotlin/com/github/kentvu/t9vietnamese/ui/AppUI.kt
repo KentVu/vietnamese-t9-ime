@@ -28,7 +28,7 @@ import androidx.compose.ui.input.key.Key as ComposeKey
 
 class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val app: DefaultT9App,
+    private val app: T9App,
 ) : UI {
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
     protected val uiState = MutableStateFlow(UIState())
@@ -61,11 +61,9 @@ class AppUI(
         }
     }
 
-    open fun getThreadId(): String = ""
-
     @Composable
-    open fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
-        Napier.d("Recompose ${getThreadId()}")
+    fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
+        //Napier.d("Recompose ${getThreadId()}")
         Surface(
             shape = MaterialTheme.shapes.medium,
             //color = MaterialTheme.colors.secondary,
@@ -162,13 +160,13 @@ class AppUI(
                 //println("NewCandidates: ${event.candidates}")
                 uiState.update { it.copy(candidates = event.candidates) }
             }
-            UI.UpdateEvent.Close -> app.requestExit()
+            UI.UpdateEvent.Close -> app.onCloseRequest()
         }
     }
 
     fun onKeyEvent(keyEvent: KeyEvent): Boolean {
         if (keyEvent.isCtrlQ()) {
-            exitApplication()
+            app.onCloseRequest()
             return true
         }
         return onUserEvent(keyEvent)
@@ -188,14 +186,14 @@ class AppUI(
         if (keyEvent.type == KeyEventType.KeyUp) {
             if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
                 eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear)).also{
-                    Napier.d("tryEmit=$it - ${getThreadId()}")
+                    //Napier.d("tryEmit=$it - ${getThreadId()}")
                 }
             }
             if (Letter2Keypad.available(keyEvent.key)) {
                 eventSource.tryEmit(UIEvent.KeyPress(
                     VNKeys.fromChar(
                         Letter2Keypad.numForKey(keyEvent.key)!!))).also {
-                    Napier.d("tryEmit(${keyEvent.key})=$it - ${getThreadId()}")
+                    //Napier.d("tryEmit(${keyEvent.key})=$it - ${getThreadId()}")
                 }
                 return true
             }

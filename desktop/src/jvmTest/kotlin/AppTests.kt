@@ -1,11 +1,20 @@
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.window.ApplicationScope
 import com.github.kentvu.t9vietnamese.desktop.DesktopT9App
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import com.github.kentvu.t9vietnamese.ui.AppUI
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.AfterTest
@@ -16,6 +25,26 @@ class AppTests {
     @get:Rule
     val composeTestRule = createComposeRule()
     private lateinit var app: DesktopT9App
+
+    @BeforeTest
+    fun setUp() {
+        app = DesktopT9App(object : ApplicationScope {
+            override fun exitApplication() {
+                Napier.d("called")
+            }
+        })
+        composeTestRule.setContent {
+            app.ui.AppUi()
+            rememberCoroutineScope { Dispatchers.Main }.launch {
+                app.start()
+            }
+        }
+    }
+
+    @AfterTest
+    fun tearDown() {
+        app.stop()
+    }
 
     @Test
     fun testInitialization() = runTest {
@@ -32,18 +61,6 @@ class AppTests {
         }
     }
 
-    @BeforeTest
-    fun setUp() {
-        app = DesktopT9App()
-        composeTestRule.setContent {
-            app.startForTest()
-        }
-    }
-
-    @AfterTest
-    fun tearDown() {
-        app.stop()
-    }
     @Test
     fun type24_candidatesNotEmpty() = runTest {
         //setUp()
@@ -103,7 +120,7 @@ class AppTests {
     }
 
     private fun ComposeContentTestRule.onCandidates() =
-        onNodeWithContentDescription(Semantic.candidates)
+        onNodeWithContentDescription(AppUI.Semantic.candidates)
 
     private suspend fun useComposeWhenIdle(block: ComposeContentTestRule.() -> Unit) {
         composeTestRule.apply {
@@ -123,6 +140,19 @@ class AppTests {
         "$n".forEach {
             val key = VNKeys.fromChar(it)
             type(key)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        @BeforeClass
+        fun beforeClass() {
+            Napier.base(DebugAntilog())
+        }
+        @JvmStatic
+        @AfterClass
+        fun afterClass() {
+            Napier.takeLogarithm()
         }
     }
 }

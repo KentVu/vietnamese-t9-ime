@@ -6,33 +6,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
-import com.github.kentvu.t9vietnamese.model.VietnameseWordList
-import com.github.kentvu.t9vietnamese.ui.T9App
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
     private val app by lazy {
-        T9App(
-            lifecycleScope,
-            Dispatchers.IO,
-            { finish() },
-            VietnameseWordList,
-            AndroidFileSystem(applicationContext),
-            object : T9App.ComposeClosure {
-                override fun setContent(block: @Composable () -> Unit) {
-                    this@MainActivity.setContent {
-                        block()
-                    }
-                }
-
-            }
+        AndroidT9App(
+            this
         )
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         app.start()
+        setContent {
+            app.ui.AppUi()
+        }
     }
 
     override fun onDestroy() {
