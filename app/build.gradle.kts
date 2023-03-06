@@ -58,6 +58,7 @@ dependencies {
     implementation("com.squareup.okio:okio:3.2.0")
     //testImplementation(compose.uiTestJUnit4)
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+    androidTestImplementation(project(":sharedtest"))
 
     //implementation "androidx.core:core-ktx:1.7.0"
 //    implementation "androidx.compose.ui:ui:$compose_version"

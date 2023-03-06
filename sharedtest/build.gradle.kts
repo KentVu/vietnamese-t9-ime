@@ -15,4 +15,5 @@ dependencies {
     implementation(compose.uiTestJUnit4)
     implementation(project(":common"))
     implementation(project(":lib"))
+    implementation(kotlin("test")) // This brings all the platform dependencies automatically
 }
