@@ -3,6 +3,7 @@ package com.github.kentvu.t9vietnamese.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.input.key.KeyEvent
 import com.github.kentvu.t9vietnamese.Backend
+import com.github.kentvu.t9vietnamese.lib.T9App
 import com.github.kentvu.t9vietnamese.model.WordList
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -12,16 +13,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okio.FileSystem
 
-class T9App(
+class DefaultT9App(
     private val scope: CoroutineScope,
     private val ioContext: CoroutineDispatcher = Dispatchers.Default,
-    exitApplication: () -> Unit,
     wordlist: WordList,
     fileSystem: FileSystem,
     private val composeClosure: ComposeClosure
-) {
+) : T9App {
 
-    val ui = AppUI(scope, exitApplication)
+    val ui = AppUI(scope, this)
     private val backend = Backend(
         ui,
         wordlist,
@@ -48,5 +48,9 @@ class T9App(
 
     interface ComposeClosure {
         fun setContent(block: @Composable () -> Unit)
+    }
+
+    override fun requestExit() {
+        exitApplication()
     }
 }

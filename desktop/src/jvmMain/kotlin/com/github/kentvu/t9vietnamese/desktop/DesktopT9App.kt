@@ -9,19 +9,28 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.t9vietnamese.Backend
 import com.github.kentvu.t9vietnamese.UIEvent
+import com.github.kentvu.t9vietnamese.lib.T9App
 import com.github.kentvu.t9vietnamese.model.VietnameseWordList
+import com.github.kentvu.t9vietnamese.ui.DefaultT9App
 import com.github.kentvu.t9vietnamese.ui.T9App
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import okio.FileSystem
 
 class DesktopT9App(
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-): T9App(scope, Dispatchers.IO) {
+): T9App by DefaultT9App(
+    CoroutineScope(Dispatchers.Main),
+    Dispatchers.IO,
+    VietnameseWordList,
+    FileSystem.SYSTEM,
+
+) {
     private var applicationScope: ApplicationScope? = null
-    override val ui = DesktopUI { applicationScope?.exitApplication() }
+    val exitApplication: () -> Unit = { applicationScope?.exitApplication() }
+    override val ui = DesktopUI(exitApplication)
     override val backend = Backend(
             ui,
             VietnameseWordList,
@@ -29,19 +38,6 @@ class DesktopT9App(
         )
 
     override fun composeClosure(block: @Composable () -> Unit) {
-        application {
-            applicationScope = this
-            Window(
-                onCloseRequest = {
-                    ui.injectEvent(UIEvent.CloseRequest)
-                },
-                title = "Compose for Desktop",
-                state = rememberWindowState(width = 300.dp, height = 600.dp),
-                onKeyEvent = ui::onKeyEvent
-            ) {
-                block()
-            }
-        }
 
     }
 

@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese.test
+package com.github.kentvu.sharedtest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule

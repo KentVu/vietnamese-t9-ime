@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,12 +24,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.native.concurrent.ThreadLocal
 import androidx.compose.ui.input.key.Key as ComposeKey
 
 class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val exitApplication: () -> Unit,
+    private val app: DefaultT9App,
 ) : UI {
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
     protected val uiState = MutableStateFlow(UIState())
@@ -164,7 +162,7 @@ class AppUI(
                 //println("NewCandidates: ${event.candidates}")
                 uiState.update { it.copy(candidates = event.candidates) }
             }
-            UI.UpdateEvent.Close -> exitApplication()
+            UI.UpdateEvent.Close -> app.requestExit()
         }
     }
 

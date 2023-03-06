@@ -18,3 +18,4 @@ pluginManagement {
 
 rootProject.name = "T9Vietnamese"
 include(":dawg-kotlin", ":lib", ":common", ":app", ":console", ":desktop", ":web")
+include(":sharedtest")
