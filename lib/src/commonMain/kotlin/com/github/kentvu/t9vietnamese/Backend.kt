@@ -2,6 +2,7 @@ package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.t9vietnamese.lib.Engine
 import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.model.WordList
 import io.github.aakira.napier.Napier
 import okio.FileSystem
@@ -14,9 +15,7 @@ class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
         engine.init()
         ui.subscribeEvents { ev ->
             when(ev) {
-                is UIEvent.KeyPress -> {
-                    onKeyPress(ev.key)
-                }
+                is UIEvent.KeyPress -> onKeyPress(ev.key)
                 UIEvent.CloseRequest -> ui.update(UI.UpdateEvent.Close)
             }
         }
@@ -26,8 +25,12 @@ class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
 
     private fun onKeyPress(key: Key) {
         Napier.d("type: ${key.symbol}")
-        engine.type(key)
-        ui.update(UI.UpdateEvent.NewCandidates(engine.candidates))
+        if (key == VNKeys.keyStar) {
+            ui.update(UI.UpdateEvent.SelectNextCandidate)
+        } else {
+            engine.type(key)
+            ui.update(UI.UpdateEvent.NewCandidates(engine.candidates))
+        }
     }
 
     fun ensureInitialized() {

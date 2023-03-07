@@ -1,16 +1,13 @@
 package com.github.kentvu.t9vietnamese.lib
 
-import com.github.kentvu.t9vietnamese.model.Key
-import com.github.kentvu.t9vietnamese.model.Trie
-import com.github.kentvu.t9vietnamese.model.VNKeys
-import com.github.kentvu.t9vietnamese.model.WordList
+import com.github.kentvu.t9vietnamese.model.*
 import okio.FileSystem
 
 class Engine(
     wordlist: WordList,
     fileSystem: FileSystem
 ) {
-    var candidates: Set<String> = emptySet()
+    var candidates: CandidateSet = CandidateSet()
         get() = field
         private set
     private val trie: Trie = DawgTrie(wordlist, fileSystem)
@@ -32,13 +29,13 @@ class Engine(
     fun type(key: Key) {
         if (key == VNKeys.Clear) {
             prefixes = emptySet()
-            candidates = emptySet()
+            candidates = CandidateSet()
             fullSequence.clear()
             return
         }
         fullSequence.append(key.symbol)
-        val _candidates = mutableSetOf(fullSequence.toString())
-        val _prefixes = mutableSetOf<String>()
+        val _candidates = linkedSetOf(fullSequence.toString())
+        val _prefixes = linkedSetOf<String>()
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
             //_candidates.addAll(key.subChars.map { "$it" })
@@ -60,7 +57,7 @@ class Engine(
             }
         }
         prefixes = _prefixes
-        candidates = _candidates
+        candidates = CandidateSet.from(_candidates)
     }
 
     fun init() {

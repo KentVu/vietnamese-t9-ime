@@ -1,5 +1,9 @@
 package com.github.kentvu.sharedtest
 
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import com.github.kentvu.t9vietnamese.model.Key
@@ -30,8 +34,9 @@ abstract class SharedAppTests {
         app.stop()
     }
 
+    // The keyboard is not enabled until backend is initialized
     @Test
-    fun testInitialization() = runTest {
+    fun testInitialization_ensureKeyboardEnabled() = runTest {
         composeTestRule.apply {
             val key = VNKeys.key2
             //onRoot().printToLog("Test")
@@ -79,12 +84,22 @@ abstract class SharedAppTests {
     fun `confirm_a_word`() = runTest {
         type(24236)
         assertCandidateDisplayed("chào")
-        selectItem("chào")
+        selectCandidate("chào")
         //app.ui.locateCandidate("chào")
     }
 
-    private suspend fun selectItem(s: String) = useComposeWhenIdle {
-        TODO("Not yet implemented")
+    private suspend fun selectCandidate(cand: String) = useComposeWhenIdle {
+        repeat(1000) {
+            type('*')
+            if (selectedCandidate() != cand) return@repeat
+        }
+        //onCandidates().onChildren().onLast().fetchSemanticsNode().config.text.printToLog("Test")
+    }
+
+    private suspend fun selectedCandidate(): String = useComposeWhenIdle {
+        onNodeWithContentDescription(AppUI.Semantic.selectedCandidate)
+            .fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
     }
 
     private suspend fun assertCandidateDisplayed(cand: String) = useComposeWhenIdle {
@@ -105,12 +120,11 @@ abstract class SharedAppTests {
     private fun ComposeContentTestRule.onCandidates() =
         onNodeWithContentDescription(AppUI.Semantic.candidates)
 
-    private suspend fun useComposeWhenIdle(block: ComposeContentTestRule.() -> Unit) {
-        composeTestRule.apply {
+    private suspend fun <T> useComposeWhenIdle(block: suspend ComposeContentTestRule.() -> T): T =
+        composeTestRule.run {
             awaitIdle()
             block()
         }
-    }
 
     private fun type(key: Key) {
         composeTestRule.apply {
@@ -120,10 +134,12 @@ abstract class SharedAppTests {
     }
 
     private fun type(n: Int) {
-        "$n".forEach {
-            val key = VNKeys.fromChar(it)
-            type(key)
-        }
+        "$n".forEach(::type)
+    }
+
+    private fun type(c: Char) {
+        val key = VNKeys.fromChar(c)
+        type(key)
     }
 
     companion object {
@@ -132,6 +148,7 @@ abstract class SharedAppTests {
         fun beforeClass() {
             Napier.base(DebugAntilog())
         }
+
         @JvmStatic
         @AfterClass
         fun afterClass() {

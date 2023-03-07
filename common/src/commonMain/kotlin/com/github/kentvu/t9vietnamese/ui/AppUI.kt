@@ -16,6 +16,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.UIEvent
+import com.github.kentvu.t9vietnamese.model.CandidateSet
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
@@ -62,7 +63,11 @@ class AppUI(
     }
 
     @Composable
-    fun Keypad(modifier: Modifier = Modifier, keysEnabled: Boolean, onKeyClick: (key: Key) -> Unit) {
+    fun Keypad(
+        modifier: Modifier = Modifier,
+        keysEnabled: Boolean,
+        onKeyClick: (key: Key) -> Unit
+    ) {
         //Napier.d("Recompose ${getThreadId()}")
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -72,35 +77,48 @@ class AppUI(
                 .animateContentSize()
                 .padding(1.dp)
         ) {
-            Column(verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.End,) {
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.End,
+            ) {
                 with(VNKeys) {
                     KeyboardRow(onKeyClick, keysEnabled, Clear)
                     KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
                     KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
                     KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
-                    KeyboardRow(onKeyClick, keysEnabled, key0)
+                    KeyboardRow(onKeyClick, keysEnabled, keyStar, key0)
                 }
             }
         }
     }
 
     @Composable
-    private fun CandidatesView(candidates: Set<String>) {
+    private fun CandidatesView(candidates: CandidateSet) {
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates
             }) {
-            candidates.forEach {
-                item(it) {
-                    Text(it, Modifier.padding(start = 4.dp))
+            candidates.forEach { cand, isSelected ->
+                item(cand.text) {
+                    Text(
+                        cand.text,
+                        Modifier.padding(start = 4.dp).run {
+                            if (isSelected)
+                                semantics { contentDescription = Semantic.selectedCandidate }
+                            else this
+                        }
+                    )
                 }
             }
         }
     }
 
     @Composable
-    private fun KeyboardRow(onKeyClick: (key: Key) -> Unit, keysEnabled: Boolean, vararg keys: Key) {
+    private fun KeyboardRow(
+        onKeyClick: (key: Key) -> Unit,
+        keysEnabled: Boolean,
+        vararg keys: Key
+    ) {
         Row {
             val mod = Modifier
                 .padding(1.dp)
@@ -138,6 +156,7 @@ class AppUI(
 
     object Semantic {
         const val candidates = "Candidates"
+        const val selectedCandidate: String = "selected_candidate"
     }
 
     override fun subscribeEvents(block: (UIEvent) -> Unit) {
@@ -150,7 +169,7 @@ class AppUI(
     }
 
     override fun update(event: UI.UpdateEvent) {
-        when(event) {
+        when (event) {
             is UI.UpdateEvent.Initialized -> {
                 //uiState.update { it.copy(true)  }
                 uiState.value = uiState.value.copy(true)
@@ -161,6 +180,8 @@ class AppUI(
                 uiState.update { it.copy(candidates = event.candidates) }
             }
             UI.UpdateEvent.Close -> app.onCloseRequest()
+            UI.UpdateEvent.SelectNextCandidate ->
+                uiState.update { it.advanceSelectedCandidate() }
         }
     }
 
@@ -185,14 +206,18 @@ class AppUI(
         Napier.d("$keyEvent")
         if (keyEvent.type == KeyEventType.KeyUp) {
             if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear)).also{
+                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear)).also {
                     //Napier.d("tryEmit=$it - ${getThreadId()}")
                 }
             }
             if (Letter2Keypad.available(keyEvent.key)) {
-                eventSource.tryEmit(UIEvent.KeyPress(
-                    VNKeys.fromChar(
-                        Letter2Keypad.numForKey(keyEvent.key)!!))).also {
+                eventSource.tryEmit(
+                    UIEvent.KeyPress(
+                        VNKeys.fromChar(
+                            Letter2Keypad.numForKey(keyEvent.key)!!
+                        )
+                    )
+                ).also {
                     //Napier.d("tryEmit(${keyEvent.key})=$it - ${getThreadId()}")
                 }
                 return true
@@ -201,6 +226,7 @@ class AppUI(
         // let other handlers receive this event
         return false
     }
+
     object Letter2Keypad {
         @OptIn(ExperimentalComposeUiApi::class)
         private val map = mapOf(
@@ -226,6 +252,7 @@ class AppUI(
             ComposeKey.X to '8',
             ComposeKey.C to '9',
         )
+
         fun available(key: ComposeKey): Boolean {
             return map.containsKey(key)
         }
