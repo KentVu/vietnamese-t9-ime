@@ -3,8 +3,6 @@ package com.github.kentvu.t9vietnamese.ui
 import androidx.compose.ui.input.key.KeyEvent
 import com.github.kentvu.t9vietnamese.Backend
 import com.github.kentvu.t9vietnamese.model.WordList
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +37,4 @@ abstract class T9App(
     }
 
     abstract fun onCloseRequest()
-    fun ensureBackendInitialized() {
-        backend.ensureInitialized()
-    }
-
-    interface ComposeClosure {
-    }
 }

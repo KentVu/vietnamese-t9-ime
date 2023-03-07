@@ -1,27 +1,20 @@
 package com.github.kentvu.sharedtest
 
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
-import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.window.ApplicationScope
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.AppUI
 import com.github.kentvu.t9vietnamese.ui.T9App
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class SharedAppTests {
@@ -31,16 +24,6 @@ abstract class SharedAppTests {
 
     abstract fun setUpApp(): T9App
 
-    @BeforeTest
-    fun setUp() {
-        app = setUpApp()
-        composeTestRule.setContent {
-            app.ui.AppUi()
-            rememberCoroutineScope { Dispatchers.Main }.launch {
-                app.start()
-            }
-        }
-    }
 
     @AfterTest
     fun tearDown() {
@@ -50,7 +33,6 @@ abstract class SharedAppTests {
     @Test
     fun testInitialization() = runTest {
         composeTestRule.apply {
-            app.ensureBackendInitialized()
             val key = VNKeys.key2
             //onRoot().printToLog("Test")
             onNode(hasText("${key.symbol}") and hasText(key.subChars))
@@ -88,13 +70,13 @@ abstract class SharedAppTests {
     }
 
     @Test
-    fun `type a word`() = runTest {
+    fun `type_a_word`() = runTest {
         type(24236)
         assertCandidateDisplayed("chào")
     }
 
     @Test
-    fun `confirm a word`() = runTest {
+    fun `confirm_a_word`() = runTest {
         type(24236)
         assertCandidateDisplayed("chào")
         selectItem("chào")
