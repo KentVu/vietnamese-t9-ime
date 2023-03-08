@@ -53,8 +53,7 @@ class AppUI(
                     CandidatesView(uiState.candidates, uiState.selectedCandidate)
                     Keypad(
                         Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
+                            .padding(innerPadding),
                         uiState.initialized
                     ) { key ->
                         eventSource.tryEmit(UIEvent.KeyPress(key))
