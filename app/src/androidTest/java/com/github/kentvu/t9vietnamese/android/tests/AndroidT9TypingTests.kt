@@ -20,7 +20,7 @@ class AndroidT9TypingTests : SharedAppTests() {
         return AndroidT9App(_composeTestRule.activity)
     }
 
-    fun unlockScreen() = _composeTestRule.activity.unlockScreen()
+    private fun unlockScreen() = _composeTestRule.activity.unlockScreen()
 
     @Before
     fun setUp() {

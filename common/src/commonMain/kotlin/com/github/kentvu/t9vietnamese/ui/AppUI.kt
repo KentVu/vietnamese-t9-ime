@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese.ui
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -48,7 +50,7 @@ class AppUI(
                     verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    CandidatesView(uiState.candidates)
+                    CandidatesView(uiState.candidates, uiState.selectedCandidate)
                     Keypad(
                         Modifier
                             .padding(innerPadding)
@@ -93,20 +95,23 @@ class AppUI(
     }
 
     @Composable
-    private fun CandidatesView(candidates: CandidateSet) {
+    private fun CandidatesView(candidates: CandidateSet, selectedPos: Int) {
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates
             }) {
-            candidates.forEach { cand, isSelected ->
+            candidates.forEachIndexed { i, cand ->
                 item(cand.text) {
                     Text(
                         cand.text,
-                        Modifier.padding(start = 4.dp).run {
-                            if (isSelected)
-                                semantics { contentDescription = Semantic.selectedCandidate }
-                            else this
-                        }
+                        Modifier.padding(start = 4.dp)
+                            .run {
+                                if (selectedPos == i)
+                                    semantics {
+                                        contentDescription = Semantic.selectedCandidate
+                                    }.background(Color.LightGray)
+                                else this
+                            }
                     )
                 }
             }
@@ -206,9 +211,7 @@ class AppUI(
         Napier.d("$keyEvent")
         if (keyEvent.type == KeyEventType.KeyUp) {
             if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear)).also {
-                    //Napier.d("tryEmit=$it - ${getThreadId()}")
-                }
+                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear))
             }
             if (Letter2Keypad.available(keyEvent.key)) {
                 eventSource.tryEmit(
@@ -217,9 +220,7 @@ class AppUI(
                             Letter2Keypad.numForKey(keyEvent.key)!!
                         )
                     )
-                ).also {
-                    //Napier.d("tryEmit(${keyEvent.key})=$it - ${getThreadId()}")
-                }
+                )
                 return true
             }
         }

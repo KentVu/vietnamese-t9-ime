@@ -57,6 +57,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
     implementation("com.squareup.okio:okio:3.2.0")
     //testImplementation(compose.uiTestJUnit4)
+    //implementation("io.github.aakira:napier:2.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
     androidTestImplementation(project(":sharedtest"))
 

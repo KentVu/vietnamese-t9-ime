@@ -1,9 +1,7 @@
 package com.github.kentvu.sharedtest
 
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import com.github.kentvu.t9vietnamese.model.Key
@@ -75,31 +73,51 @@ abstract class SharedAppTests {
     }
 
     @Test
-    fun `type_a_word`() = runTest {
+    fun type_a_word() = runTest {
         type(24236)
         assertCandidateDisplayed("chào")
     }
 
     @Test
-    fun `confirm_a_word`() = runTest {
+    fun confirm_a_word() = runTest {
         type(24236)
-        assertCandidateDisplayed("chào")
-        selectCandidate("chào")
+        val cand = "chào"
+        assertCandidateDisplayed(cand)
+        selectCandidate(cand)
+        type(0)
+        checkWordIsConfirmed(cand)
         //app.ui.locateCandidate("chào")
     }
 
+    private fun checkWordIsConfirmed(cand: String) {
+        TODO("Not yet implemented")
+    }
+
     private suspend fun selectCandidate(cand: String) = useComposeWhenIdle {
-        repeat(1000) {
+        //repeat(10) {
+        for (i in 0..10) {
             type('*')
-            if (selectedCandidate() != cand) return@repeat
+            if (selectedCandidate() == cand) break//return@repeat
         }
+        //logd("selectedCandidate:${selectedCandidate()}")
+        //Napier.use {  }
         //onCandidates().onChildren().onLast().fetchSemanticsNode().config.text.printToLog("Test")
     }
 
     private suspend fun selectedCandidate(): String = useComposeWhenIdle {
-        onNodeWithContentDescription(AppUI.Semantic.selectedCandidate)
-            .fetchSemanticsNode().config
-            .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
+        try {
+            onNodeWithContentDescription(AppUI.Semantic.selectedCandidate).run {
+                printToLog("selectedCandidate")
+                fetchSemanticsNode().config.also {
+                    Napier.d("selectedCandidate:$it")
+                }
+                    .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
+
+            }
+        } catch (e: AssertionError) {
+            Napier.w("No selectedCandidate!!")
+            ""
+        }
     }
 
     private suspend fun assertCandidateDisplayed(cand: String) = useComposeWhenIdle {
@@ -155,4 +173,10 @@ abstract class SharedAppTests {
             Napier.takeLogarithm()
         }
     }
+}
+
+private suspend fun Napier.use(block: suspend Napier.() -> Unit) {
+    base(DebugAntilog())
+    block()
+    takeLogarithm()
 }

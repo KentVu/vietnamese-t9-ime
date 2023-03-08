@@ -2,7 +2,6 @@ package com.github.kentvu.t9vietnamese.model
 
 
 class CandidateSet private constructor(private val candidates: Set<Candidate>) {
-    private var selected: Int = 0
 
     companion object {
         fun from(candidates: Set<String>) =
@@ -13,8 +12,12 @@ class CandidateSet private constructor(private val candidates: Set<Candidate>) {
 
     constructor() : this(setOf<Candidate>())
 
-    fun forEach(action: (Candidate, Boolean) -> Unit): Unit =
+    fun forEach(action: (Candidate) -> Unit): Unit =
         candidates.forEachIndexed { i, cand ->
-            action(cand, selected == i)
+            action(cand)
         }
+
+    fun forEachIndexed(action: (index: Int, Candidate) -> Unit) {
+        candidates.forEachIndexed(action)
+    }
 }
