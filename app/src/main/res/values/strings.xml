@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">T9 Vietnamese</string>
+    <string name="label_subtype_vi_VN">Vietnamese</string>
 </resources>

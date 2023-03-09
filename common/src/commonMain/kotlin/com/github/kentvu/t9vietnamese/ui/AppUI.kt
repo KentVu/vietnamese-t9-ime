@@ -69,6 +69,21 @@ class AppUI(
     }
 
     @Composable
+    fun ImeUI() {
+        Keypad(
+            Modifier,
+            uiState.initialized.value
+        ) { key ->
+            eventSource.tryEmit(UIEvent.KeyPress(key))
+        }
+    }
+
+    @Composable
+    fun CandidatesView() {
+        CandidatesView(uiState.candidates.value, uiState.selectedCandidate.value)
+    }
+
+    @Composable
     fun Keypad(
         modifier: Modifier = Modifier,
         keysEnabled: Boolean,

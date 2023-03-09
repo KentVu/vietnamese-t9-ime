@@ -1,14 +1,17 @@
 package com.github.kentvu.t9vietnamese.android
 
+import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), ActivityInterface {
     private val app by lazy {
         AndroidT9App(
             this
@@ -38,4 +41,9 @@ class MainActivity : ComponentActivity() {
     fun AppPreview() {
         app.ui.AppUi()
     }
+
+    override val scope: CoroutineScope
+        get() = lifecycleScope
+    override val context: Context
+        get() = this
 }
