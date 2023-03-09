@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,11 +34,11 @@ class AppUI(
     private val app: T9App,
 ) : UI {
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
-    protected val uiState = MutableStateFlow(UIState())
+    protected val uiState = UIState()
 
     @Composable
     fun AppUi() {
-        val uiState by uiState.collectAsState()
+        //val uiState by uiState.collectAsState()
         T9VietnameseTheme {
             Scaffold(topBar = {
                 TopAppBar(title = {
@@ -50,11 +50,16 @@ class AppUI(
                     verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    CandidatesView(uiState.candidates, uiState.selectedCandidate)
+                    var confirmedText by uiState.confirmedText
+                    TextField(
+                        value = confirmedText,
+                        onValueChange = { confirmedText = it }
+                    )
+                    CandidatesView(uiState.candidates.value, uiState.selectedCandidate.value)
                     Keypad(
                         Modifier
                             .padding(innerPadding),
-                        uiState.initialized
+                        uiState.initialized.value
                     ) { key ->
                         eventSource.tryEmit(UIEvent.KeyPress(key))
                     }
@@ -176,16 +181,19 @@ class AppUI(
         when (event) {
             is UI.UpdateEvent.Initialized -> {
                 //uiState.update { it.copy(true)  }
-                uiState.value = uiState.value.copy(true)
+                //uiState.value = uiState.value.copy(true)
+                uiState.initialized.value = true
             }
             is UI.UpdateEvent.NewCandidates -> {
                 Napier.d("NewCandidates: ${event.candidates}", tag = "DesktopUI")
                 //println("NewCandidates: ${event.candidates}")
-                uiState.update { it.copy(candidates = event.candidates) }
+                //uiState.update { it.copy(candidates = event.candidates) }
+                uiState.candidates.value = event.candidates
             }
             UI.UpdateEvent.Close -> app.onCloseRequest()
             UI.UpdateEvent.SelectNextCandidate ->
-                uiState.update { it.advanceSelectedCandidate() }
+                uiState.advanceSelectedCandidate()
+                //uiState.update { it.advanceSelectedCandidate() }
         }
     }
 
@@ -251,6 +259,7 @@ class AppUI(
             ComposeKey.Z to '7',
             ComposeKey.X to '8',
             ComposeKey.C to '9',
+            ComposeKey.Semicolon to '*',
         )
 
         fun available(key: ComposeKey): Boolean {

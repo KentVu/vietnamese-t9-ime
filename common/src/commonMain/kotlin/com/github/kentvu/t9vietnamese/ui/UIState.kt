@@ -1,17 +1,22 @@
 package com.github.kentvu.t9vietnamese.ui
 
-import com.github.kentvu.t9vietnamese.model.Candidate
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.github.kentvu.t9vietnamese.model.CandidateSet
 
-data class UIState(
-    val initialized: Boolean,
-    val candidates: CandidateSet,
-    val selectedCandidate: Int = 0
-) {
-    fun advanceSelectedCandidate(): UIState {
-        return copy(selectedCandidate = selectedCandidate+1)
+class UIState() {
+    //private val _initialized = mutableStateOf(false)
+    val initialized: MutableState<Boolean> = mutableStateOf(false)
+    //private var _candidates = mutableStateOf(CandidateSet())
+    val candidates: MutableState<CandidateSet> = mutableStateOf(CandidateSet())
+    //private val _selectedCandidate = mutableStateOf(0)
+    val selectedCandidate: MutableState<Int> = mutableStateOf(0)
+    val confirmedText = mutableStateOf("")
+        //set(value) = field.run { this.value = value }
+
+    fun advanceSelectedCandidate() {
+        selectedCandidate.run { value += 1 }
     }
 
-    constructor() : this(false, CandidateSet(),)
 
 }
