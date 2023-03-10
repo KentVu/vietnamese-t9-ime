@@ -12,7 +12,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-class T9Vietnamese : InputMethodService(), ActivityInterface {
+class T9Vietnamese : InputMethodService(),
+    com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction {
     private lateinit var inputView: ComposeView
     private lateinit var candidatesView: ComposeView
     private val app by lazy { AndroidT9App(this) }

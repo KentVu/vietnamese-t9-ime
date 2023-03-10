@@ -17,7 +17,7 @@ fun main() {
             app.start()
         }
         Window(
-            onCloseRequest = app::onCloseRequest,
+            onCloseRequest = app::finish,
             title = "Compose for Desktop",
             state = rememberWindowState(width = 300.dp, height = 600.dp),
             onKeyEvent = {

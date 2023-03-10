@@ -207,7 +207,7 @@ class AppUI(
                 //uiState.update { it.copy(candidates = event.candidates) }
                 uiState.candidates.value = event.candidates
             }
-            UI.UpdateEvent.Close -> app.onCloseRequest()
+            UI.UpdateEvent.Close -> app.finish()
             UI.UpdateEvent.SelectNextCandidate ->
                 uiState.advanceSelectedCandidate()
                 //uiState.update { it.advanceSelectedCandidate() }
@@ -219,7 +219,7 @@ class AppUI(
 
     fun onKeyEvent(keyEvent: KeyEvent): Boolean {
         if (keyEvent.isCtrlQ()) {
-            app.onCloseRequest()
+            app.finish()
             return true
         }
         return onUserEvent(keyEvent)

@@ -11,7 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 
-class MainActivity : ComponentActivity(), ActivityInterface {
+class MainActivity : ComponentActivity(),
+    com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction {
     private val app by lazy {
         AndroidT9App(
             this
