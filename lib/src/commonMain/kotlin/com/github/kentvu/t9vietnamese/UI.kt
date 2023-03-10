@@ -10,6 +10,7 @@ interface UI {
         object Initialized : UpdateEvent()
         object Close : UpdateEvent()
         object SelectNextCandidate : UpdateEvent()
+        object Confirm : UpdateEvent()
 
         class NewCandidates(val candidates: CandidateSet) : UpdateEvent()
     }

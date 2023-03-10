@@ -53,6 +53,7 @@ class AppUI(
                     var confirmedText by uiState.confirmedText
                     TextField(
                         value = confirmedText,
+                        modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
                         onValueChange = { confirmedText = it }
                     )
                     CandidatesView(uiState.candidates.value, uiState.selectedCandidate.value)
@@ -181,6 +182,7 @@ class AppUI(
     object Semantic {
         const val candidates = "Candidates"
         const val selectedCandidate: String = "selected_candidate"
+        const val testOutput: String = "test_output"
     }
 
     override fun subscribeEvents(block: (UIEvent) -> Unit) {
@@ -209,6 +211,9 @@ class AppUI(
             UI.UpdateEvent.SelectNextCandidate ->
                 uiState.advanceSelectedCandidate()
                 //uiState.update { it.advanceSelectedCandidate() }
+            UI.UpdateEvent.Confirm -> uiState.apply {
+                confirmedText.value += candidates.value[selectedCandidate.value].text
+            }
         }
     }
 

@@ -1,16 +1,16 @@
 package com.github.kentvu.t9vietnamese.model
 
 
-class CandidateSet private constructor(private val candidates: Set<Candidate>) {
+class CandidateSet private constructor(private val candidates: List<Candidate>) {
 
     companion object {
-        fun from(candidates: Set<String>) =
-            CandidateSet(candidates.map { Candidate(it) }.toSet())
+        fun from(candidates: LinkedHashSet<String>) =
+            CandidateSet(candidates.toList().map { Candidate(it) })
     }
     //constructor(candidates: Set<String>) :
     //        this(candidates.map { Candidate(it) }.toSet())
 
-    constructor() : this(setOf<Candidate>())
+    constructor() : this(listOf<Candidate>())
 
     fun forEach(action: (Candidate) -> Unit): Unit =
         candidates.forEachIndexed { i, cand ->
@@ -20,4 +20,6 @@ class CandidateSet private constructor(private val candidates: Set<Candidate>) {
     fun forEachIndexed(action: (index: Int, Candidate) -> Unit) {
         candidates.forEachIndexed(action)
     }
+
+    operator fun get(i: Int): Candidate = candidates[i]
 }

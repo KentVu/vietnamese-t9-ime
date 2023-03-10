@@ -27,6 +27,8 @@ class Backend(private val ui: UI, wordlist: WordList, fileSystem: FileSystem) {
         Napier.d("type: ${key.symbol}")
         if (key == VNKeys.keyStar) {
             ui.update(UI.UpdateEvent.SelectNextCandidate)
+        } else if (key == VNKeys.key0) {
+            ui.update(UI.UpdateEvent.Confirm)
         } else {
             engine.type(key)
             ui.update(UI.UpdateEvent.NewCandidates(engine.candidates))

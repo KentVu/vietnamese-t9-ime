@@ -89,8 +89,9 @@ abstract class SharedAppTests {
         //app.ui.locateCandidate("chào")
     }
 
-    private fun checkWordIsConfirmed(cand: String) {
-        TODO("Not yet implemented")
+    private suspend fun checkWordIsConfirmed(cand: String) = useComposeWhenIdle {
+        onNodeWithContentDescription(AppUI.Semantic.testOutput)
+            .assertTextEquals("$cand ")
     }
 
     private suspend fun selectCandidate(cand: String) = useComposeWhenIdle {
