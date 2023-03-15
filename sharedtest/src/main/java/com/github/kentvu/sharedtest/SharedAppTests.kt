@@ -1,5 +1,6 @@
 package com.github.kentvu.sharedtest
 
+import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
@@ -38,8 +39,13 @@ abstract class SharedAppTests {
         composeTestRule.apply {
             val key = VNKeys.key2
             //onRoot().printToLog("Test")
-            onNode(hasText("${key.symbol}") and hasText(key.subChars))
-                .assertHasClickAction()
+            val matcher=hasText("${key.symbol}") and hasText(key.subChars)
+            onNode(matcher).also {
+                waitUntil(30_000) {
+                    //it.fetchSemanticsNode().config.getOrElse(SemanticsProperties.Disabled) { true }
+                    onAllNodes(matcher and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+                }
+            }.assertHasClickAction()
                 .assertIsEnabled()
                 .performClick()
                 .printToLog("Test")
@@ -89,8 +95,22 @@ abstract class SharedAppTests {
         //app.ui.locateCandidate("chào")
     }
 
+    @Test
+    fun whenLastCandidateSelected_selectMore_returnToFirstCandidate() = runTest {
+        type(24236)
+        val candidates = getCandidates()
+        repeat(candidates.size) { type('*') }
+        type('*')
+        assert(selectedCandidate() == candidates[0])
+    }
+
+    private suspend fun getCandidates() = useComposeWhenIdle {
+        onCandidates().fetchSemanticsNode().children
+            .map { it.getTextOrEmpty() }
+    }
+
     private suspend fun checkWordIsConfirmed(cand: String) = useComposeWhenIdle {
-        onNodeWithContentDescription(AppUI.Semantic.testOutput)
+        onNodeWithContentDescription(AppUI.Semantic.testOutput).apply { printToLog("checkWordIsConfirmed") }
             .assertTextEquals("$cand ")
     }
 
@@ -109,10 +129,7 @@ abstract class SharedAppTests {
         try {
             onNodeWithContentDescription(AppUI.Semantic.selectedCandidate).run {
                 printToLog("selectedCandidate")
-                fetchSemanticsNode().config.also {
-                    Napier.d("selectedCandidate:$it")
-                }
-                    .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
+                fetchSemanticsNode().getTextOrEmpty()
 
             }
         } catch (e: AssertionError) {
@@ -174,6 +191,17 @@ abstract class SharedAppTests {
             Napier.takeLogarithm()
         }
     }
+}
+
+private fun SemanticsNode.getTextOrEmpty(): String {
+    return config.also {
+        Napier.d("$it")
+    }
+        .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
+}
+
+private fun SemanticsNode.getDisabledOrEmpty(): String {
+        TODO()
 }
 
 private suspend fun Napier.use(block: suspend Napier.() -> Unit) {

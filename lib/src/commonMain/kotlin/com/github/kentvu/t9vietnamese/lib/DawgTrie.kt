@@ -12,7 +12,7 @@ class DawgTrie(
 ) : Trie {
     //val modifiableDAWGSet = ModifiableDAWGSet()
     lateinit var dawg: Dawg
-    private val dawgSavePath = "$source.dawg".toPath()
+    private val dawgSavePath = "${source.name}.dawg".toPath()
 
     override fun load() {
         //modifiableDAWGSet.addAll(source.iterable())

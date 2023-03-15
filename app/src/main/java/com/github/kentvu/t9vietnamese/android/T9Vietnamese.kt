@@ -5,6 +5,7 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
+import com.github.kentvu.t9vietnamese.ui.T9App
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
@@ -12,11 +13,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-class T9Vietnamese : InputMethodService(),
-    com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction {
+class T9Vietnamese : InputMethodService() {
     private lateinit var inputView: ComposeView
     private lateinit var candidatesView: ComposeView
-    private val app by lazy { AndroidT9App(this) }
+    private val app by lazy {
+        object : T9App(
+            env = object : AndroidEnvironmentInteraction(this){
+                // stopSelf?
+                override fun finish() = Unit
+            }
+        ){}
+    }
 
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     override fun onCreate() {
@@ -66,11 +73,4 @@ class T9Vietnamese : InputMethodService(),
         keyboardViewLifecycleOwner.onDestroy()
     }
 
-    override val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
-    override val context: Context
-        get() = this
-
-    override fun finish() {
-        // Don't exit in service
-    }
 }

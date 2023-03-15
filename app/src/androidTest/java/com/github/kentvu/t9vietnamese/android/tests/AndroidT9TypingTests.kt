@@ -3,7 +3,7 @@ package com.github.kentvu.t9vietnamese.android.tests
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.github.kentvu.sharedtest.SharedAppTests
-import com.github.kentvu.t9vietnamese.android.AndroidT9App
+import com.github.kentvu.t9vietnamese.android.AndroidActivityT9App
 import com.github.kentvu.t9vietnamese.android.MainActivity
 import com.github.kentvu.t9vietnamese.android.tests.TestHelpers.unlockScreen
 import com.github.kentvu.t9vietnamese.ui.T9App
@@ -17,7 +17,8 @@ class AndroidT9TypingTests : SharedAppTests() {
         get() = _composeTestRule
 
     override fun setUpApp(): T9App {
-        return AndroidT9App(_composeTestRule.activity)
+        //useComposeWhenIdle {  }
+        return AndroidActivityT9App(_composeTestRule.activity)
     }
 
     private fun unlockScreen() = _composeTestRule.activity.unlockScreen()

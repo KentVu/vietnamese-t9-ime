@@ -11,10 +11,9 @@ import androidx.lifecycle.lifecycleScope
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 
-class MainActivity : ComponentActivity(),
-    com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction {
+class MainActivity : ComponentActivity() {
     private val app by lazy {
-        AndroidT9App(
+        AndroidActivityT9App(
             this
         )
     }
@@ -42,9 +41,4 @@ class MainActivity : ComponentActivity(),
     fun AppPreview() {
         app.ui.AppUi()
     }
-
-    override val scope: CoroutineScope
-        get() = lifecycleScope
-    override val context: Context
-        get() = this
 }
