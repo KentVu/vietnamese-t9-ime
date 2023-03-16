@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese
 
-import com.github.kentvu.t9vietnamese.model.CandidateSet
+import com.github.kentvu.t9vietnamese.model.Candidate
+import com.github.kentvu.t9vietnamese.model.CandidateSelection
 
 interface UI {
     fun subscribeEvents(block: (UIEvent) -> Unit)
@@ -9,10 +10,11 @@ interface UI {
     sealed class UpdateEvent {
         object Initialized : UpdateEvent()
         object Close : UpdateEvent()
-        object SelectNextCandidate : UpdateEvent()
-        object Confirm : UpdateEvent()
+        //object
+        // SelectNextCandidate : UpdateEvent()
 
-        class NewCandidates(val candidates: CandidateSet) : UpdateEvent()
+        class UpdateCandidates(val candidates: CandidateSelection) : UpdateEvent()
+        class Confirm(val selectedCandidate: Candidate) : UpdateEvent()
     }
     //class DefaultUI: UI {}
 }

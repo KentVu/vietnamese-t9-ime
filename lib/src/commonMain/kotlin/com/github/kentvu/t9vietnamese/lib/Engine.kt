@@ -1,16 +1,11 @@
 package com.github.kentvu.t9vietnamese.lib
 
+import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
-import okio.FileSystem
 
-class Engine(
-    wordlist: WordList,
-    fileSystem: FileSystem
-) {
-    var candidates: CandidateSet = CandidateSet()
-        get() = field
+class Engine(private val ui: UI, private val trie: Trie) {
+    var candidates: CandidateSelection = CandidateSelection()
         private set
-    private val trie: Trie = DawgTrie(wordlist, fileSystem)
     private val fullSequence = StringBuilder(10)
     private var prefixes: Set<String> = emptySet()
 
@@ -28,11 +23,22 @@ class Engine(
 
     fun type(key: Key) {
         if (key == VNKeys.Clear) {
-            prefixes = emptySet()
-            candidates = CandidateSet()
-            fullSequence.clear()
+            reset()
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (key == VNKeys.keyStar) {
+            //ui.update(UI.UpdateEvent.SelectNextCandidate)
+            candidates=candidates.advanceSelectedCandidate()
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
+        if (key == VNKeys.key0) {
+            ui.update(UI.UpdateEvent.Confirm(candidates.selectedCandidate))
+            reset()
+            return
+        }
+
         fullSequence.append(key.symbol)
         val _candidates = linkedSetOf(fullSequence.toString())
         val _prefixes = linkedSetOf<String>()
@@ -57,11 +63,15 @@ class Engine(
             }
         }
         prefixes = _prefixes
-        candidates = CandidateSet.from(_candidates)
+        candidates = CandidateSelection.from(_candidates)
+        ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
     }
 
-    fun init() {
-        trie.load()
+    private fun reset() {
+        prefixes = emptySet()
+        candidates = CandidateSelection()
+        fullSequence.clear()
+        //selectedCandidateId=0
     }
 
 }

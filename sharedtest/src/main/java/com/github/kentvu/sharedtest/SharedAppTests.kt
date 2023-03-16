@@ -200,10 +200,6 @@ private fun SemanticsNode.getTextOrEmpty(): String {
         .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
 }
 
-private fun SemanticsNode.getDisabledOrEmpty(): String {
-        TODO()
-}
-
 private suspend fun Napier.use(block: suspend Napier.() -> Unit) {
     base(DebugAntilog())
     block()

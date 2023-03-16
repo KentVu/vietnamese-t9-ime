@@ -18,7 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.UIEvent
-import com.github.kentvu.t9vietnamese.model.CandidateSet
+import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
@@ -56,7 +56,7 @@ class AppUI(
                         modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
                         onValueChange = { confirmedText = it }
                     )
-                    CandidatesView(uiState.candidates.value, uiState.selectedCandidate.value)
+                    CandidatesView(uiState.candidates.value)
                     Keypad(
                         Modifier
                             .padding(innerPadding),
@@ -81,7 +81,7 @@ class AppUI(
 
     @Composable
     fun CandidatesView() {
-        CandidatesView(uiState.candidates.value, uiState.selectedCandidate.value)
+        CandidatesView(uiState.candidates.value)
     }
 
     @Composable
@@ -115,18 +115,18 @@ class AppUI(
     }
 
     @Composable
-    private fun CandidatesView(candidates: CandidateSet, selectedPos: Int) {
+    private fun CandidatesView(candidates: CandidateSelection) {
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates
             }) {
-            candidates.forEachIndexed { i, cand ->
+            candidates.forEach { cand ->
                 item(cand.text) {
                     Text(
                         cand.text,
                         Modifier.padding(start = 4.dp)
                             .run {
-                                if (selectedPos == i)
+                                if (candidates.selectedCandidate == cand)
                                     semantics {
                                         contentDescription = Semantic.selectedCandidate
                                     }.background(Color.LightGray)
@@ -201,18 +201,17 @@ class AppUI(
                 //uiState.value = uiState.value.copy(true)
                 uiState.initialized.value = true
             }
-            is UI.UpdateEvent.NewCandidates -> {
-                Napier.d("NewCandidates: ${event.candidates}", tag = "DesktopUI")
-                //println("NewCandidates: ${event.candidates}")
+            is UI.UpdateEvent.UpdateCandidates -> {
+                Napier.d("UpdateCandidates: ${event.candidates}", tag = "DesktopUI")
+                //println("UpdateCandidates: ${event.candidates}")
                 //uiState.update { it.copy(candidates = event.candidates) }
                 uiState.candidates.value = event.candidates
             }
             UI.UpdateEvent.Close -> app.finish()
-            UI.UpdateEvent.SelectNextCandidate ->
-                uiState.advanceSelectedCandidate()
+            //UI.UpdateEvent.SelectNextCandidate -> uiState.advanceSelectedCandidate()
                 //uiState.update { it.advanceSelectedCandidate() }
-            UI.UpdateEvent.Confirm -> uiState.apply {
-                confirmedText.value += candidates.value[selectedCandidate.value].text
+            is UI.UpdateEvent.Confirm -> uiState.apply {
+                confirmedText.value += event.selectedCandidate.text + " "
             }
         }
     }
