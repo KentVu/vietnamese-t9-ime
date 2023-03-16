@@ -92,7 +92,7 @@ abstract class SharedAppTests {
         selectCandidate(cand)
         type(0)
         checkWordIsConfirmed(cand)
-        //app.ui.locateCandidate("chào")
+        assertCandidatesEmpty()
     }
 
     @Test
@@ -200,8 +200,3 @@ private fun SemanticsNode.getTextOrEmpty(): String {
         .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
 }
 
-private suspend fun Napier.use(block: suspend Napier.() -> Unit) {
-    base(DebugAntilog())
-    block()
-    takeLogarithm()
-}
