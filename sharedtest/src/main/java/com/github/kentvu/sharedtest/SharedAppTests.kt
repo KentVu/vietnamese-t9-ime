@@ -99,9 +99,21 @@ abstract class SharedAppTests {
     fun whenLastCandidateSelected_selectMore_returnToFirstCandidate() = runTest {
         type(24236)
         val candidates = getCandidates()
-        repeat(candidates.size) { type('*') }
+        Napier.d("Candidates:$candidates")
+        repeat(candidates.size - 1) { type('*') }
+        Napier.d("lastSelectedCandidate:${selectedCandidate()}")
         type('*')
+        Napier.d("CandidateAfterLast:${selectedCandidate()}")
         assert(selectedCandidate() == candidates[0])
+    }
+
+    @Test
+    fun displayShorterCandidatesFirst() = runTest {
+        type(24)
+        val candidates = getCandidates()
+        assert(
+            candidates.take(10).all { it.length <= 3}
+        ) { "First 10 candidates should have length <= 2" }
     }
 
     private suspend fun getCandidates() = useComposeWhenIdle {

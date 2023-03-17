@@ -7,8 +7,8 @@ class CandidateSelection(
 ) {
 
     companion object {
-        fun from(candidates: LinkedHashSet<String>) =
-            CandidateSelection(candidates.toList().map { Candidate(it) })
+        fun from(candidates: List<String>) =
+            CandidateSelection(candidates.map { Candidate(it) })
     }
     //constructor(candidates: Set<String>) :
     //        this(candidates.map { Candidate(it) }.toSet())
@@ -22,13 +22,14 @@ class CandidateSelection(
         candidates.forEach { cand -> action(cand) }
     }
 
-    fun forEachIndexed(action: (index: Int, Candidate) -> Unit) {
-        candidates.forEachIndexed(action)
-    }
-
     operator fun get(i: Int): Candidate = candidates[i]
 
     fun advanceSelectedCandidate(): CandidateSelection {
-        return CandidateSelection(candidates, selectedCandidateId + 1)
+        return CandidateSelection(
+            candidates,
+            if (selectedCandidateId == candidates.lastIndex)
+                0
+            else selectedCandidateId + 1
+        )
     }
 }

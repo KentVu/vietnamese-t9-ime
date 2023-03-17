@@ -58,13 +58,19 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 key.subChars.forEach { sc ->
                     if (trie.containsPrefix(pf + sc)) {
                         _prefixes.add(pf + sc)
-                        _candidates.addAll(trie.prefixSearch(pf + sc))
+                        _candidates.addAll(
+                            trie.prefixSearch(pf + sc)
+                        )
                     }
                 }
             }
         }
         prefixes = _prefixes
-        candidates = CandidateSelection.from(_candidates)
+        candidates = CandidateSelection.from(
+            _candidates
+                .groupBy { it.length }
+                .values.flatten()
+        )
         ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
     }
 
