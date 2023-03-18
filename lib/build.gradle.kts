@@ -55,10 +55,18 @@ kotlin {
             dependencies {
                 implementation(project(":dawg-kotlin"))
 //                implementation(kotlin("coroutines"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains:annotations:15.0")
-                implementation("com.squareup.okio:okio:3.2.0")
+                api("com.squareup.okio:okio:3.2.0")
                 implementation("com.doist.x:normalize:1.0.3")
+                api("io.github.aakira:napier:2.6.1")//$napierVersion
+            }
+        }
+        named("androidMain") {
+            kotlin.srcDirs("src/jvmMain/kotlin")
+            dependencies {
+                api("androidx.appcompat:appcompat:1.5.1")
+                api("androidx.core:core-ktx:1.8.0")
             }
         }
         val jvmMain by getting {
@@ -72,12 +80,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
                 implementation("app.cash.turbine:turbine:0.12.1")
                 implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
+                implementation("com.willowtreeapps.assertk:assertk:0.25")
             }
         }
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("com.google.truth:truth:1.1.3")
             }
         }
     }
@@ -98,6 +106,8 @@ android {
 
     sourceSets {
         named("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res")
             // Share resources from commonMain
             // https://luisramos.dev/how-to-share-resources-kmm
             resources {

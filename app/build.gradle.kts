@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -14,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 //        vectorDrawables {
 //            useSupportLibrary true
 //        }
@@ -30,9 +32,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-//    kotlinOptions {
-//        jvmTarget = '1.8'
-//    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 //    buildFeatures {
 //        compose true
 //    }
@@ -51,11 +53,15 @@ dependencies {
     implementation(project(":lib"))
     implementation(project(":common"))
     implementation("androidx.activity:activity-compose:1.5.0")
-//    implementation(compose.preview)
+    //implementation(compose.preview)
     implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
     implementation("com.squareup.okio:okio:3.2.0")
+    //testImplementation(compose.uiTestJUnit4)
+    //implementation("io.github.aakira:napier:2.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+    androidTestImplementation(project(":sharedtest"))
 
-//    implementation "androidx.core:core-ktx:1.7.0"
+    //implementation "androidx.core:core-ktx:1.7.0"
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.material:material:$compose_version"
 //    implementation("androidx.compose.ui:ui-tooling-preview:${extra["compose.version"]}")
@@ -70,4 +76,10 @@ dependencies {
 //    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     // Needed for createComposeRule, but not createAndroidComposeRule:
 //    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }

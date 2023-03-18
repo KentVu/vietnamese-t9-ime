@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese
+package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.model.Key
 

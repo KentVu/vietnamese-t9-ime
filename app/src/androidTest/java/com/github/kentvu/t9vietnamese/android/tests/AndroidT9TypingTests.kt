@@ -1,33 +1,31 @@
 package com.github.kentvu.t9vietnamese.android.tests
 
-import AppUi
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import com.github.kentvu.t9vietnamese.model.VNKeys
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.github.kentvu.sharedtest.SharedAppTests
+import com.github.kentvu.t9vietnamese.android.AndroidActivityT9App
+import com.github.kentvu.t9vietnamese.android.MainActivity
+import com.github.kentvu.t9vietnamese.android.tests.TestHelpers.unlockScreen
+import com.github.kentvu.t9vietnamese.ui.T9App
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 
-class AndroidT9TypingTests {
+class AndroidT9TypingTests : SharedAppTests() {
+    private val _composeTestRule = createAndroidComposeRule<MainActivity>()
     @get:Rule
-    val composeTestRule = createComposeRule()
-    // use createAndroidComposeRule<YourActivity>() if you need access to
-    // an activity
+    override val composeTestRule: ComposeContentTestRule
+        get() = _composeTestRule
+
+    override fun setUpApp(): T9App {
+        //useComposeWhenIdle {  }
+        return AndroidActivityT9App(_composeTestRule.activity)
+    }
+
+    private fun unlockScreen() = _composeTestRule.activity.unlockScreen()
 
     @Before
     fun setUp() {
-        // Start the app
-        composeTestRule.setContent {
-            AppUi(, app.keyPad)
-        }
-    }
-
-    @Test
-    fun typingTest() {
-        composeTestRule.onNodeWithText("${VNKeys.key0.symbol}").performClick()
-
-        composeTestRule.onNodeWithText("${VNKeys.key0.symbol}").assertIsDisplayed()
+        app = setUpApp()
+        unlockScreen()
     }
 }

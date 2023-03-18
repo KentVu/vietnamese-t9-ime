@@ -1,8 +1,10 @@
-package com.github.kentvu.t9vietnamese
+package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.model.Key
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 abstract class Sequencer(keyEvents: Flow<Key>) {

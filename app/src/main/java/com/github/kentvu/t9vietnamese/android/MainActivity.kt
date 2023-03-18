@@ -1,50 +1,44 @@
 package com.github.kentvu.t9vietnamese.android
 
-import AppUi
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.kentvu.t9vietnamese.VNT9App
-import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okio.FileSystem
-import okio.ForwardingFileSystem
-import okio.source
+import androidx.lifecycle.lifecycleScope
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
+    private val app by lazy {
+        AndroidActivityT9App(
+            this
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val app = VNT9App(
-            DecomposedVietnameseWords(
-                DecomposedVietnameseWords::class.java.classLoader?.getResourceAsStream("vi-DauMoi.dic")!!.source()
-            ),
-            AndroidFileSystem(applicationContext)
-        )
+        app.start()
         setContent {
-            var candidates by remember { mutableStateOf(listOf<String>()) }
-            var appInitialized by remember { mutableStateOf(false) }
-            LaunchedEffect(1) {
-                withContext(Dispatchers.IO) {
-                    app.init()
-                }
-                appInitialized = true
-            }
-            AppUi(appInitialized) {
-                app.type(it)
-                Log.d("MainActivity", "${it.symbol}: ${app.candidates}")
-            }
+            app.ui.AppUi()
         }
     }
-}
 
-@Preview
-@Composable
-fun PreviewKeyboard() {
-    AppUi(true) {
+    override fun onDestroy() {
+        super.onDestroy()
+        app.stop()
+    }
 
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        Napier.d("$keyCode")
+        return event?.let { app.onKeyEvent(androidx.compose.ui.input.key.KeyEvent(it)) }
+            ?: super.onKeyUp(keyCode, null)
+    }
+
+    @Preview
+    @Composable
+    fun AppPreview() {
+        app.ui.AppUi()
     }
 }

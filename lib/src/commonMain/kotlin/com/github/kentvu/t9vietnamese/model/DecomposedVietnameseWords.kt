@@ -21,6 +21,8 @@ class DecomposedVietnameseWords(private val ins: Source) : WordList {
             }
         }
     }
+    override val name: String
+        get() = "DecomposedVietnameseWords"
 
     override fun iterable(): Iterable<String> {
         return sortedWords

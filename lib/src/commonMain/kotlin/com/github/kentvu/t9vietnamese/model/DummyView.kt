@@ -1,6 +1,6 @@
-package com.github.kentvu.t9vietnamese.jvm
+package com.github.kentvu.t9vietnamese.model
 
-import com.github.kentvu.t9vietnamese.T9Engine
+import com.github.kentvu.t9vietnamese.lib.T9Engine
 import com.github.kentvu.t9vietnamese.model.View
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*

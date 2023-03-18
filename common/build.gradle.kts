@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -6,7 +8,8 @@ plugins {
 
 kotlin {
     android()
-    jvm("desktop")
+    //jvm("desktop")
+    jvm()
     js(IR) {
         browser()
     }
@@ -22,6 +25,13 @@ kotlin {
 //                implementation(compose.preview)
             }
         }
+        named("jvmTest") {
+            dependencies {
+                implementation(kotlin("test")) // This brings all the platform dependencies automatically
+                // Test rules and transitive dependencies:
+                implementation(compose.uiTestJUnit4)
+            }
+        }
         named("androidMain") {
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")
@@ -29,11 +39,17 @@ kotlin {
                 implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
             }
         }
-        named("desktopMain") {
+        named("androidTest") {
+            kotlin.srcDirs("src/jvmTest/kotlin")
             dependencies {
-                implementation(compose.preview)
+                implementation("androidx.compose.ui:ui-test-junit4:1.2.1")
             }
         }
+        //named("desktopMain") {
+        //    dependencies {
+        //        implementation(compose.preview)
+        //    }
+        //}
     }
 }
 

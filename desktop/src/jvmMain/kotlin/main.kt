@@ -1,26 +1,33 @@
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.awt.awtEventOrNull
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.github.kentvu.t9vietnamese.desktop.DesktopT9App
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Compose for Desktop",
-        state = rememberWindowState(width = 300.dp, height = 300.dp),
-        onKeyEvent = {
-            if (it.type == KeyEventType.KeyUp && it.isCtrlPressed && it.key == Key.A) {
-                println("Ctrl + A is pressed")
-                true
-            } else {
-                // let other handlers receive this event
-                false
-            }
+fun main() {
+    application {
+        val app = DesktopT9App(this)
+        LaunchedEffect(1) {
+            Napier.base(DebugAntilog())
+            app.start()
         }
-    ) {
-        AppUi(, app.keyPad)
+        Window(
+            onCloseRequest = app::finish,
+            title = "Compose for Desktop",
+            state = rememberWindowState(width = 300.dp, height = 600.dp),
+            onKeyEvent = {
+                if (it.awtEventOrNull?.keyChar == '*') {
+                    app.onKeyEvent(KeyEvent(it.nativeKeyEvent))
+                }
+                app.onKeyEvent(it)
+            }
+        ) {
+            app.ui.AppUi()
+        }
     }
 }

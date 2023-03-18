@@ -6,6 +6,7 @@ object VNKeys {
     }
 
     private val sym2Key = mutableMapOf<Char, Key>()
+    val Clear: Key = Key('C', "").apply { sym2Key[symbol] = this }
     val key1: Key = Key('1', ".,?").apply { sym2Key[symbol] = this }
     val key2: Key = Key('2', "abć").apply { sym2Key[symbol] = this }
     val key3: Key = Key('3', "def̀").apply { sym2Key[symbol] = this }
@@ -16,6 +17,7 @@ object VNKeys {
     val key8: Key = Key('8', "tuv").apply { sym2Key[symbol] = this }
     val key9: Key = Key('9', "wxyz").apply { sym2Key[symbol] = this }
     val key0: Key = Key('0', " ").apply { sym2Key[symbol] = this }
+    val keyStar: Key = Key('*', "").apply { sym2Key[symbol] = this }
 
     val all = listOf(
         key1, key2, key3,

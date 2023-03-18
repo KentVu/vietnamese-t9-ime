@@ -1,10 +1,11 @@
-package com.github.kentvu.t9vietnamese.jvm
+package com.github.kentvu.t9vietnamese.lib
 
-import com.github.kentvu.t9vietnamese.KeySequence
-import com.github.kentvu.t9vietnamese.T9Engine
 import com.github.kentvu.t9vietnamese.model.Trie
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class DawgT9Engine(val trie: Trie, input: SharedFlow<KeySequence>, scope: CoroutineScope) : T9Engine(input) {

@@ -7,7 +7,7 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="11" />
+        <option name="gradleJvm" value="Embedded JDK" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/dawg-kotlin" />
             <option value="$PROJECT_DIR$/desktop" />
             <option value="$PROJECT_DIR$/lib" />
+            <option value="$PROJECT_DIR$/sharedtest" />
             <option value="$PROJECT_DIR$/web" />
           </set>
         </option>

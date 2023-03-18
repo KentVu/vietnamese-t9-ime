@@ -1,13 +1,10 @@
-package com.github.kentvu.t9vietnamese.jvm
+package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.model.Trie
 import com.github.kentvu.t9vietnamese.model.WordList
 import okio.FileSystem
-import okio.Path
 import okio.Path.Companion.toPath
 import org.chalup.dawg.Dawg
-
-//import org.quinto.dawg.ModifiableDAWGSet
 
 class DawgTrie(
     private val source: WordList,
@@ -15,7 +12,7 @@ class DawgTrie(
 ) : Trie {
     //val modifiableDAWGSet = ModifiableDAWGSet()
     lateinit var dawg: Dawg
-    private val dawgSavePath = "$source.dawg".toPath()
+    private val dawgSavePath = "${source.name}.dawg".toPath()
 
     override fun load() {
         //modifiableDAWGSet.addAll(source.iterable())
