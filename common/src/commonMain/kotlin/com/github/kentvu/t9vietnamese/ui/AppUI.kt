@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.input.key.Key as ComposeKey
 
-class AppUI(
+abstract class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val app: T9App,
 ) : UI {
@@ -70,21 +70,6 @@ class AppUI(
     }
 
     @Composable
-    fun ImeUI() {
-        Keypad(
-            Modifier,
-            uiState.initialized.value
-        ) { key ->
-            eventSource.tryEmit(UIEvent.KeyPress(key))
-        }
-    }
-
-    @Composable
-    fun CandidatesView() {
-        CandidatesView(uiState.candidates.value)
-    }
-
-    @Composable
     fun Keypad(
         modifier: Modifier = Modifier,
         keysEnabled: Boolean,
@@ -115,7 +100,7 @@ class AppUI(
     }
 
     @Composable
-    private fun CandidatesView(candidates: CandidateSelection) {
+    protected fun CandidatesView(candidates: CandidateSelection) {
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates

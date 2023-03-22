@@ -1,6 +1,5 @@
 package com.github.kentvu.t9vietnamese.android
 
-import android.content.Context
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -10,8 +9,6 @@ import com.stackoverflow.android.KeyboardViewLifecycleOwner
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 
 class T9Vietnamese : InputMethodService() {
     private lateinit var inputView: ComposeView
@@ -22,7 +19,10 @@ class T9Vietnamese : InputMethodService() {
                 // stopSelf?
                 override fun finish() = Unit
             }
-        ){}
+        ){
+            override val scope: CoroutineScope = createCoroutineScope()
+            override val ui: ImeServiceUI = ImeServiceUI(scope, this)
+        }
     }
 
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()

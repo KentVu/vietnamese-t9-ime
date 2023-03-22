@@ -7,18 +7,20 @@ import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import com.github.kentvu.t9vietnamese.model.DecomposedVietnameseWords
 import kotlinx.coroutines.*
 
-abstract class T9App(private val env: EnvironmentInteraction) {
+abstract class T9App(
+    protected val env: EnvironmentInteraction,
+) {
 
-    private val scope = CoroutineScope(env.mainDispatcher + Job())
-    val ui = AppUI(scope, this)
+    protected abstract val scope: CoroutineScope
+    abstract val ui: AppUI
     //private val engine = Engine(ui, DecomposedVietnameseWords(env.vnWordsSource), env.fileSystem)
-    private val backend = Backend(
+    private val backend by lazy { Backend(
         ui,
         DawgTrie(
             DecomposedVietnameseWords(env.vnWordsSource),
             env.fileSystem
         )
-    )
+    ) }
 
     fun start() {
         scope.launch(env.ioDispatcher) {
@@ -36,4 +38,6 @@ abstract class T9App(private val env: EnvironmentInteraction) {
     fun finish() {
         env.finish()
     }
+
+    protected fun createCoroutineScope() = CoroutineScope(env.mainDispatcher + Job())
 }

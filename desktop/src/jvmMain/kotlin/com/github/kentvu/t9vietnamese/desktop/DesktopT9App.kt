@@ -2,10 +2,8 @@ package com.github.kentvu.t9vietnamese.desktop
 
 import androidx.compose.ui.window.ApplicationScope
 import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
-import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import com.github.kentvu.t9vietnamese.ui.T9App
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
 import okio.Source
