@@ -11,7 +11,7 @@ abstract class T9App(
     protected val env: EnvironmentInteraction,
 ) {
 
-    protected abstract val scope: CoroutineScope
+    protected val scope = CoroutineScope(env.mainDispatcher + Job())
     abstract val ui: AppUI
     //private val engine = Engine(ui, DecomposedVietnameseWords(env.vnWordsSource), env.fileSystem)
     private val backend by lazy { Backend(
@@ -39,5 +39,4 @@ abstract class T9App(
         env.finish()
     }
 
-    protected fun createCoroutineScope() = CoroutineScope(env.mainDispatcher + Job())
 }

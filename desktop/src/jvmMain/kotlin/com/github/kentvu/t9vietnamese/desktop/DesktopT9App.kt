@@ -3,6 +3,7 @@ package com.github.kentvu.t9vietnamese.desktop
 import androidx.compose.ui.window.ApplicationScope
 import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import com.github.kentvu.t9vietnamese.ui.T9App
+import com.github.kentvu.t9vietnamese.ui.TestUI
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
@@ -23,8 +24,9 @@ class DesktopT9App(private val applicationScope: ApplicationScope) : T9App(
         override fun finish() {
             applicationScope.exitApplication()
         }
-    },
+    }
 ) {
+    override val ui = TestUI(scope, this)
 
     //@Composable
     //fun startForTest() {

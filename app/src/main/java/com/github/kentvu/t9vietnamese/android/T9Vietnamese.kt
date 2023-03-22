@@ -20,7 +20,6 @@ class T9Vietnamese : InputMethodService() {
                 override fun finish() = Unit
             }
         ){
-            override val scope: CoroutineScope = createCoroutineScope()
             override val ui: ImeServiceUI = ImeServiceUI(scope, this)
         }
     }
