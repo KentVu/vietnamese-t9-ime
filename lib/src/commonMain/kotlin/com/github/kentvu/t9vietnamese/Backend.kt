@@ -3,7 +3,6 @@ package com.github.kentvu.t9vietnamese
 import com.github.kentvu.t9vietnamese.lib.Engine
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.Trie
-import com.github.kentvu.t9vietnamese.model.VNKeys
 import io.github.aakira.napier.Napier
 
 class Backend(private val ui: UI, private val trie: Trie) {
@@ -13,10 +12,10 @@ class Backend(private val ui: UI, private val trie: Trie) {
 
     fun init() {
         trie.load()
-        ui.subscribeEvents { ev ->
+        ui.subscribeKeypadEvents { ev ->
             when (ev) {
-                is UIEvent.KeyPress -> onKeyPress(ev.key)
-                UIEvent.CloseRequest -> ui.update(UI.UpdateEvent.Close)
+                is KeypadEvent.KeyPress -> onKeyPress(ev.key)
+                KeypadEvent.CloseRequest -> ui.update(UI.UpdateEvent.Close)
             }
         }
         ui.update(UI.UpdateEvent.Initialized)

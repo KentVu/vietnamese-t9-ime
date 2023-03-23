@@ -17,7 +17,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.UI
-import com.github.kentvu.t9vietnamese.UIEvent
+import com.github.kentvu.t9vietnamese.KeypadEvent
+import com.github.kentvu.t9vietnamese.lib.InputConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
@@ -33,8 +34,117 @@ abstract class AppUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val app: T9App,
 ) : UI {
-    protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
+    protected val eventSource = MutableSharedFlow<KeypadEvent>(extraBufferCapacity = 1)
     protected val uiState = UIState()
+
+    override fun subscribeKeypadEvents(block: (KeypadEvent) -> Unit) {
+        scope.launch {
+            eventSource.collect {
+                block(it)
+            }
+        }
+        Napier.d("eventSource.subCount:${eventSource.subscriptionCount.value}")
+    }
+
+    override val inputConnection = object:InputConnection{
+        override fun commitText(text: String) {
+            uiState.apply {
+                confirmedText.value += text + " "
+            }
+        }
+    }
+
+    override fun update(event: UI.UpdateEvent) {
+        when (event) {
+            is UI.UpdateEvent.Initialized -> {
+                //uiState.update { it.copy(true)  }
+                //uiState.value = uiState.value.copy(true)
+                uiState.initialized.value = true
+            }
+            is UI.UpdateEvent.UpdateCandidates -> {
+                Napier.d("UpdateCandidates: ${event.candidates}", tag = "DesktopUI")
+                //println("UpdateCandidates: ${event.candidates}")
+                //uiState.update { it.copy(candidates = event.candidates) }
+                uiState.candidates.value = event.candidates
+            }
+            UI.UpdateEvent.Close -> app.finish()
+        }
+    }
+
+    fun onKeyEvent(keyEvent: KeyEvent): Boolean {
+        if (keyEvent.isCtrlQ()) {
+            app.finish()
+            return true
+        }
+        return onUserEvent(keyEvent)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun KeyEvent.isCtrlQ(): Boolean {
+        return type == KeyEventType.KeyUp && isCtrlPressed && key == ComposeKey.Q
+    }
+
+    /**
+     * @return event handled.
+     */
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun onUserEvent(keyEvent: KeyEvent): Boolean {
+        Napier.d("$keyEvent")
+        if (keyEvent.type == KeyEventType.KeyUp) {
+            if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
+                eventSource.tryEmit(KeypadEvent.KeyPress(VNKeys.Clear))
+            }
+            if (Letter2Keypad.available(keyEvent.key)) {
+                eventSource.tryEmit(
+                    KeypadEvent.KeyPress(
+                        VNKeys.fromChar(
+                            Letter2Keypad.numForKey(keyEvent.key)!!
+                        )
+                    )
+                )
+                return true
+            }
+        }
+        // let other handlers receive this event
+        return false
+    }
+
+    object Letter2Keypad {
+        @OptIn(ExperimentalComposeUiApi::class)
+        private val map = mapOf(
+            ComposeKey.Zero to '0',
+            ComposeKey.One to '1',
+            ComposeKey.Two to '2',
+            ComposeKey.Three to '3',
+            ComposeKey.Four to '4',
+            ComposeKey.Five to '5',
+            ComposeKey.Six to '6',
+            ComposeKey.Seven to '7',
+            ComposeKey.Eight to '8',
+            ComposeKey.Nine to '9',
+            // Next is for simulating a keypad by left-side of the keyboard.
+            ComposeKey.Spacebar to '0',
+            ComposeKey.Q to '1',
+            ComposeKey.W to '2',
+            ComposeKey.E to '3',
+            ComposeKey.A to '4',
+            ComposeKey.S to '5',
+            ComposeKey.D to '6',
+            ComposeKey.Z to '7',
+            ComposeKey.X to '8',
+            ComposeKey.C to '9',
+            ComposeKey.Semicolon to '*',
+        )
+
+        fun available(key: ComposeKey): Boolean {
+            return map.containsKey(key)
+        }
+
+        fun numForKey(key: ComposeKey): Char? {
+            return map[key]
+        }
+
+    }
 
     @Composable
     fun AppUi() {
@@ -62,7 +172,7 @@ abstract class AppUI(
                             .padding(innerPadding),
                         uiState.initialized.value
                     ) { key ->
-                        eventSource.tryEmit(UIEvent.KeyPress(key))
+                        eventSource.tryEmit(KeypadEvent.KeyPress(key))
                     }
                 }
             }
@@ -168,111 +278,5 @@ abstract class AppUI(
         const val candidates = "Candidates"
         const val selectedCandidate: String = "selected_candidate"
         const val testOutput: String = "test_output"
-    }
-
-    override fun subscribeEvents(block: (UIEvent) -> Unit) {
-        scope.launch {
-            eventSource.collect {
-                block(it)
-            }
-        }
-        Napier.d("eventSource.subCount:${eventSource.subscriptionCount.value}")
-    }
-
-    override fun update(event: UI.UpdateEvent) {
-        when (event) {
-            is UI.UpdateEvent.Initialized -> {
-                //uiState.update { it.copy(true)  }
-                //uiState.value = uiState.value.copy(true)
-                uiState.initialized.value = true
-            }
-            is UI.UpdateEvent.UpdateCandidates -> {
-                Napier.d("UpdateCandidates: ${event.candidates}", tag = "DesktopUI")
-                //println("UpdateCandidates: ${event.candidates}")
-                //uiState.update { it.copy(candidates = event.candidates) }
-                uiState.candidates.value = event.candidates
-            }
-            UI.UpdateEvent.Close -> app.finish()
-            //UI.UpdateEvent.SelectNextCandidate -> uiState.advanceSelectedCandidate()
-                //uiState.update { it.advanceSelectedCandidate() }
-            is UI.UpdateEvent.Confirm -> uiState.apply {
-                confirmedText.value += event.selectedCandidate.text + " "
-            }
-        }
-    }
-
-    fun onKeyEvent(keyEvent: KeyEvent): Boolean {
-        if (keyEvent.isCtrlQ()) {
-            app.finish()
-            return true
-        }
-        return onUserEvent(keyEvent)
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun KeyEvent.isCtrlQ(): Boolean {
-        return type == KeyEventType.KeyUp && isCtrlPressed && key == ComposeKey.Q
-    }
-
-    /**
-     * @return event handled.
-     */
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun onUserEvent(keyEvent: KeyEvent): Boolean {
-        Napier.d("$keyEvent")
-        if (keyEvent.type == KeyEventType.KeyUp) {
-            if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(UIEvent.KeyPress(VNKeys.Clear))
-            }
-            if (Letter2Keypad.available(keyEvent.key)) {
-                eventSource.tryEmit(
-                    UIEvent.KeyPress(
-                        VNKeys.fromChar(
-                            Letter2Keypad.numForKey(keyEvent.key)!!
-                        )
-                    )
-                )
-                return true
-            }
-        }
-        // let other handlers receive this event
-        return false
-    }
-
-    object Letter2Keypad {
-        @OptIn(ExperimentalComposeUiApi::class)
-        private val map = mapOf(
-            ComposeKey.Zero to '0',
-            ComposeKey.One to '1',
-            ComposeKey.Two to '2',
-            ComposeKey.Three to '3',
-            ComposeKey.Four to '4',
-            ComposeKey.Five to '5',
-            ComposeKey.Six to '6',
-            ComposeKey.Seven to '7',
-            ComposeKey.Eight to '8',
-            ComposeKey.Nine to '9',
-            // Next is for simulating a keypad by left-side of the keyboard.
-            ComposeKey.Spacebar to '0',
-            ComposeKey.Q to '1',
-            ComposeKey.W to '2',
-            ComposeKey.E to '3',
-            ComposeKey.A to '4',
-            ComposeKey.S to '5',
-            ComposeKey.D to '6',
-            ComposeKey.Z to '7',
-            ComposeKey.X to '8',
-            ComposeKey.C to '9',
-            ComposeKey.Semicolon to '*',
-        )
-
-        fun available(key: ComposeKey): Boolean {
-            return map.containsKey(key)
-        }
-
-        fun numForKey(key: ComposeKey): Char? {
-            return map[key]
-        }
-
     }
 }

@@ -2,7 +2,7 @@ package com.github.kentvu.t9vietnamese.android
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.github.kentvu.t9vietnamese.UIEvent
+import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.ui.AppUI
 import com.github.kentvu.t9vietnamese.ui.T9App
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +15,7 @@ class ImeServiceUI(scope: CoroutineScope, app: T9App) : AppUI(scope, app) {
             Modifier,
             uiState.initialized.value
         ) { key ->
-            eventSource.tryEmit(UIEvent.KeyPress(key))
+            eventSource.tryEmit(KeypadEvent.KeyPress(key))
         }
     }
 
