@@ -1,33 +1,31 @@
-@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.jetbrains.compose)
 }
 
 android {
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.github.kentvu.t9vietnamese.android"
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//        vectorDrawables {
-//            useSupportLibrary true
-//        }
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
-//    buildTypes {
-//        release {
-//            minifyEnabled = false
-//            proguardFiles = getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//        }
-//    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -35,12 +33,12 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-//    buildFeatures {
-//        compose true
-//    }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion compose_version
-//    }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.androidxComposeCompiler.get()
+    }
     packagingOptions {
         resources {
             excludes.add("/META-INF/{AL2.0,LGPL2.1}")
@@ -50,32 +48,33 @@ android {
 
 dependencies {
 
-    implementation(project(":lib"))
-    implementation(project(":common"))
-    implementation("androidx.activity:activity-compose:1.5.0")
-    //implementation(compose.preview)
-    implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
-    implementation("com.squareup.okio:okio:3.2.0")
+    //implementation(project(":lib"))
+    //implementation(project(":common"))
+    //androidTestImplementation(project(":sharedtest"))
+
+    // Compose
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+
+    implementation(libs.squareup.okio)
     //testImplementation(compose.uiTestJUnit4)
     //implementation("io.github.aakira:napier:2.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+
+    // Local tests: jUnit, coroutines, Android runner
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(project(":sharedtest"))
 
-    //implementation "androidx.core:core-ktx:1.7.0"
-//    implementation "androidx.compose.ui:ui:$compose_version"
-//    implementation "androidx.compose.material:material:$compose_version"
-//    implementation("androidx.compose.ui:ui-tooling-preview:${extra["compose.version"]}")
-//    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-//    implementation 'androidx.appcompat:appcompat:1.3.0'
-//    implementation 'com.google.android.material:material:1.4.0'
-//    testImplementation "junit:junit:$junit_version"
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-//    androidTestImplementation 'androidx.test:rules:1.4.0'
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-//    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-//    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    // Needed for createComposeRule, but not createAndroidComposeRule:
-//    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+    // Instrumented tests: jUnit rules and runners
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    //androidTestImplementation(libs.androidx.test.espresso.core)
+
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

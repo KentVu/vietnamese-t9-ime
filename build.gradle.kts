@@ -2,24 +2,24 @@
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
-    kotlin("jvm") apply false
-    kotlin("multiplatform") apply false
-    kotlin("android") apply false
-    id("com.android.application") apply false
-    id("com.android.library") apply false
-    id("org.jetbrains.compose") apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.jetbrains.compose) apply false
 }
 
 group = "github.kentvu"
 version = "1.0"
 
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
+//subprojects {
+//    repositories {
+//        google()
+//        mavenCentral()
+//        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//    }
+//}
 
 //task clean(type: Delete) {
 //    delete(rootProject.buildDir)

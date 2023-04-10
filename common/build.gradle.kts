@@ -1,9 +1,9 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 
 plugins {
-    id("com.android.library")
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
 }
 
 kotlin {
@@ -19,8 +19,8 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material)
-                implementation(project(mapOf("path" to ":lib")))
+                api(compose.material3)
+                implementation(project(":lib"))
                 // Needed only for preview.
 //                implementation(compose.preview)
             }
@@ -34,15 +34,15 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.5.1")
-                api("androidx.core:core-ktx:1.8.0")
-                implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
+                implementation(libs.androidx.appcompat)
+                implementation(libs.androidx.core.ktx)
+                implementation(libs.androidx.compose.ui.tooling.preview)
             }
         }
         named("androidTest") {
             kotlin.srcDirs("src/jvmTest/kotlin")
             dependencies {
-                implementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+                implementation(libs.androidx.compose.ui.test.junit4)
             }
         }
         //named("desktopMain") {

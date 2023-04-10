@@ -1,34 +1,18 @@
 plugins {
-    id("com.android.library")
-    kotlin("multiplatform")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
 }
-/*
 java {
-   sourceCompatibility = JavaVersion.VERSION_1_8
-   targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-dependencies {
-   implementation project(path: ':DAWG')
-   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
-
-   testImplementation "org.jetbrains.kotlin:kotlin-test"
-   //testImplementation "org.jetbrains.kotlin:kotlin-test-junit5"
-   //testImplementation "junit:junit:$junit_version"
-   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-   testImplementation 'app.cash.turbine:turbine:0.8.0'
-   //testImplementation "org.mockito.kotlin:mockito-kotlin:$mockito_version"
-}
-
+/*
 compileTestKotlin {
    kotlinOptions {
        jvmTarget = "1.8"
        //freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
    }
-}
-
-test {
-   useJUnitPlatform()
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
