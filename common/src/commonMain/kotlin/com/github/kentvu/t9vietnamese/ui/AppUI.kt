@@ -4,7 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -146,6 +146,7 @@ abstract class AppUI(
 
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AppUi() {
         //val uiState by uiState.collectAsState()
@@ -189,7 +190,6 @@ abstract class AppUI(
         Surface(
             shape = MaterialTheme.shapes.medium,
             //color = MaterialTheme.colors.secondary,
-            elevation = 1.dp,
             modifier = modifier
                 .animateContentSize()
                 .padding(1.dp)
@@ -264,11 +264,11 @@ abstract class AppUI(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "${key.symbol}",
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     key.subChars,
-                    style = MaterialTheme.typography.subtitle2
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }

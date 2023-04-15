@@ -34,9 +34,9 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                implementation(libs.androidx.appcompat)
-                implementation(libs.androidx.core.ktx)
-                implementation(libs.androidx.compose.ui.tooling.preview)
+                //implementation(libs.androidx.appcompat)
+                //implementation(libs.androidx.core.ktx)
+                //implementation(libs.androidx.compose.ui.tooling.preview)
             }
         }
         named("androidTest") {

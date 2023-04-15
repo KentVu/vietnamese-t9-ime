@@ -48,9 +48,8 @@ android {
 
 dependencies {
 
-    //implementation(project(":lib"))
-    //implementation(project(":common"))
-    //androidTestImplementation(project(":sharedtest"))
+    implementation(project(":lib"))
+    implementation(project(":common"))
 
     // Compose
     val composeBom = platform(libs.androidx.compose.bom)
@@ -61,6 +60,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(libs.squareup.okio)
     //testImplementation(compose.uiTestJUnit4)
