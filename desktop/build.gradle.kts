@@ -14,7 +14,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
-                implementation(project(":lib"))
+                implementation(project(":common:ui"))
                 implementation(libs.kotlinx.coroutines.swing)
             }
         }

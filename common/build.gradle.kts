@@ -1,12 +1,11 @@
-@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.jetbrains.compose)
 }
 
 kotlin {
+    //applyDefaultHierarchyTemplate()
+    jvm()
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -14,8 +13,6 @@ kotlin {
             }
         }
     }
-
-    jvm()
     /*js(IR) {
         browser()
     }*/
@@ -23,45 +20,47 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material3)
-                implementation(project(":lib"))
+                implementation(project(":dawg-kotlin"))
+//                implementation(kotlin("coroutines"))
+                implementation(libs.kotlinx.coroutines.core)
+                //implementation("org.jetbrains:annotations:15.0")
+                api(libs.okio)
+                implementation(libs.doistx.normalize)
                 implementation(libs.napier)
-                // Needed only for preview.
-//                implementation(compose.preview)
+            }
+        }
+        named("androidMain") {
+            kotlin.srcDirs("src/jvmMain/kotlin")
+            dependencies {
+                api(libs.androidx.appcompat)
+                api(libs.androidx.core.ktx)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                //implementation("com.squareup.okio:okio:3.2.0")
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.test)
+                implementation("app.cash.turbine:turbine:0.12.1")
+                implementation(libs.okio.fakefilesystem)
+                implementation("com.willowtreeapps.assertk:assertk:0.25")
             }
         }
         named("jvmTest") {
             dependencies {
-                implementation(kotlin("test")) // This brings all the platform dependencies automatically
-                // Test rules and transitive dependencies:
-                implementation(compose.desktop.uiTestJUnit4)
+                implementation(kotlin("test"))
             }
         }
-        named("androidMain") {
-            dependencies {
-                api(libs.androidx.appcompat)
-                api(libs.androidx.core.ktx)
-                implementation(libs.androidx.compose.ui.tooling.preview)
-            }
-        }
-        val androidInstrumentedTest by getting {
-            dependencies {
-                implementation(libs.androidx.compose.ui.uiTestJunit4)
-            }
-        }
-        //named("desktopMain") {
-        //    dependencies {
-        //        implementation(compose.preview)
-        //    }
-        //}
     }
 }
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = "com.github.kentvu.t9vietnamese.ui"
+    namespace = "com.github.kentvu.t9vietnamese"
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
