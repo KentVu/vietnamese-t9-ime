@@ -55,7 +55,7 @@ kotlin {
             dependencies {
                 implementation(project(":dawg-kotlin"))
 //                implementation(kotlin("coroutines"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
                 implementation("org.jetbrains:annotations:15.0")
                 api("com.squareup.okio:okio:3.2.0")
                 implementation("com.doist.x:normalize:1.0.3")
@@ -65,8 +65,8 @@ kotlin {
         named("androidMain") {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.5.1")
-                api("androidx.core:core-ktx:1.8.0")
+                api("androidx.appcompat:appcompat:1.6.1")
+                api("androidx.core:core-ktx:1.12.0")
             }
         }
         val jvmMain by getting {
@@ -77,7 +77,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version")
                 implementation("app.cash.turbine:turbine:0.12.1")
                 implementation("com.squareup.okio:okio-fakefilesystem:3.2.0")
                 implementation("com.willowtreeapps.assertk:assertk:0.25")

@@ -52,16 +52,16 @@ dependencies {
 
     implementation(project(":lib"))
     implementation(project(":common"))
-    implementation("androidx.activity:activity-compose:1.5.0")
+    implementation("androidx.activity:activity-compose:1.8.1")
     //implementation(compose.preview)
-    implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
     implementation("com.squareup.okio:okio:3.2.0")
     //testImplementation(compose.uiTestJUnit4)
     //implementation("io.github.aakira:napier:2.6.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.0")
     androidTestImplementation(project(":sharedtest"))
 
-    //implementation "androidx.core:core-ktx:1.7.0"
+    //implementation "androidx.core:core-ktx:1.12.0"
 //    implementation "androidx.compose.ui:ui:$compose_version"
 //    implementation "androidx.compose.material:material:$compose_version"
 //    implementation("androidx.compose.ui:ui-tooling-preview:${extra["compose.version"]}")

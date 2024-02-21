@@ -1,3 +1,3 @@
 [submodule "dawg-kotlin"]
 	path = dawg-kotlin
-	url = https://github.com/KentVu/dawg-kotlin.git
+	url = git@githubkent:KentVu/dawg-kotlin.git

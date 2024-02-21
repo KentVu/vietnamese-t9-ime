@@ -34,15 +34,15 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.5.1")
-                api("androidx.core:core-ktx:1.8.0")
-                implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
+                api("androidx.appcompat:appcompat:1.6.1")
+                api("androidx.core:core-ktx:1.12.0")
+                implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
             }
         }
         named("androidTest") {
             kotlin.srcDirs("src/jvmTest/kotlin")
             dependencies {
-                implementation("androidx.compose.ui:ui-test-junit4:1.2.1")
+                implementation("androidx.compose.ui:ui-test-junit4:1.6.0")
             }
         }
         //named("desktopMain") {

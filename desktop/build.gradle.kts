@@ -17,7 +17,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":lib"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutines_version")
             }
         }
         named("jvmTest") {
@@ -28,7 +28,7 @@ kotlin {
         named("commonTest") {
             dependencies {
                 implementation(kotlin("test")) // This brings all the platform dependencies automatically
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version")
                 // Test rules and transitive dependencies:
                 implementation(compose.uiTestJUnit4)
             }
