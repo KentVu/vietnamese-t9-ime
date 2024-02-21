@@ -27,6 +27,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 implementation(project(":lib"))
+                implementation(libs.napier)
                 // Needed only for preview.
 //                implementation(compose.preview)
             }
@@ -35,7 +36,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test")) // This brings all the platform dependencies automatically
                 // Test rules and transitive dependencies:
-                implementation(compose.uiTestJUnit4)
+                implementation(compose.desktop.uiTestJUnit4)
             }
         }
         named("androidMain") {
@@ -64,7 +65,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
     }
 
     compileOptions {
