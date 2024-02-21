@@ -1,26 +1,32 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 
 plugins {
-    id("com.android.library")
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
 }
 
 kotlin {
-    android()
-    //jvm("desktop")
-    jvm()
-    js(IR) {
-        browser()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = libs.versions.jvmTarget.get()
+            }
+        }
     }
+
+    jvm()
+    /*js(IR) {
+        browser()
+    }*/
 
     sourceSets {
         named("commonMain") {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material)
-                implementation(project(mapOf("path" to ":lib")))
+                api(compose.material3)
+                implementation(project(":lib"))
                 // Needed only for preview.
 //                implementation(compose.preview)
             }
@@ -34,15 +40,14 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.12.0")
-                implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
+                api(libs.androidx.appcompat)
+                api(libs.androidx.core.ktx)
+                implementation(libs.androidx.compose.ui.tooling.preview)
             }
         }
-        named("androidTest") {
-            kotlin.srcDirs("src/jvmTest/kotlin")
+        val androidInstrumentedTest by getting {
             dependencies {
-                implementation("androidx.compose.ui:ui-test-junit4:1.6.0")
+                implementation(libs.androidx.compose.ui.uiTestJunit4)
             }
         }
         //named("desktopMain") {
@@ -54,22 +59,16 @@ kotlin {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = "com.github.kentvu.t9vietnamese.ui"
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 32
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    sourceSets {
-        named("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-            res.srcDirs("src/androidMain/res")
-        }
     }
 }

@@ -1,0 +1,76 @@
+[versions]
+
+project = "1.0.0"
+kotlin = "1.9.22"
+agp = "8.1.1"
+jvmTarget = "11"
+#jvmToolchain = "17"
+
+android-minSdk = "24"
+android-compileSdk = "34"
+android-targetSdk = "34"
+
+compose-jetbrains = "1.6.0-beta01"
+compose-ui = "1.6.0"
+
+coroutines = "1.7.3"
+coroutines-test = "1.8.0"
+
+androidx-activity = "1.8.2"
+androidx-activityCompose = "1.8.2"
+androidx-appcompat = "1.6.1"
+androidx-core-ktx = "1.12.0"
+
+decompose = "2.1.4-compose-experimental"
+essenty = "1.2.0"
+koin = "3.5.2-RC1"
+sqlDelight = "2.0.1"
+
+[plugins]
+
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jetbrains" }
+#sqlDelight = { id = "com.squareup.sqldelight", version.ref = "sqlDelight" }
+sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
+
+[libraries]
+
+androidx-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidx-activity" }
+androidx-activity-activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activityCompose" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
+androidx-compose-ui-uiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-ui" }
+androidx-compose-ui-uiTestManifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose-ui" }
+
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.5.0" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.6.2" }
+
+decompose-decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decompose" }
+decompose-extensionsComposeJetbrains = { group = "com.arkivanov.decompose", name = "extensions-compose-jetbrains", version.ref = "decompose" }
+
+essenty-lifecycle = { group = "com.arkivanov.essenty", name = "lifecycle", version.ref = "essenty" }
+
+koin = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }
+koalaplot = { group = "io.github.koalaplot", name = "koalaplot-core", version = "0.5.2" }
+russhwolf-settings = { group = "com.russhwolf", name = "multiplatform-settings", version = "1.1.1" }
+#sqlDelight = { group = "com.squareup.sqldelight", name = "runtime", version.ref = "sqlDelight" }
+sqlDelight-androidDriver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqlDelight" }
+sqlDelight-nativeDriver = { group = "app.cash.sqldelight", name = "native-driver", version.ref = "sqlDelight" }
+sqlDelight-sqliteDriver = { group = "app.cash.sqldelight", name = "sqlite-driver", version.ref = "sqlDelight" }
+sqlDelight-primitiveAdapters = { group = "app.cash.sqldelight", name = "primitive-adapters", version.ref = "sqlDelight" }
+okio = { group = "com.squareup.okio", name = "okio", version = "3.8.0" }
+okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version = "3.8.0" }
+doistx-normalize = { group = "com.doist.x", name = "normalize", version = "1.0.5" }
+
+# Android only
+linesdk = { module = "com.linecorp.linesdk:linesdk", version = "5.9.1" }
