@@ -15,7 +15,8 @@ kotlin {
     sourceSets {
         val androidMain by getting {
             dependencies {
-                //implementation(project(":common:ui"))
+                implementation(project(":common"))
+                implementation(project(":common:ui"))
             }
         }
     }
