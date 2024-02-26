@@ -2,8 +2,8 @@ rootProject.name = "T9Vietnamese"
 
 include(":dawg-kotlin")
 include(":lib")
+include(":lib:logging")
 include(":common")
-include(":common:logging")
 include(":common:ui")
 include(":app")
 //include(":console")

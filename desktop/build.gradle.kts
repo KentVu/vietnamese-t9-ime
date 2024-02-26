@@ -15,6 +15,8 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":common:ui"))
+                implementation(project(":lib"))
+                implementation(project(":lib:logging"))
                 implementation(libs.kotlinx.coroutines.swing)
             }
         }
@@ -36,7 +38,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.github.kentvu.t9vietnamese.desktop.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

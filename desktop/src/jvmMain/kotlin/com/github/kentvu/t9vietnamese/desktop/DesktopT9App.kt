@@ -20,7 +20,8 @@ class DesktopT9App(private val applicationScope: ApplicationScope) : T9App(
         override val fileSystem: FileSystem
             get() = FileSystem.SYSTEM
         override val vnWordsSource: Source
-            get() = DesktopT9App::class.java.classLoader?.getResourceAsStream("vi-DauMoi.dic")!!.source()
+            get() = DesktopT9App::class.java.classLoader
+                ?.getResourceAsStream("vi-DauMoi.dic")!!.source()
 
         override fun finish() {
             applicationScope.exitApplication()

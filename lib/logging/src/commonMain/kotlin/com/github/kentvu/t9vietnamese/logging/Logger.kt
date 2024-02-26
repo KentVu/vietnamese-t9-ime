@@ -1,7 +1,5 @@
 package com.github.kentvu.t9vietnamese.logging
 
-import com.finggallink.bpo2link.common.logging.NapierLogger
-
 interface Logger {
   fun debug(message: () -> String)
   fun debug(message: String)

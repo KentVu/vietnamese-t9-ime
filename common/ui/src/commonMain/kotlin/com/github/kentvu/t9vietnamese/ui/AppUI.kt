@@ -5,6 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -21,7 +29,6 @@ import com.github.kentvu.t9vietnamese.UIEvent
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
-import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,10 +43,11 @@ class AppUI(
     protected val eventSource = MutableSharedFlow<UIEvent>(extraBufferCapacity = 1)
     protected val uiState = UIState()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AppUi() {
         //val uiState by uiState.collectAsState()
-        T9VietnameseTheme {
+        MaterialTheme {
             Scaffold(topBar = {
                 TopAppBar(title = {
                     Text("T9Vietnamese")
@@ -94,7 +102,7 @@ class AppUI(
         Surface(
             shape = MaterialTheme.shapes.medium,
             //color = MaterialTheme.colors.secondary,
-            elevation = 1.dp,
+            shadowElevation = 1.dp,
             modifier = modifier
                 .animateContentSize()
                 .padding(1.dp)
@@ -169,11 +177,11 @@ class AppUI(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "${key.symbol}",
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Text(
                     key.subChars,
-                    style = MaterialTheme.typography.subtitle2
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
         }
