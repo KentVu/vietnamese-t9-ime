@@ -4,8 +4,8 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
-import com.github.kentvu.t9vietnamese.logging.Logger
-import com.github.kentvu.t9vietnamese.logging.NapierLogger
+import com.github.kentvu.lib.logging.Logger
+import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.ui.T9App
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
 
@@ -28,8 +28,10 @@ class T9Vietnamese : InputMethodService() {
 
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     override fun onCreate() {
+        android.util.Log.d("T9VietnameseIME", "onCreate:")
         super.onCreate()
         NapierLogger.init()
+        log.debug("onCreateInputView:")
         inputView = ComposeView(this).apply {
             setContent {
                 app.ui.ImeUI()
@@ -46,7 +48,7 @@ class T9Vietnamese : InputMethodService() {
 
     override fun onCreateInputView(): View {
         //return super.onCreateInputView()
-        log.debug(":")
+        log.debug("onCreateInputView:")
         //Compose uses the decor view to locate the "owner" instances
         keyboardViewLifecycleOwner.attachToDecorView(
             window?.window?.decorView

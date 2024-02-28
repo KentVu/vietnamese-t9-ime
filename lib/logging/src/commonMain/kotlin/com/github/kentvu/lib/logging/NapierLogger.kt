@@ -1,6 +1,5 @@
-package com.github.kentvu.t9vietnamese.logging
+package com.github.kentvu.lib.logging
 
-import com.github.kentvu.t9vietnamese.logging.Logger
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
@@ -36,8 +35,12 @@ class NapierLogger(private val tag: String) : Logger {
   }
 
   companion object {
+    private var initialized = false
     fun init() {
-      Napier.base(DebugAntilog())
+      if (!initialized) {
+        Napier.base(DebugAntilog())
+        initialized = true
+      }
     }
   }
 }

@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import com.github.kentvu.t9vietnamese.ui.T9App
-import com.github.kentvu.t9vietnamese.ui.TestUI
+import com.github.kentvu.t9vietnamese.ui.DesktopUI
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
@@ -15,7 +15,7 @@ class AndroidActivityT9App(activity: Activity) :
     T9App(
         ActivityEnvironmentInteraction(activity),
     ) {
-    override val ui = TestUI(scope, this)
+    override val ui = DesktopUI(scope, this)
 }
 
 class ActivityEnvironmentInteraction(private val activity: Activity) : AndroidEnvironmentInteraction

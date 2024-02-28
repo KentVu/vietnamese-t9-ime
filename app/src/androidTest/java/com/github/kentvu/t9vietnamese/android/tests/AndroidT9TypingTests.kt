@@ -10,7 +10,7 @@ import com.github.kentvu.t9vietnamese.ui.T9App
 import org.junit.Before
 import org.junit.Rule
 
-class AndroidT9TypingTests : SharedAppTests() {
+class AndroidT9TypingTests : com.github.kentvu.sharedtest.SharedAppTests() {
     private val _composeTestRule = createAndroidComposeRule<MainActivity>()
     @get:Rule
     override val composeTestRule: ComposeContentTestRule

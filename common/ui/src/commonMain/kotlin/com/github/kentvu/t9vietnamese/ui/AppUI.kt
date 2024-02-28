@@ -24,10 +24,10 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.lib.InputConnection
-import com.github.kentvu.t9vietnamese.logging.Logger
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
@@ -72,7 +72,7 @@ abstract class AppUI(
                 uiState.initialized.value = true
             }
             is UI.UpdateEvent.UpdateCandidates -> {
-                Logger.tag("DesktopUI").debug("UpdateCandidates: ${event.candidates}")
+                Logger.tag("AppUI").debug("UpdateCandidates: ${event.candidates}")
                 //println("UpdateCandidates: ${event.candidates}")
                 //uiState.update { it.copy(candidates = event.candidates) }
                 uiState.candidates.value = event.candidates

@@ -30,6 +30,14 @@ kotlin {
 //                implementation(compose.preview)
             }
         }
+        named("commonTest") {
+            dependencies {
+                implementation(libs.junit)
+                implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
+                //implementation(libs.mockative)
+            }
+        }
         named("jvmTest") {
             dependencies {
                 implementation(kotlin("test")) // This brings all the platform dependencies automatically

@@ -3,14 +3,26 @@ package com.github.kentvu.sharedtest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasTextExactly
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onChildAt
+import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToLog
+import com.github.kentvu.lib.logging.Logger
+import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.AppUI
 import com.github.kentvu.t9vietnamese.ui.T9App
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
@@ -99,11 +111,11 @@ abstract class SharedAppTests {
     fun whenLastCandidateSelected_selectMore_returnToFirstCandidate() = runTest {
         type(24236)
         val candidates = getCandidates()
-        Napier.d("Candidates:$candidates")
+        log.debug("Candidates:$candidates")
         repeat(candidates.size - 1) { type('*') }
-        Napier.d("lastSelectedCandidate:${selectedCandidate()}")
+        log.debug("lastSelectedCandidate:${selectedCandidate()}")
         type('*')
-        Napier.d("CandidateAfterLast:${selectedCandidate()}")
+        log.debug("CandidateAfterLast:${selectedCandidate()}")
         assert(selectedCandidate() == candidates[0])
     }
 
@@ -145,7 +157,7 @@ abstract class SharedAppTests {
 
             }
         } catch (e: AssertionError) {
-            Napier.w("No selectedCandidate!!")
+            log.warn("No selectedCandidate!!")
             ""
         }
     }
@@ -191,24 +203,24 @@ abstract class SharedAppTests {
     }
 
     companion object {
+        private val log = Logger.tag("SharedAppTests")
         @JvmStatic
         @BeforeClass
         fun beforeClass() {
-            Napier.base(DebugAntilog())
+            NapierLogger.init()
         }
 
         @JvmStatic
         @AfterClass
         fun afterClass() {
-            Napier.takeLogarithm()
+            //Napier.takeLogarithm()
         }
     }
 }
 
 private fun SemanticsNode.getTextOrEmpty(): String {
     return config.also {
-        Napier.d("$it")
+        Logger.tag("SharedAppTests").debug("getTextOrEmpty: $it")
     }
         .getOrNull(SemanticsProperties.Text)?.first()?.text ?: ""
 }
-

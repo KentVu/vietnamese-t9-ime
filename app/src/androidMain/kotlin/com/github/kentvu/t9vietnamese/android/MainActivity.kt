@@ -6,7 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.kentvu.t9vietnamese.logging.Logger
+import com.github.kentvu.lib.logging.Logger
+import com.github.kentvu.lib.logging.NapierLogger
 
 class MainActivity : ComponentActivity() {
     private val app by lazy {
@@ -16,6 +17,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        NapierLogger.init()
         app.start()
         setContent {
             app.ui.AppUi()
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        android.util.Log.d("MainActivity", "$keyCode")
         Logger.tag("MainActivity").debug("$keyCode")
         return event?.let { app.onKeyEvent(androidx.compose.ui.input.key.KeyEvent(it)) }
             ?: super.onKeyUp(keyCode, null)

@@ -7,8 +7,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import com.github.kentvu.t9vietnamese.desktop.DesktopT9App
-import com.github.kentvu.t9vietnamese.logging.NapierLogger
+import com.github.kentvu.lib.logging.NapierLogger
 
 fun main() {
     NapierLogger.init()

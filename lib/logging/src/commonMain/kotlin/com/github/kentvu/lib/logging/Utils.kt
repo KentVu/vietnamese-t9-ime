@@ -1,6 +1,4 @@
-package com.github.kentvu.t9vietnamese.logging
-
-import com.github.kentvu.t9vietnamese.logging.Logger
+package com.github.kentvu.lib.logging
 
 /** Like [TODO] but only logging. */
 fun LogTODO(reason: String = "Not yet implemented") {

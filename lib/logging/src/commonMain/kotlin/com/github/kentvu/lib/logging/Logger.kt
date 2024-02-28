@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese.logging
+package com.github.kentvu.lib.logging
 
 interface Logger {
   fun debug(message: () -> String)

@@ -1,7 +1,7 @@
 package com.github.kentvu.t9vietnamese
 
+import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.lib.Engine
-import com.github.kentvu.t9vietnamese.logging.Logger
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.Trie
 

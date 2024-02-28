@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import org.junit.Rule
 import kotlin.test.BeforeTest
 
-class AppTests : SharedAppTests() {
+class AppTests : com.github.kentvu.sharedtest.SharedAppTests() {
     @get:Rule
     override val composeTestRule = createComposeRule()
     override fun setUpApp(): T9App {
