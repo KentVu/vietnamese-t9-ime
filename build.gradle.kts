@@ -11,13 +11,13 @@ plugins {
 group = "github.kentvu"
 version = "1.0"
 
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
+//subprojects {
+//    repositories {
+//        google()
+//        mavenCentral()
+//        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+//    }
+//}
 
 //task clean(type: Delete) {
 //    delete(rootProject.buildDir)

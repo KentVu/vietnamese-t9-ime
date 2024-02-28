@@ -19,11 +19,10 @@ object VNKeys {
     val key0: Key = Key('0', " ").apply { sym2Key[symbol] = this }
     val keyStar: Key = Key('*', "").apply { sym2Key[symbol] = this }
 
-    val all = listOf(
-        key1, key2, key3,
-        key4, key5, key6,
-        key7, key8, key9,
-        key0,
-    )
-
+    val pad = KeyPad(listOf(
+            key1, key2, key3,
+            key4, key5, key6,
+            key7, key8, key9,
+            key0,
+        ))
 }

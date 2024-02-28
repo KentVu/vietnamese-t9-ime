@@ -1,7 +1,5 @@
 package com.example.compose.tutorial
 
-import com.github.kentvu.t9vietnamese.android.Message
-
 object SampleData {
     // Sample conversation data
     val conversationSample = listOf(

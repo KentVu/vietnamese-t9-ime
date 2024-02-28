@@ -34,7 +34,8 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
         if (key == VNKeys.key0) {
-            ui.update(UI.UpdateEvent.Confirm(candidates.selectedCandidate))
+            //ui.update(UI.UpdateEvent.Confirm(candidates.selectedCandidate))
+            ui.inputConnection.commitText(candidates.selectedCandidate.text)
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return

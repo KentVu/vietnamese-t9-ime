@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.T9Vietnamese" >
         <activity
-            android:name=".MainActivity"
+            android:name=".android.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".T9Vietnamese"
+            android:name=".android.T9Vietnamese"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
             <intent-filter>
@@ -29,7 +29,7 @@
                 android:resource="@xml/method" />
         </service>
         <activity
-            android:name=".ComposeTutorialActivity"
+            android:name="com.example.compose.tutorial.ComposeTutorialActivity"
             android:exported="true"
             android:theme="@style/Theme.T9Vietnamese" >
         </activity>

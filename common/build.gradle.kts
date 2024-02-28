@@ -21,12 +21,12 @@ kotlin {
         named("commonMain") {
             dependencies {
                 implementation(project(":dawg-kotlin"))
+                implementation(project(":lib:logging"))
 //                implementation(kotlin("coroutines"))
                 implementation(libs.kotlinx.coroutines.core)
                 //implementation("org.jetbrains:annotations:15.0")
                 api(libs.okio)
                 implementation(libs.doistx.normalize)
-                implementation(libs.napier)
             }
         }
         named("androidMain") {
@@ -69,5 +69,16 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    sourceSets {
+        named("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res")
+            // Share resources from commonMain
+            // https://luisramos.dev/how-to-share-resources-kmm
+            resources {
+                srcDir("src/commonMain/resources")
+            }
+        }
     }
 }

@@ -39,19 +39,20 @@ class KeyboardViewLifecycleOwner :
     fun attachToDecorView(decorView: View?) {
         if (decorView == null) return
 
-        ViewTreeLifecycleOwner.set(decorView, this)
-        ViewTreeViewModelStoreOwner.set(decorView, this)
+        decorView.setViewTreeLifecycleOwner(this)
+        decorView.setViewTreeViewModelStoreOwner(this)
         decorView.setViewTreeSavedStateRegistryOwner(this)
     }
 
     // LifecycleOwner methods
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
-    override fun getLifecycle(): Lifecycle = lifecycleRegistry
+    //override fun getLifecycle(): Lifecycle = lifecycleRegistry
+    override val lifecycle: Lifecycle get() = lifecycleRegistry
 
     // ViewModelStore methods
     private val store = ViewModelStore()
-    override fun getViewModelStore(): ViewModelStore = store
+    override val viewModelStore: ViewModelStore get() = store
 
     // SavedStateRegistry methods
     private val savedStateRegistryController = SavedStateRegistryController.create(this)

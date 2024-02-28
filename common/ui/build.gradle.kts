@@ -25,7 +25,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 implementation(project(":common"))
-                implementation(libs.napier)
+                implementation(project(":lib:logging"))
                 // Needed only for preview.
 //                implementation(compose.preview)
             }
@@ -39,6 +39,7 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
+                api(libs.androidx.activity.activityCompose)
                 api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
                 implementation(libs.androidx.compose.ui.tooling.preview)

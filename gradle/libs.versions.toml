@@ -21,6 +21,7 @@ androidx-activityCompose = "1.8.2"
 androidx-appcompat = "1.6.1"
 androidx-core-ktx = "1.12.0"
 
+junit = "4.13.2"
 decompose = "2.1.4-compose-experimental"
 essenty = "1.2.0"
 koin = "3.5.2-RC1"
@@ -35,6 +36,7 @@ jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-jetbr
 
 [libraries]
 
+androidx-activity-activityCompose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activityCompose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
@@ -44,6 +46,7 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
 
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }
 okio = { group = "com.squareup.okio", name = "okio", version = "3.8.0" }
 okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version = "3.8.0" }

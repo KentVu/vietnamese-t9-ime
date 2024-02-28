@@ -17,6 +17,23 @@ kotlin {
             dependencies {
                 implementation(project(":common"))
                 implementation(project(":common:ui"))
+                implementation(project(":lib:logging"))
+                implementation(libs.androidx.compose.ui.tooling.preview)
+            }
+        }
+        val androidUnitTest by getting {
+            dependencies {
+                // Local tests: jUnit, coroutines, Android runner
+                implementation(libs.junit)
+            }
+        }
+        val androidInstrumentedTest by getting {
+            // Instrumented tests: jUnit rules and runners
+            dependencies {
+                //implementation(libs.androidx.test.ext.junit)
+                //androidTestImplementation(libs.androidx.test.espresso.core)
+                //implementation(libs.androidx.compose.ui.test.junit4)
+                //implementation(project(":sharedtest"))
             }
         }
     }
@@ -24,7 +41,7 @@ kotlin {
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = "com.github.kentvu.t9vietnamese.android"
+    namespace = "com.github.kentvu.t9vietnamese"
 
     defaultConfig {
         applicationId = "com.github.kentvu.t9vietnamese"
@@ -37,7 +54,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
         }
     }

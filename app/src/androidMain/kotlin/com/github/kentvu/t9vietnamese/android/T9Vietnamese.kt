@@ -1,19 +1,18 @@
 package com.github.kentvu.t9vietnamese.android
 
-import android.content.Context
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
+import com.github.kentvu.t9vietnamese.logging.Logger
+import com.github.kentvu.t9vietnamese.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.ui.T9App
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 
 class T9Vietnamese : InputMethodService() {
+    companion object {
+        private val log = Logger.tag("T9VietnameseIME")
+    }
     private lateinit var inputView: ComposeView
     private lateinit var candidatesView: ComposeView
     private val app by lazy {
@@ -22,13 +21,15 @@ class T9Vietnamese : InputMethodService() {
                 // stopSelf?
                 override fun finish() = Unit
             }
-        ){}
+        ){
+            override val ui: ImeServiceUI = ImeServiceUI(scope, this)
+        }
     }
 
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     override fun onCreate() {
         super.onCreate()
-        Napier.base(DebugAntilog())
+        NapierLogger.init()
         inputView = ComposeView(this).apply {
             setContent {
                 app.ui.ImeUI()
@@ -45,7 +46,7 @@ class T9Vietnamese : InputMethodService() {
 
     override fun onCreateInputView(): View {
         //return super.onCreateInputView()
-        Napier.d(":")
+        log.debug(":")
         //Compose uses the decor view to locate the "owner" instances
         keyboardViewLifecycleOwner.attachToDecorView(
             window?.window?.decorView
@@ -55,7 +56,7 @@ class T9Vietnamese : InputMethodService() {
     }
 
     override fun onCreateCandidatesView(): View {
-        Napier.d("onCreateCandidatesView:")
+        log.debug("onCreateCandidatesView:")
         setCandidatesViewShown(true)
         return candidatesView
     }
