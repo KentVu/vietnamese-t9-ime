@@ -3,7 +3,7 @@ package com.github.kentvu.t9vietnamese.model
 
 class CandidateSelection(
     private val candidates: List<Candidate>,
-    private val selectedCandidateId: Int = 0
+    val selectedCandidateId: Int = 0
 ) {
 
     companion object {

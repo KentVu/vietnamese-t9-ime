@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -221,10 +223,13 @@ abstract class AppUI(
 
     @Composable
     protected fun CandidatesView(candidates: CandidateSelection) {
+        val state = rememberLazyListState(candidates.selectedCandidateId)
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates
-            }) {
+            },
+            state = state
+        ) {
             candidates.forEach { cand ->
                 item(cand.text) {
                     Text(
@@ -241,6 +246,11 @@ abstract class AppUI(
                 }
             }
         }
+        if (state.layoutInfo.visibleItemsInfo.isNotEmpty())
+            if (candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index)
+                LaunchedEffect(candidates) {
+                    state.scrollToItem(candidates.selectedCandidateId)
+                }
     }
 
     @Composable
