@@ -10,27 +10,32 @@ plugins {
 kotlin {
     jvm()
     sourceSets {
-        named("jvmMain") {
+        named("commonMain") {
             dependencies {
-                implementation(compose.desktop.currentOs)
                 implementation(project(":common"))
                 implementation(project(":common:ui"))
                 implementation(project(":lib"))
                 implementation(project(":lib:logging"))
+            }
+        }
+        named("jvmMain") {
+            dependencies {
+                implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
             }
         }
         named("jvmTest") {
             dependencies {
+                implementation(project(":common:ui"))
+                implementation(kotlin("test")) // This brings all the platform dependencies automatically
+                implementation(libs.kotlinx.coroutines.test)
+                // Test rules and transitive dependencies:
+                implementation(compose.desktop.uiTestJUnit4)
                 //implementation(project(":sharedtest"))
             }
         }
         named("commonTest") {
             dependencies {
-                implementation(kotlin("test")) // This brings all the platform dependencies automatically
-                implementation(libs.kotlinx.coroutines.test)
-                // Test rules and transitive dependencies:
-                implementation(compose.uiTestJUnit4)
             }
         }
     }

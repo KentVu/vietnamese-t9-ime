@@ -2,7 +2,7 @@
 
 project = "1.0.0"
 kotlin = "1.9.22"
-agp = "8.1.1"
+agp = "7.4.0"
 jvmTarget = "11"
 #jvmToolchain = "17"
 
@@ -10,7 +10,7 @@ android-minSdk = "24"
 android-compileSdk = "34"
 android-targetSdk = "34"
 
-compose-jetbrains = "1.6.0-beta01"
+compose-jetbrains = "1.6.0"
 compose-ui = "1.6.0"
 
 coroutines = "1.7.3"
@@ -43,9 +43,11 @@ androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling
 androidx-compose-ui-uiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-ui" }
 
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version = "0.5.0" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }

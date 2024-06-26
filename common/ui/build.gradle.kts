@@ -24,7 +24,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material3)
-                implementation(project(":common"))
+                api(project(":common"))
                 implementation(project(":lib:logging"))
                 // Needed only for preview.
 //                implementation(compose.preview)
@@ -34,6 +34,8 @@ kotlin {
             dependencies {
                 implementation(libs.junit)
                 implementation(libs.kotlin.test)
+                //implementation(libs.kotlin.test.junit)
+                implementation(kotlin("test")) // This brings all the platform dependencies automatically
                 implementation(libs.kotlinx.coroutines.test)
                 //implementation(libs.mockative)
             }
@@ -51,6 +53,11 @@ kotlin {
                 api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
                 implementation(libs.androidx.compose.ui.tooling.preview)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.datetime)
             }
         }
         val androidInstrumentedTest by getting {
