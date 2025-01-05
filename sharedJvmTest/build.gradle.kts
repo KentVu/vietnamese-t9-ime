@@ -11,13 +11,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_7
 }
 
-/*repositories {
-  mavenLocal()
-  mavenCentral()
-  google()
-  maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}*/
-
 dependencies {
     implementation(compose.uiTestJUnit4)
     api(project(":common:ui"))

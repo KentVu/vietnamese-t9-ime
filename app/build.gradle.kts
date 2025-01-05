@@ -1,7 +1,8 @@
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.android.application)
-  alias(libs.plugins.jetbrains.compose)
+  alias(libs.plugins.compose.multiplatform)
+  alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -18,7 +19,7 @@ kotlin {
         implementation(project(":common"))
         implementation(project(":common:ui"))
         implementation(project(":lib:logging"))
-        implementation(libs.androidx.compose.ui.tooling.preview)
+        //implementation(libs.androidx.compose.ui.tooling.preview)
       }
     }
     val androidUnitTest by getting {
@@ -30,7 +31,7 @@ kotlin {
     val androidInstrumentedTest by getting {
       // Instrumented tests: jUnit rules and runners
       dependencies {
-        implementation(project(":sharedJvmTest"))
+        //implementation(project(":sharedJvmTest"))
         implementation(libs.androidx.compose.ui.uiTestJunit4)
         //implementation(libs.androidx.test.ext.junit)
         //androidTestImplementation(libs.androidx.test.espresso.core)

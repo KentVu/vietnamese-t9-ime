@@ -45,9 +45,146 @@ abstract class AppUI(
 ) : UI {
     companion object {
         private val log = Logger.tag("AppUI")
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
+        fun Ui(ui: UI) {
+          //val uiState by uiState.collectAsState()
+          MaterialTheme {
+            Scaffold(topBar = {
+              TopAppBar(title = {
+                Text("T9Vietnamese")
+              })
+            }) { innerPadding ->
+              Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.fillMaxSize()
+              ) {
+                val uiState = UIState()
+                var confirmedText by uiState.confirmedText
+                TextField(
+                  value = confirmedText,
+                  modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
+                  onValueChange = { confirmedText = it }
+                )
+                CandidatesView(uiState.candidates.value)
+                Keypad(
+                  Modifier.padding(innerPadding),
+                  uiState.initialized.value
+                ) { key ->
+                  ui.eventSource.tryEmit(KeypadEvent.KeyPress(key))
+                    ui.k
+                }
+              }
+            }
+          }
+        }
+
+        @Composable
+        fun Keypad(
+            modifier: Modifier = Modifier,
+            keysEnabled: Boolean,
+            onKeyClick: (key: Key) -> Unit
+        ) {
+            //Napier.d("Recompose ${getThreadId()}")
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                //color = MaterialTheme.colors.secondary,
+                modifier = modifier
+                    .animateContentSize()
+                    .padding(1.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    with(VNKeys) {
+                        KeyboardRow(onKeyClick, keysEnabled, Clear)
+                        KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
+                        KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
+                        KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
+                        KeyboardRow(onKeyClick, keysEnabled, keyStar, key0)
+                    }
+                }
+            }
+        }
+
+        @Composable
+        protected fun CandidatesView(candidates: CandidateSelection) {
+            val state = rememberLazyListState(candidates.selectedCandidateId)
+            LazyRow(
+                modifier = Modifier.semantics {
+                    contentDescription = Semantic.candidates
+                }.background(Color.Gray.copy(alpha = 0.5f)),
+                state = state
+            ) {
+                candidates.forEach { cand ->
+                    item(cand.text) {
+                        Text(
+                            cand.text,
+                            Modifier.padding(start = 4.dp)
+                                .run {
+                                    if (candidates.selectedCandidate == cand)
+                                        semantics {
+                                            contentDescription = Semantic.selectedCandidate
+                                        }.background(Color.LightGray)
+                                    else this
+                                },
+                            //Color.White
+                        )
+                    }
+                }
+            }
+            if (state.layoutInfo.visibleItemsInfo.isNotEmpty())
+                if (candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index)
+                    LaunchedEffect(candidates) {
+                        state.scrollToItem(candidates.selectedCandidateId)
+                    }
+        }
+
+        @Composable
+        private fun KeyboardRow(
+            onKeyClick: (key: Key) -> Unit,
+            keysEnabled: Boolean,
+            vararg keys: Key
+        ) {
+            Row {
+                val mod = Modifier
+                    .padding(1.dp)
+                    .weight(1F)
+                for (key in keys) {
+                    ComposableKey(key, mod, keysEnabled, onKeyClick)
+                }
+            }
+        }
+
+        @Composable
+        private fun ComposableKey(
+            key: Key,
+            modifier: Modifier,
+            keysEnabled: Boolean,
+            onKeyClick: (key: Key) -> Unit
+        ) {
+            Button(
+                modifier = modifier/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/,
+                enabled = keysEnabled,
+                onClick = { onKeyClick(key) }
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "${key.symbol}",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        key.subChars,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        }
     }
+
     protected val eventSource = MutableSharedFlow<KeypadEvent>(extraBufferCapacity = 1)
-    protected val uiState = UIState()
 
     override fun subscribeKeypadEvents(block: (KeypadEvent) -> Unit) {
         scope.launch {
@@ -156,142 +293,6 @@ abstract class AppUI(
             return map[key]
         }
 
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun AppUi() {
-        //val uiState by uiState.collectAsState()
-        MaterialTheme {
-            Scaffold(topBar = {
-                TopAppBar(title = {
-                    Text("T9Vietnamese")
-                })
-            }) { innerPadding ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    var confirmedText by uiState.confirmedText
-                    TextField(
-                        value = confirmedText,
-                        modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
-                        onValueChange = { confirmedText = it }
-                    )
-                    CandidatesView(uiState.candidates.value)
-                    Keypad(
-                        Modifier
-                            .padding(innerPadding),
-                        uiState.initialized.value
-                    ) { key ->
-                        eventSource.tryEmit(KeypadEvent.KeyPress(key))
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun Keypad(
-        modifier: Modifier = Modifier,
-        keysEnabled: Boolean,
-        onKeyClick: (key: Key) -> Unit
-    ) {
-        //Napier.d("Recompose ${getThreadId()}")
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            //color = MaterialTheme.colors.secondary,
-            modifier = modifier
-                .animateContentSize()
-                .padding(1.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.End,
-            ) {
-                with(VNKeys) {
-                    KeyboardRow(onKeyClick, keysEnabled, Clear)
-                    KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
-                    KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
-                    KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
-                    KeyboardRow(onKeyClick, keysEnabled, keyStar, key0)
-                }
-            }
-        }
-    }
-
-    @Composable
-    protected fun CandidatesView(candidates: CandidateSelection) {
-        val state = rememberLazyListState(candidates.selectedCandidateId)
-        LazyRow(
-            modifier = Modifier.semantics {
-                contentDescription = Semantic.candidates
-            },
-            state = state
-        ) {
-            candidates.forEach { cand ->
-                item(cand.text) {
-                    Text(
-                        cand.text,
-                        Modifier.padding(start = 4.dp)
-                            .run {
-                                if (candidates.selectedCandidate == cand)
-                                    semantics {
-                                        contentDescription = Semantic.selectedCandidate
-                                    }.background(Color.LightGray)
-                                else this
-                            }
-                    )
-                }
-            }
-        }
-        if (state.layoutInfo.visibleItemsInfo.isNotEmpty())
-            if (candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index)
-                LaunchedEffect(candidates) {
-                    state.scrollToItem(candidates.selectedCandidateId)
-                }
-    }
-
-    @Composable
-    private fun KeyboardRow(
-        onKeyClick: (key: Key) -> Unit,
-        keysEnabled: Boolean,
-        vararg keys: Key
-    ) {
-        Row {
-            val mod = Modifier
-                .padding(1.dp)
-                .weight(1F)
-            for (key in keys) {
-                ComposableKey(key, mod, keysEnabled, onKeyClick)
-            }
-        }
-    }
-
-    @Composable
-    private fun ComposableKey(
-        key: Key,
-        modifier: Modifier,
-        keysEnabled: Boolean,
-        onKeyClick: (key: Key) -> Unit
-    ) {
-        Button(
-            modifier = modifier/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/,
-            enabled = keysEnabled,
-            onClick = { onKeyClick(key) }
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    "${key.symbol}",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    key.subChars,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-        }
     }
 
     object Semantic {

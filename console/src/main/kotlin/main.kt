@@ -1,10 +1,16 @@
+/*
 import com.github.kentvu.t9vietnamese.model.*
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.*
 import okio.FileSystem
-
+*/
 fun main(args: Array<String>) {
+  //App()
+  println("Hello World! " + args.firstOrNull())
+}
+/*
+fun App() {
     runBlocking {
         Napier.base(DebugAntilog("T9AppConsole"))
         val app = VNT9App(
@@ -36,3 +42,4 @@ fun main(args: Array<String>) {
         job.cancel()
     }
 }
+*/

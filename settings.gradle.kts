@@ -6,10 +6,10 @@ include(":lib:logging")
 include(":common")
 include(":common:ui")
 include(":app")
-//include(":console")
+include(":console")
 include(":desktop")
 //include(":web")
-include(":sharedJvmTest")
+//include(":sharedJvmTest")
 
 pluginManagement {
   repositories {
@@ -27,7 +27,7 @@ dependencyResolutionManagement {
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
-  versionCatalogs {
+  /*versionCatalogs {
     create("libs") {
       version("androidxTestExt", "1.1.5")
       version("androidxTestEspresso", "3.5.1")
@@ -39,5 +39,5 @@ dependencyResolutionManagement {
         "espresso-core"
       ).versionRef("androidxTestEspresso")
     }
-  }
+  }*/
 }
