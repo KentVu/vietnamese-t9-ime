@@ -2,6 +2,13 @@ package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
+import com.github.kentvu.t9vietnamese.model.VNKeys
+import kotlin.apply
+import kotlin.collections.toSet
+import kotlin.text.deleteAt
+import kotlin.text.dropLast
+import kotlin.text.last
+import kotlin.text.lastIndex
 
 class Engine(private val ui: UI, private val trie: Trie) {
     var candidates: CandidateSelection = CandidateSelection()
@@ -29,7 +36,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
         }
         if (key == VNKeys.keyStar) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
-            candidates=candidates.advanceSelectedCandidate()
+            candidates = candidates.advanceSelectedCandidate()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
@@ -41,7 +48,11 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
 
-        fullSequence.append(key.symbol)
+        if (key == VNKeys.keyBackspace) {
+            fullSequence.apply { deleteAt(lastIndex) }
+        } else {
+            fullSequence.append(key.symbol)
+        }
         val _candidates = linkedSetOf(fullSequence.toString())
         val _prefixes = linkedSetOf<String>()
         if (fullSequence.length == 1) {
@@ -54,19 +65,34 @@ class Engine(private val ui: UI, private val trie: Trie) {
                     _prefixes.add(c)
                 }
             }
+            prefixes = _prefixes
         } else {
-            prefixes.forEach { pf ->
-                key.subChars.forEach { sc ->
-                    if (trie.containsPrefix(pf + sc)) {
-                        _prefixes.add(pf + sc)
+            //val lastKey: Key
+            if (key == VNKeys.keyBackspace) {
+                //lastKey = VNKeys.fromChar(fullSequence.last())
+                prefixes = prefixes.map { it.dropLast(1) }.toSet()
+                prefixes.forEach { pf ->
+                    if (trie.containsPrefix(pf)) {
                         _candidates.addAll(
-                            trie.prefixSearch(pf + sc)
+                            trie.prefixSearch(pf)
                         )
                     }
                 }
+            } else /*key!=Backspace*/{
+                //lastKey = key
+                prefixes.forEach { pf ->
+                    key.subChars.forEach { sc ->
+                        if (trie.containsPrefix(pf + sc)) {
+                            _prefixes.add(pf + sc)
+                            _candidates.addAll(
+                                trie.prefixSearch(pf + sc)
+                            )
+                        }
+                    }
+                }
+                prefixes = _prefixes
             }
         }
-        prefixes = _prefixes
         candidates = CandidateSelection.from(
             _candidates
                 .groupBy { it.length }

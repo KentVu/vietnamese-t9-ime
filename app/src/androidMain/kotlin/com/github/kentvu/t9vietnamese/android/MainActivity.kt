@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
-import com.github.kentvu.t9vietnamese.ui.AppUI
 
 class MainActivity : ComponentActivity() {
     private val app by lazy {
@@ -19,7 +18,7 @@ class MainActivity : ComponentActivity() {
         NapierLogger.init()
         app.start()
         setContent {
-            AppUI.Ui(app.ui)
+            app.ui.AppUi()
         }
     }
 

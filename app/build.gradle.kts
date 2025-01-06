@@ -54,6 +54,8 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
+  buildFeatures { compose = true }
+
   buildTypes {
     release {
       isMinifyEnabled = false
@@ -63,4 +65,8 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
+}
+
+dependencies {
+    implementation(libs.androidx.compose.ui.tooling.preview)
 }

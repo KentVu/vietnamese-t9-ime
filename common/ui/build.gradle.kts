@@ -92,7 +92,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    //debugImplementation(libs.androidx.compose.ui.tooling)
     //https://stackoverflow.com/a/68224436/1562087
     //debugImplementation(compose.uiTooling)
 }
