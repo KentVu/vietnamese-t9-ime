@@ -15,6 +15,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
         private set
     private val fullSequence = StringBuilder(10)
     private var prefixes: Set<String> = emptySet()
+    private val prefixesCache= mutableMapOf<String, Set<String>>()
 
     fun type(keySequence: String) {
         keySequence.forEach { k ->
@@ -66,31 +67,27 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 }
             }
             prefixes = _prefixes
+            prefixesCache[fullSequence.toString()] = _prefixes
         } else {
-            //val lastKey: Key
             if (key == VNKeys.keyBackspace) {
-                //lastKey = VNKeys.fromChar(fullSequence.last())
-                prefixes = prefixes.map { it.dropLast(1) }.toSet()
-                prefixes.forEach { pf ->
-                    if (trie.containsPrefix(pf)) {
-                        _candidates.addAll(
-                            trie.prefixSearch(pf)
-                        )
-                    }
-                }
+                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
             } else /*key!=Backspace*/{
-                //lastKey = key
                 prefixes.forEach { pf ->
                     key.subChars.forEach { sc ->
                         if (trie.containsPrefix(pf + sc)) {
                             _prefixes.add(pf + sc)
-                            _candidates.addAll(
-                                trie.prefixSearch(pf + sc)
-                            )
                         }
                     }
                 }
                 prefixes = _prefixes
+                prefixesCache[fullSequence.toString()] = _prefixes
+            }
+        }
+        prefixes.forEach { pf ->
+            if (trie.containsPrefix(pf)) {
+                _candidates.addAll(
+                    trie.prefixSearch(pf)
+                )
             }
         }
         candidates = CandidateSelection.from(

@@ -15,3 +15,5 @@ iosApp/iosApp.xcodeproj/*
 shared/shared.podspec
 # MSOffice working file?
 ~$*
+.kotlin/sessions/
+*.dawg

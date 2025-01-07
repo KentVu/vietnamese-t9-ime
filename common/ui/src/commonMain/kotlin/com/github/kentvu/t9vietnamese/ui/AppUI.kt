@@ -147,7 +147,7 @@ abstract class AppUI(
             ComposeKey.X to '8',
             ComposeKey.C to '9',
             ComposeKey.Semicolon to '*',
-            ComposeKey.Backspace to '<',
+            ComposeKey.Backspace to '⌫',
         )
 
         fun available(key: ComposeKey): Boolean {
