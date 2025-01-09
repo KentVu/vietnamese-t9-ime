@@ -59,15 +59,18 @@ class Engine(private val ui: UI, private val trie: Trie) {
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
             //_candidates.addAll(key.subChars.map { "$it" })
-            //prefixes = it.toSet() // assuming trie has 1 character prefix
-            key.subChars.map { "$it" }.forEach { c ->
-                if (trie.containsPrefix(c)) {
-                    _candidates.add(c)
-                    _prefixes.add(c)
-                }
+            if (key == VNKeys.keyBackspace) {
+                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
+            } else /*key!=Backspace*/{
+              key.subChars.map { "$it" }.forEach { c ->
+                  if (trie.containsPrefix(c)) {
+                      _candidates.add(c)
+                      _prefixes.add(c)
+                  }
+              }
+              prefixes = _prefixes
+              prefixesCache[fullSequence.toString()] = _prefixes
             }
-            prefixes = _prefixes
-            prefixesCache[fullSequence.toString()] = _prefixes
         } else {
             if (key == VNKeys.keyBackspace) {
                 prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
