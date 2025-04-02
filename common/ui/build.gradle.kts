@@ -51,7 +51,6 @@ kotlin {
         named("androidMain") {
             dependencies {
                 api(libs.androidx.activity.activityCompose)
-                api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
                 implementation(libs.androidx.compose.ui.tooling.preview)
             }

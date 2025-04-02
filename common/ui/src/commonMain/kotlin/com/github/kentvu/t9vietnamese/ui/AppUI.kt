@@ -23,8 +23,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.UI
@@ -37,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlin.text.dropLast
 import androidx.compose.ui.input.key.Key as ComposeKey
 
 abstract class AppUI(
@@ -63,6 +66,14 @@ abstract class AppUI(
         override fun commitText(text: String) {
             uiState.apply {
                 confirmedText.value += text + " "
+            }
+        }
+
+        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
+            uiState.apply {
+                confirmedText.apply {
+                    value = value.dropLast(1)
+                }
             }
         }
     }
@@ -181,6 +192,10 @@ abstract class AppUI(
                         modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
                         onValueChange = { confirmedText = it }
                     )
+                    val clipboardManager = LocalClipboardManager.current
+                    Button({clipboardManager.setText(AnnotatedString(confirmedText))}) {
+                        Text("Copy")
+                    }
                     CandidatesView(uiState.candidates.value)
                     Keypad(
                         Modifier
@@ -229,7 +244,7 @@ abstract class AppUI(
         LazyRow(
             modifier = Modifier.semantics {
                 contentDescription = Semantic.candidates
-            },
+            }.background(Color.LightGray),
             state = state
         ) {
             candidates.forEach { cand ->
@@ -241,7 +256,7 @@ abstract class AppUI(
                                 if (candidates.selectedCandidate == cand)
                                     semantics {
                                         contentDescription = Semantic.selectedCandidate
-                                    }.background(Color.LightGray)
+                                    }.background(Color.Gray)
                                 else this
                             }
                     )

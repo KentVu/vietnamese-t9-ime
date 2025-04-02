@@ -7,6 +7,7 @@ import kotlin.apply
 import kotlin.collections.toSet
 import kotlin.text.deleteAt
 import kotlin.text.dropLast
+import kotlin.text.isNotEmpty
 import kotlin.text.last
 import kotlin.text.lastIndex
 
@@ -50,7 +51,12 @@ class Engine(private val ui: UI, private val trie: Trie) {
         }
 
         if (key == VNKeys.keyBackspace) {
-            fullSequence.apply { deleteAt(lastIndex) }
+            if (fullSequence.isNotEmpty()) {
+                fullSequence.apply { deleteAt(lastIndex) }
+            } else {
+                ui.inputConnection.deleteSurroundingText(1, 0)
+                return
+            }
         } else {
             fullSequence.append(key.symbol)
         }

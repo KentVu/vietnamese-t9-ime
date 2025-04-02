@@ -6,8 +6,10 @@ import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
+import com.github.kentvu.t9vietnamese.lib.InputConnection
 import com.github.kentvu.t9vietnamese.ui.T9App
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
+import kotlin.text.toHexString
 
 class T9Vietnamese : InputMethodService() {
     companion object {
@@ -22,7 +24,19 @@ class T9Vietnamese : InputMethodService() {
                 override fun finish() = Unit
             }
         ){
-            override val ui: ImeServiceUI = ImeServiceUI(scope, this)
+            override val ui: ImeServiceUI = ImeServiceUI(
+                scope,
+                this,
+                object: InputConnection {
+                    override fun commitText(text: String) {
+                        currentInputConnection.commitText("$text ", 0)
+                    }
+
+                    override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
+                        currentInputConnection.deleteSurroundingText(beforeLength, afterLength)
+                    }
+                }
+            )
         }
     }
 
@@ -65,6 +79,7 @@ class T9Vietnamese : InputMethodService() {
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         keyboardViewLifecycleOwner.onResume()
+        log.debug("onStartInputView:EditorInfo=type=${info?.inputType?.toString(16)}")
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {

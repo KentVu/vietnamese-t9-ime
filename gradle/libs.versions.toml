@@ -1,33 +1,33 @@
 [versions]
 
 project = "1.0.0"
-kotlin = "2.0.10"
-agp = "8.2.0"
+kotlin = "2.1.20" # https://github.com/JetBrains/kotlin/releases
+agp = "8.9.0" # https://developer.android.com/studio/releases/gradle-plugin
 jvmTarget = "11"
 #jvmToolchain = "17"
 
 android-minSdk = "24"
-android-compileSdk = "34"
+android-compileSdk = "35"
 android-targetSdk = "34"
 
-compose-multiplatform = "1.6.11"
-compose-ui = "1.6.11"
+compose-multiplatform = "1.7.3" # https://github.com/JetBrains/compose-multiplatform/releases
+compose-ui = "1.7.8" # https://developer.android.com/jetpack/androidx/releases/compose-ui
 
-coroutines = "1.8.1"
-coroutines-test = "1.8.1"
+coroutines = "1.10.1" # https://github.com/Kotlin/kotlinx.coroutines
+coroutines-test = "1.10.1" # https://github.com/Kotlin/kotlinx.coroutines
 
 androidx-activity = "1.9.0"
-androidx-activityCompose = "1.9.0"
+androidx-activityCompose = "1.10.1" # https://developer.android.com/jetpack/androidx/releases/activity # androidx-activity-compose
 androidx-appcompat = "1.6.1"
-androidx-core = "1.13.1"
-androidx-core-ktx = "1.12.0"
+androidx-core = "1.15.0" # https://developer.android.com/jetpack/androidx/releases/core
+androidx-core-ktx = "1.15.0" # https://developer.android.com/jetpack/androidx/releases/core
 
 junit = "4.13.2"
 decompose = "3.1.0"
 essenty = "2.1.0"
-koin = "3.5.2-RC1"
-sqlDelight = "2.0.2"
-datetime = "0.6.0"
+koin = "4.0.2" # https://github.com/InsertKoinIO/koin#setup--current-version
+sqlDelight = "2.0.2" # https://github.com/cashapp/sqldelight/releases
+datetime = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
 
 [plugins]
 
@@ -44,7 +44,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-core = { group = "androidx.core", name = "core", version.ref = "androidx-core" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
-androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version = "1.6.7" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
 androidx-compose-ui-uiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-ui" }
 
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }

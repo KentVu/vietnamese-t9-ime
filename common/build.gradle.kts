@@ -60,7 +60,7 @@ kotlin {
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = "com.github.kentvu.t9vietnamese"
+    namespace = "com.github.kentvu.t9vietnamese.common"
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
