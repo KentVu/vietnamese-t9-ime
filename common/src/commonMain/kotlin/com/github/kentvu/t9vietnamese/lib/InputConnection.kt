@@ -5,4 +5,6 @@ interface InputConnection {
     fun commitText(text: String)
     fun deleteSurroundingText(beforeLength: Int,
                 afterLength:Int )
+    fun performEditorAction()
+
 }

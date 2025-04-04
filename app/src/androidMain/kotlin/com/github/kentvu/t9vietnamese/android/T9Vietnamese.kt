@@ -35,6 +35,10 @@ class T9Vietnamese : InputMethodService() {
                     override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
                         currentInputConnection.deleteSurroundingText(beforeLength, afterLength)
                     }
+
+                    override fun performEditorAction() {
+                        currentInputConnection.performEditorAction(currentInputEditorInfo.actionId)
+                    }
                 }
             )
         }

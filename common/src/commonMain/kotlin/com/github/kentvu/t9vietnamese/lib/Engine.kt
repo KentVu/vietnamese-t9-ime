@@ -37,6 +37,16 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (key == VNKeys.keyOk) {
+            if (fullSequence.isNotEmpty()) {
+                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                reset()
+                ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            } else {
+                ui.inputConnection.performEditorAction()
+            }
+            return
+        }
         if (key == VNKeys.keyStar) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
@@ -44,6 +54,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
         if (key == VNKeys.keyHash) {
+            // Commit fullSequence directly.
             /*ui.inputConnection.commitText(fullSequence.toString())
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/

@@ -76,6 +76,10 @@ abstract class AppUI(
                 }
             }
         }
+
+        override fun performEditorAction() {
+            //TODO("Not yet implemented")
+        }
     }
 
     override fun update(event: UI.UpdateEvent) {
@@ -228,11 +232,11 @@ abstract class AppUI(
                 horizontalAlignment = Alignment.End,
             ) {
                 with(VNKeys) {
-                    KeyboardRow(onKeyClick, keysEnabled, Clear, keyBackspace)
+                    KeyboardRow(onKeyClick, keysEnabled, Clear, keyOk, keyBackspace)
                     KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
                     KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
                     KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
-                    KeyboardRow(onKeyClick, keysEnabled, keyHash, key0, keyStar)
+                    KeyboardRow(onKeyClick, keysEnabled, keyStar, key0, keyHash)
                 }
             }
         }
