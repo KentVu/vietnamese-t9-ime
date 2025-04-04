@@ -32,4 +32,13 @@ class CandidateSelection(
             else selectedCandidateId + 1
         )
     }
+
+    fun isNotEmpty() = candidates.isNotEmpty()
+    fun select(id: Int): CandidateSelection {
+        return CandidateSelection(candidates, id)
+    }
+
+    fun lastIndex(): Int {
+        return candidates.lastIndex
+    }
 }

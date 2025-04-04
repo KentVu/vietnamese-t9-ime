@@ -232,7 +232,7 @@ abstract class AppUI(
                     KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
                     KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
                     KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
-                    KeyboardRow(onKeyClick, keysEnabled, keyStar, key0)
+                    KeyboardRow(onKeyClick, keysEnabled, keyHash, key0, keyStar)
                 }
             }
         }

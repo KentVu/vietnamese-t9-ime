@@ -4,6 +4,7 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import kotlin.apply
+import kotlin.collections.toMutableList
 import kotlin.collections.toSet
 import kotlin.text.deleteAt
 import kotlin.text.dropLast
@@ -42,9 +43,21 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (key == VNKeys.keyHash) {
+            /*ui.inputConnection.commitText(fullSequence.toString())
+            reset()
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/
+            // Hash button: select the number sequence.
+            candidates = candidates.select(candidates.lastIndex())
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
         if (key == VNKeys.key0) {
-            //ui.update(UI.UpdateEvent.Confirm(candidates.selectedCandidate))
-            ui.inputConnection.commitText(candidates.selectedCandidate.text)
+            if (candidates.isNotEmpty()) {
+                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+            } else {
+                ui.inputConnection.commitText("${VNKeys.key0.subChars.first()}")
+            }
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
@@ -60,7 +73,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
         } else {
             fullSequence.append(key.symbol)
         }
-        val _candidates = linkedSetOf(fullSequence.toString())
+        val _candidates = linkedSetOf<String>()
         val _prefixes = linkedSetOf<String>()
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
@@ -103,6 +116,10 @@ class Engine(private val ui: UI, private val trie: Trie) {
             _candidates
                 .groupBy { it.length }
                 .values.flatten()
+                // Put number sequence as the last candidate.
+                .toMutableList().also {
+                  it.add(fullSequence.toString())
+                }
         )
         ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
     }
