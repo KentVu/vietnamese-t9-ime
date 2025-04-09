@@ -2,14 +2,12 @@ package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
+import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import kotlin.apply
 import kotlin.collections.toMutableList
-import kotlin.collections.toSet
 import kotlin.text.deleteAt
-import kotlin.text.dropLast
 import kotlin.text.isNotEmpty
-import kotlin.text.last
 import kotlin.text.lastIndex
 
 class Engine(private val ui: UI, private val trie: Trie) {
@@ -19,25 +17,25 @@ class Engine(private val ui: UI, private val trie: Trie) {
     private var prefixes: Set<String> = emptySet()
     private val prefixesCache= mutableMapOf<String, Set<String>>()
 
-    fun type(keySequence: String) {
+    /*fun type(keySequence: String) {
         keySequence.forEach { k ->
             type(VNKeys.fromChar(k))
         }
-    }
-    fun type(keySequence: List<Key>) {
+    }*/
+    fun type(keySequence: List<Action>) {
         keySequence.forEach { key ->
             //if(key.isWordTerminal)
             type(key)
         }
     }
 
-    fun type(key: Key) {
-        if (key == VNKeys.Clear) {
+    fun type(action: Action) {
+        if (action == Action.Clear) {
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
-        if (key == VNKeys.keyOk) {
+        if (action == Action.Ok) {
             if (fullSequence.isNotEmpty()) {
                 ui.inputConnection.commitText(candidates.selectedCandidate.text)
                 reset()
@@ -47,13 +45,13 @@ class Engine(private val ui: UI, private val trie: Trie) {
             }
             return
         }
-        if (key == VNKeys.keyStar) {
+        if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
-        if (key == VNKeys.keyHash) {
+        if (action == Action.Hash) {
             // Commit fullSequence directly.
             /*ui.inputConnection.commitText(fullSequence.toString())
             reset()
@@ -63,18 +61,32 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
-        if (key == VNKeys.key0) {
+        if (action == Action.Space) {
             if (candidates.isNotEmpty()) {
                 ui.inputConnection.commitText(candidates.selectedCandidate.text)
             } else {
-                ui.inputConnection.commitText("${VNKeys.key0.subChars.first()}")
+                ui.inputConnection.commitText("${Action.Space.symbol}")
             }
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (action == Action.Return) {
+            ui.inputConnection.commitText("\n")
+            reset()
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
 
-        if (key == VNKeys.keyBackspace) {
+        if (action == Action.Zero) {
+            fullSequence.append(action.symbol)
+            prefixes = emptySet()
+            candidates = CandidateSelection.from(listOf(fullSequence.toString()))
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
+
+        if (action == Action.Backspace) {
             if (fullSequence.isNotEmpty()) {
                 fullSequence.apply { deleteAt(lastIndex) }
             } else {
@@ -82,17 +94,19 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 return
             }
         } else {
-            fullSequence.append(key.symbol)
+            fullSequence.append(action.symbol)
         }
         val _candidates = linkedSetOf<String>()
         val _prefixes = linkedSetOf<String>()
+        // TODO inject subChars
+        val subChars = VNKeys.fromChar(action.symbol).subChars
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
             //_candidates.addAll(key.subChars.map { "$it" })
-            if (key == VNKeys.keyBackspace) {
+            if (action == Action.Backspace) {
                 prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
             } else /*key!=Backspace*/{
-              key.subChars.map { "$it" }.forEach { c ->
+                subChars.map { "$it" }.forEach { c ->
                   if (trie.containsPrefix(c)) {
                       _candidates.add(c)
                       _prefixes.add(c)
@@ -102,11 +116,11 @@ class Engine(private val ui: UI, private val trie: Trie) {
               prefixesCache[fullSequence.toString()] = _prefixes
             }
         } else {
-            if (key == VNKeys.keyBackspace) {
+            if (action == Action.Backspace) {
                 prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
             } else /*key!=Backspace*/{
                 prefixes.forEach { pf ->
-                    key.subChars.forEach { sc ->
+                    subChars.forEach { sc ->
                         if (trie.containsPrefix(pf + sc)) {
                             _prefixes.add(pf + sc)
                         }

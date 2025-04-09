@@ -1,31 +1,41 @@
 package com.github.kentvu.t9vietnamese.model
 
-object VNKeys {
-    fun fromChar(c: Char): Key {
-        return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
+/** Predefined keys for VNmese keypad. */
+enum class VNKeys(
+    override val action: Action,
+    override val subChars: String,
+    override val longAction: Action? = null
+) : Key {
+    Clear(Action.Clear, ""),//.apply { sym2Key[action.symbol] = this }
+    keyBackspace(Action.Backspace, ""),//.apply { sym2Key[action.symbol] = this }
+    keyStar(Action.Star, "⏎",Action.Return),//.apply { sym2Key[action.symbol] = this }
+    keyHash(Action.Hash, ""),//.apply { sym2Key[action.symbol] = this }
+    keyOk(Action.Ok, ""),//.apply { sym2Key[action.symbol] = this } // ✔,↵,🆗 is not accepted by the JVM??
+    key1(Action.One, ".,?"),//.apply { sym2Key[action.symbol] = this }
+    key2(Action.Two, "aăâbć"),//.apply { sym2Key[action.symbol] = this }
+    key3(Action.Three, "dđef̀ê"),//.apply { sym2Key[action.symbol] = this }
+    key4(Action.Four, "ghỉ"),//.apply { sym2Key[action.symbol] = this }
+    key5(Action.Five, "jkl̃"),//.apply { sym2Key[action.symbol] = this }
+    key6(Action.Six, "mnọôơ"),//.apply { sym2Key[action.symbol] = this }
+    key7(Action.Seven, "pqrs"),//.apply { sym2Key[action.symbol] = this }
+    key8(Action.Eight, "tuưv"),//.apply { sym2Key[action.symbol] = this }
+    key9(Action.Nine, "wxyz"),//.apply { sym2Key[action.symbol] = this }
+    key0(Action.Space, "0", Action.Zero),//.apply { sym2Key[action.symbol] = this }
+    ;
+    companion object {
+        private val sym2Key =
+            entries.associateBy { it.action.symbol }
+        fun fromChar(c: Char): Key {
+            return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
+        }
     }
 
-    private val sym2Key = mutableMapOf<Char, Key>()
-    val Clear: Key = Key('C', "").apply { sym2Key[symbol] = this }
-    val keyBackspace: Key = Key('⌫', "").apply { sym2Key[symbol] = this }
-    val keyStar: Key = Key('*', "").apply { sym2Key[symbol] = this }
-    val keyHash: Key = Key('#', "").apply { sym2Key[symbol] = this }
-    val keyOk: Key = Key('✅', "").apply { sym2Key[symbol] = this } // ✔,↵,🆗 is not accepted by the JVM??
-    val key1: Key = Key('1', ".,?").apply { sym2Key[symbol] = this }
-    val key2: Key = Key('2', "aăâbć").apply { sym2Key[symbol] = this }
-    val key3: Key = Key('3', "dđef̀ê").apply { sym2Key[symbol] = this }
-    val key4: Key = Key('4', "ghỉ").apply { sym2Key[symbol] = this }
-    val key5: Key = Key('5', "jkl̃").apply { sym2Key[symbol] = this }
-    val key6: Key = Key('6', "mnọôơ").apply { sym2Key[symbol] = this }
-    val key7: Key = Key('7', "pqrs").apply { sym2Key[symbol] = this }
-    val key8: Key = Key('8', "tuưv").apply { sym2Key[symbol] = this }
-    val key9: Key = Key('9', "wxyz").apply { sym2Key[symbol] = this }
-    val key0: Key = Key('0', " ").apply { sym2Key[symbol] = this }
-
+    /*
     val pad = KeyPad(listOf(
             key1, key2, key3,
             key4, key5, key6,
             key7, key8, key9,
             key0,
         ))
+     */
 }

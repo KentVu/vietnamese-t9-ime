@@ -1,4 +1,9 @@
 package com.github.kentvu.t9vietnamese.model
 
-data class Key(val symbol: Char, val subChars: String) {
+interface Key {
+    val action: Action
+    val subChars: String
+    /** Long press symbol */
+    val longAction: Action?
+        //get() = null
 }

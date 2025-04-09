@@ -5,7 +5,7 @@ import com.github.kentvu.t9vietnamese.model.Key
 class KeySequence(keys: List<Key>) {
 
     private val keys = keys.toTypedArray()
-    private val keyString = keys.map { it.symbol }.joinToString("")
+    private val keyString = keys.map { it.action }.joinToString("")
     val length: Int = keys.size
 
     fun forEach(block: (Key) -> Unit) {

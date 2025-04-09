@@ -21,8 +21,12 @@ class ImeServiceUI(
         Keypad(
             Modifier,
             uiState.initialized.value
-        ) { key ->
-            eventSource.tryEmit(KeypadEvent.KeyPress(key))
+          ) { key, isLong ->
+            if (isLong) {
+                if (key.longAction != null)
+                    eventSource.tryEmit(
+                        KeypadEvent.KeyPress(key.longAction!!))
+            } else eventSource.tryEmit(KeypadEvent.KeyPress(key.action))
         }
     }
 

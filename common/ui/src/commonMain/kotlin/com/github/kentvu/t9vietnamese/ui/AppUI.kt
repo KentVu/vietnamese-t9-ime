@@ -1,11 +1,11 @@
 package com.github.kentvu.t9vietnamese.ui
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +35,7 @@ import com.github.kentvu.t9vietnamese.lib.InputConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import com.github.kentvu.t9vietnamese.model.VNKeys.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -120,14 +121,14 @@ abstract class AppUI(
         log.debug("$keyEvent")
         if (keyEvent.type == KeyEventType.KeyUp) {
             if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(KeypadEvent.KeyPress(VNKeys.Clear))
+                eventSource.tryEmit(KeypadEvent.KeyPress(Clear.action))
             }
             if (Letter2Keypad.available(keyEvent.key)) {
                 eventSource.tryEmit(
                     KeypadEvent.KeyPress(
                         VNKeys.fromChar(
                             Letter2Keypad.numForKey(keyEvent.key)!!
-                        )
+                        ).action
                     )
                 )
                 return true
@@ -205,8 +206,14 @@ abstract class AppUI(
                         Modifier
                             .padding(innerPadding),
                         uiState.initialized.value
-                    ) { key ->
-                        eventSource.tryEmit(KeypadEvent.KeyPress(key))
+                    ) { key, isLong ->
+                        if (isLong) {
+                            if (key.longAction != null)
+                                eventSource.tryEmit(
+                                    KeypadEvent.KeyPress(key.longAction!!)
+                                )
+                        } else eventSource.tryEmit(
+                            KeypadEvent.KeyPress(key.action))
                     }
                 }
             }
@@ -217,7 +224,7 @@ abstract class AppUI(
     fun Keypad(
         modifier: Modifier = Modifier,
         keysEnabled: Boolean,
-        onKeyClick: (key: Key) -> Unit
+        onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         //Napier.d("Recompose ${getThreadId()}")
         Surface(
@@ -276,7 +283,7 @@ abstract class AppUI(
 
     @Composable
     private fun KeyboardRow(
-        onKeyClick: (key: Key) -> Unit,
+        onKeyClick: (key: Key, isLong: Boolean) -> Unit,
         keysEnabled: Boolean,
         vararg keys: Key
     ) {
@@ -290,26 +297,28 @@ abstract class AppUI(
         }
     }
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun ComposableKey(
         key: Key,
         modifier: Modifier,
         keysEnabled: Boolean,
-        onKeyClick: (key: Key) -> Unit
+        onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         Button(
-            modifier = modifier/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/,
-            enabled = keysEnabled,
-            onClick = { onKeyClick(key) }
+            onClick = { onKeyClick(key, false) },
+            onLongClick = { onKeyClick(key, true) },
+            modifier = modifier,/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/
+            enabled = keysEnabled
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "${key.symbol}",
+                    "${key.action.symbol}",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
                     key.subChars,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }

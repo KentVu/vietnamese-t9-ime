@@ -2,7 +2,7 @@ package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.lib.Engine
-import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.Trie
 
 class Backend(private val ui: UI, private val trie: Trie) {
@@ -14,7 +14,7 @@ class Backend(private val ui: UI, private val trie: Trie) {
         trie.load()
         ui.subscribeKeypadEvents { ev ->
             when (ev) {
-                is KeypadEvent.KeyPress -> onKeyPress(ev.key)
+                is KeypadEvent.KeyPress -> onKeyPress(ev.action)
                 KeypadEvent.CloseRequest -> ui.update(UI.UpdateEvent.Close)
             }
         }
@@ -22,9 +22,9 @@ class Backend(private val ui: UI, private val trie: Trie) {
         initialized = true
     }
 
-    private fun onKeyPress(key: Key) {
-        Logger.tag("Backend").debug("type: ${key.symbol}")
-        engine.type(key)
+    private fun onKeyPress(action: Action) {
+        Logger.tag("Backend").debug("type: ${action.symbol}")
+        engine.type(action)
     }
 
     fun ensureInitialized() {
