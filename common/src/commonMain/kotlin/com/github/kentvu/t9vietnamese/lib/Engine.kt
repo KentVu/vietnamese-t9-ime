@@ -63,7 +63,8 @@ class Engine(private val ui: UI, private val trie: Trie) {
         }
         if (action == Action.Space) {
             if (candidates.isNotEmpty()) {
-                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                // commit current composing word with a space.
+                ui.inputConnection.commitText(candidates.selectedCandidate.text + " ")
             } else {
                 ui.inputConnection.commitText("${Action.Space.symbol}")
             }
@@ -72,7 +73,12 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
         if (action == Action.Return) {
-            ui.inputConnection.commitText("\n")
+            if (candidates.isNotEmpty()) {
+                // if we're in middle of composing a word, commit without a space.
+                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+            } else {
+                ui.inputConnection.commitText("\n")
+            }
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return

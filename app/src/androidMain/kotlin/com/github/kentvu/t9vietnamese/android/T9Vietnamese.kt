@@ -29,7 +29,7 @@ class T9Vietnamese : InputMethodService() {
                 this,
                 object: InputConnection {
                     override fun commitText(text: String) {
-                        currentInputConnection.commitText("$text ", 0)
+                        currentInputConnection.commitText(text, 0)
                     }
 
                     override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {

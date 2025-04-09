@@ -66,7 +66,7 @@ abstract class AppUI(
     override val inputConnection = object:InputConnection{
         override fun commitText(text: String) {
             uiState.apply {
-                confirmedText.value += text + " "
+                confirmedText.value += text
             }
         }
 
