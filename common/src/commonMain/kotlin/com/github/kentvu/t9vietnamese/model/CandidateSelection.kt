@@ -7,8 +7,8 @@ class CandidateSelection(
 ) {
 
     companion object {
-        fun from(candidates: List<String>) =
-            CandidateSelection(candidates.map { Candidate(it) })
+        fun from(candidates: List<String>, selectedCandidateId: Int = 0): CandidateSelection =
+            CandidateSelection(candidates.map { Candidate(it) }, selectedCandidateId)
     }
     //constructor(candidates: Set<String>) :
     //        this(candidates.map { Candidate(it) }.toSet())
@@ -18,7 +18,7 @@ class CandidateSelection(
     val selectedCandidate: Candidate
         get() = candidates[selectedCandidateId]
 
-    fun forEach(action: (Candidate) -> Unit): Unit {
+    fun forEach(action: (Candidate) -> Unit) {
         candidates.forEach { cand -> action(cand) }
     }
 

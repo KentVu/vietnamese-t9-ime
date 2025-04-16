@@ -16,6 +16,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
     private val fullSequence = StringBuilder(10)
     private var prefixes: Set<String> = emptySet()
     private val prefixesCache= mutableMapOf<String, Set<String>>()
+    var shiftMode: Boolean = false
 
     /*fun type(keySequence: String) {
         keySequence.forEach { k ->
@@ -62,18 +63,18 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
         if (action == Action.Space) {
-            if (candidates.isNotEmpty()) {
+            if (isComposing()) {
                 // commit current composing word with a space.
                 ui.inputConnection.commitText(candidates.selectedCandidate.text + " ")
             } else {
-                ui.inputConnection.commitText("${Action.Space.symbol}")
+                ui.inputConnection.commitText("${Action.Space.rawChar}")
             }
             reset()
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
         if (action == Action.Return) {
-            if (candidates.isNotEmpty()) {
+            if (isComposing()) {
                 // if we're in middle of composing a word, commit without a space.
                 ui.inputConnection.commitText(candidates.selectedCandidate.text)
             } else {
@@ -83,12 +84,23 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
-
         if (action == Action.Zero) {
-            fullSequence.append(action.symbol)
+            fullSequence.append(action.rawChar)
             prefixes = emptySet()
             candidates = CandidateSelection.from(listOf(fullSequence.toString()))
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
+        val _candidates = linkedSetOf<String>()
+        if (action == Action.Shift) {
+            shiftMode = !shiftMode
+            expandPrefixesTo(_candidates)
+            updateCandidateSelection(
+                if (shiftMode)
+                    _candidates.map { it.replaceFirstChar(Char::uppercaseChar) }.toSet()
+                else _candidates,
+                preserveSel = true
+            )
             return
         }
 
@@ -102,10 +114,11 @@ class Engine(private val ui: UI, private val trie: Trie) {
         } else {
             fullSequence.append(action.symbol)
         }
-        val _candidates = linkedSetOf<String>()
         val _prefixes = linkedSetOf<String>()
         // TODO inject subChars
-        val subChars = VNKeys.fromChar(action.symbol).subChars
+        val subChars = VNKeys.fromChar(
+            action.rawChar ?: error("Should be typing action here")
+        ).subChars
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
             //_candidates.addAll(key.subChars.map { "$it" })
@@ -136,6 +149,11 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 prefixesCache[fullSequence.toString()] = _prefixes
             }
         }
+        expandPrefixesTo(_candidates)
+        updateCandidateSelection(_candidates)
+    }
+
+    private fun expandPrefixesTo(_candidates: LinkedHashSet<String>) {
         prefixes.forEach { pf ->
             if (trie.containsPrefix(pf)) {
                 _candidates.addAll(
@@ -143,23 +161,29 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 )
             }
         }
+    }
+
+    private fun updateCandidateSelection(cands: Set<String>, preserveSel: Boolean = false) {
         candidates = CandidateSelection.from(
-            _candidates
+            cands
                 .groupBy { it.length }
                 .values.flatten()
                 // Put number sequence as the last candidate.
                 .toMutableList().also {
-                  it.add(fullSequence.toString())
-                }
+                    it.add(fullSequence.toString())
+                },
+            if (preserveSel) candidates.selectedCandidateId else 0
         )
         ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
     }
+
+    private fun isComposing() = candidates.isNotEmpty()
 
     private fun reset() {
         prefixes = emptySet()
         candidates = CandidateSelection()
         fullSequence.clear()
-        //selectedCandidateId=0
+        shiftMode = false
     }
 
 }

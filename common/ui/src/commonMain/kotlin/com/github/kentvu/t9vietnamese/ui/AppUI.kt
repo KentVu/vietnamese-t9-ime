@@ -32,6 +32,7 @@ import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.lib.InputConnection
+import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.VNKeys
@@ -121,7 +122,7 @@ abstract class AppUI(
         log.debug("$keyEvent")
         if (keyEvent.type == KeyEventType.KeyUp) {
             if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(KeypadEvent.KeyPress(Clear.action))
+                eventSource.tryEmit(KeypadEvent.KeyPress(Action.Clear))
             }
             if (Letter2Keypad.available(keyEvent.key)) {
                 eventSource.tryEmit(
@@ -239,7 +240,7 @@ abstract class AppUI(
                 horizontalAlignment = Alignment.End,
             ) {
                 with(VNKeys) {
-                    KeyboardRow(onKeyClick, keysEnabled, Clear, keyOk, keyBackspace)
+                    KeyboardRow(onKeyClick, keysEnabled, Shift, keyOk, keyBackspace)
                     KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
                     KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
                     KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
@@ -292,14 +293,14 @@ abstract class AppUI(
                 .padding(1.dp)
                 .weight(1F)
             for (key in keys) {
-                ComposableKey(key, mod, keysEnabled, onKeyClick)
+                ComposeKey(key, mod, keysEnabled, onKeyClick)
             }
         }
     }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    private fun ComposableKey(
+    private fun ComposeKey(
         key: Key,
         modifier: Modifier,
         keysEnabled: Boolean,
@@ -311,16 +312,24 @@ abstract class AppUI(
             modifier = modifier,/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/
             enabled = keysEnabled
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                //Modifier.fillMaxWidth(0.8f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    "${key.action.symbol}",
-                    style = MaterialTheme.typography.titleLarge
+                    key.action.symbol,
+                    style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    key.subChars,
+                    key.subChars/*if (key.action.type == Control)*/,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+            /*Text(
+                "↓",
+                Modifier.align(Alignment.CenterStart),
+                Color.LightGray
+            )*/
         }
     }
 

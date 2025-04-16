@@ -6,11 +6,11 @@ enum class VNKeys(
     override val subChars: String,
     override val longAction: Action? = null
 ) : Key {
-    Clear(Action.Clear, ""),//.apply { sym2Key[action.symbol] = this }
-    keyBackspace(Action.Backspace, ""),//.apply { sym2Key[action.symbol] = this }
-    keyStar(Action.Star, "⏎",Action.Return),//.apply { sym2Key[action.symbol] = this }
-    keyHash(Action.Hash, ""),//.apply { sym2Key[action.symbol] = this }
-    keyOk(Action.Ok, ""),//.apply { sym2Key[action.symbol] = this } // ✔,↵,🆗 is not accepted by the JVM??
+    Shift(Action.Shift, ""),//.apply { sym2Key[action.symbol] = this }
+    keyBackspace(Action.Backspace, "C", Action.Clear),//.apply { sym2Key[action.symbol] = this }
+    keyStar(Action.Star, ""),//.apply { sym2Key[action.symbol] = this }
+    keyHash(Action.Hash, "⏎", Action.Return),//.apply { sym2Key[action.symbol] = this }
+    keyOk(Action.Ok, ""),//.apply { sym2Key[action.symbol] = this }
     key1(Action.One, ".,?"),//.apply { sym2Key[action.symbol] = this }
     key2(Action.Two, "aăâbć"),//.apply { sym2Key[action.symbol] = this }
     key3(Action.Three, "dđef̀ê"),//.apply { sym2Key[action.symbol] = this }
@@ -24,7 +24,7 @@ enum class VNKeys(
     ;
     companion object {
         private val sym2Key =
-            entries.associateBy { it.action.symbol }
+            entries.associateBy { it.action.rawChar /*symbol.first()*/ }
         fun fromChar(c: Char): Key {
             return sym2Key[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
         }
