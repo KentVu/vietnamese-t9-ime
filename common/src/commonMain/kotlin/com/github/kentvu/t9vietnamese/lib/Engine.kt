@@ -36,16 +36,6 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
-        if (action == Action.Ok) {
-            if (fullSequence.isNotEmpty()) {
-                ui.inputConnection.commitText(candidates.selectedCandidate.text)
-                reset()
-                ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
-            } else {
-                ui.inputConnection.performEditorAction()
-            }
-            return
-        }
         if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
@@ -73,6 +63,16 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (action == Action.Ok) {
+            if (isComposing()) {
+                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+            } else {
+                ui.inputConnection.performEditorAction()
+            }
+            reset()
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+        }
         if (action == Action.Return) {
             if (isComposing()) {
                 // if we're in middle of composing a word, commit without a space.
@@ -94,26 +94,26 @@ class Engine(private val ui: UI, private val trie: Trie) {
         val _candidates = linkedSetOf<String>()
         if (action == Action.Shift) {
             shiftMode = !shiftMode
-            expandPrefixesTo(_candidates)
-            updateCandidateSelection(
-                if (shiftMode)
-                    _candidates.map { it.replaceFirstChar(Char::uppercaseChar) }.toSet()
-                else _candidates,
-                preserveSel = true
-            )
+            if (isComposing()) {
+                expandPrefixesTo(_candidates)
+                updateCandidateSelection(_candidates, preserveSel = true)
+            }
             return
         }
 
         if (action == Action.Backspace) {
-            if (fullSequence.isNotEmpty()) {
+            if (isComposing()) {
                 fullSequence.apply { deleteAt(lastIndex) }
+                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
+                expandPrefixesTo(_candidates)
+                updateCandidateSelection(_candidates)
             } else {
                 ui.inputConnection.deleteSurroundingText(1, 0)
-                return
             }
-        } else {
-            fullSequence.append(action.symbol)
+            return
         }
+
+        fullSequence.append(action.symbol)
         val _prefixes = linkedSetOf<String>()
         // TODO inject subChars
         val subChars = VNKeys.fromChar(
@@ -167,7 +167,10 @@ class Engine(private val ui: UI, private val trie: Trie) {
         candidates = CandidateSelection.from(
             cands
                 .groupBy { it.length }
-                .values.flatten()
+                .values.flatten().run {
+                    if (!shiftMode) this
+                    else map { it.replaceFirstChar(Char::uppercaseChar) }
+                }
                 // Put number sequence as the last candidate.
                 .toMutableList().also {
                     it.add(fullSequence.toString())
