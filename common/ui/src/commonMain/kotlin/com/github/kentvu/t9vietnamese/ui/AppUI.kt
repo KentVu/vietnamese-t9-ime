@@ -35,6 +35,7 @@ import com.github.kentvu.t9vietnamese.lib.InputConnection
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.model.VNKeys.*
 import kotlinx.coroutines.CoroutineScope
@@ -320,8 +321,15 @@ abstract class AppUI(
                     key.action.symbol,
                     style = MaterialTheme.typography.bodyLarge
                 )
+                val rawChar = key.action.rawChar
                 Text(
-                    key.subChars/*if (key.action.type == Control)*/,
+                    if (key.longAction != null) {
+                        key.longAction!!.symbol
+                    } else if (rawChar != null) { /*if (key.action.type == Control)*/
+                        if (rawChar.isDigit()) {
+                            NumericSubstitution.VN.forNum(rawChar)
+                        } else "$rawChar"
+                    } else "",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

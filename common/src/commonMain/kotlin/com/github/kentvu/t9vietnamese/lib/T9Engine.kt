@@ -2,7 +2,7 @@ package com.github.kentvu.t9vietnamese.lib
 
 import kotlinx.coroutines.flow.Flow
 
-abstract class T9Engine(input: Flow<KeySequence>) {
+abstract class T9Engine(input: Flow<ActionSequence>) {
 
     abstract val output: Flow<T9EngineOutput>
 

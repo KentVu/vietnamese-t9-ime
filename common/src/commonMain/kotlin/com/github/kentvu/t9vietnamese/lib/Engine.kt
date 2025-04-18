@@ -3,12 +3,14 @@ package com.github.kentvu.t9vietnamese.lib
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
+import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import kotlin.apply
 import kotlin.collections.toMutableList
 import kotlin.text.deleteAt
 import kotlin.text.isNotEmpty
 import kotlin.text.lastIndex
+import kotlin.text.map
 
 class Engine(private val ui: UI, private val trie: Trie) {
     var candidates: CandidateSelection = CandidateSelection()
@@ -91,6 +93,23 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
             return
         }
+        if (action == Action.One) {
+            fullSequence.append(Action.One.rawChar)
+            if (isComposing()) {
+                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                reset()
+            }
+            candidates = CandidateSelection.from(
+                buildList {
+                    addAll(
+                        NumericSubstitution.VN.forNum(Action.One.rawChar!!)
+                            .map { "$it" })
+                    add("${Action.One.rawChar}")
+                })
+            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            return
+            // pass through
+        }
         val _candidates = linkedSetOf<String>()
         if (action == Action.Shift) {
             shiftMode = !shiftMode
@@ -113,41 +132,33 @@ class Engine(private val ui: UI, private val trie: Trie) {
             return
         }
 
-        fullSequence.append(action.symbol)
+        fullSequence.append(action.rawChar)
         val _prefixes = linkedSetOf<String>()
         // TODO inject subChars
-        val subChars = VNKeys.fromChar(
+        val subChars = // TODO move to Action
+            NumericSubstitution.VN.forNum(
             action.rawChar ?: error("Should be typing action here")
-        ).subChars
+        )
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
-            //_candidates.addAll(key.subChars.map { "$it" })
-            if (action == Action.Backspace) {
-                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
-            } else /*key!=Backspace*/{
-                subChars.map { "$it" }.forEach { c ->
-                  if (trie.containsPrefix(c)) {
-                      _candidates.add(c)
-                      _prefixes.add(c)
-                  }
+            subChars.map { "$it" }.forEach { c ->
+              if (trie.containsPrefix(c)) {
+                  _candidates.add(c)
+                  _prefixes.add(c)
               }
-              prefixes = _prefixes
-              prefixesCache[fullSequence.toString()] = _prefixes
-            }
+          }
+            prefixes = _prefixes
+            prefixesCache[fullSequence.toString()] = _prefixes
         } else {
-            if (action == Action.Backspace) {
-                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
-            } else /*key!=Backspace*/{
-                prefixes.forEach { pf ->
-                    subChars.forEach { sc ->
-                        if (trie.containsPrefix(pf + sc)) {
-                            _prefixes.add(pf + sc)
-                        }
+            prefixes.forEach { pf ->
+                subChars.forEach { sc ->
+                    if (trie.containsPrefix(pf + sc)) {
+                        _prefixes.add(pf + sc)
                     }
                 }
-                prefixes = _prefixes
-                prefixesCache[fullSequence.toString()] = _prefixes
             }
+            prefixes = _prefixes
+            prefixesCache[fullSequence.toString()] = _prefixes
         }
         expandPrefixesTo(_candidates)
         updateCandidateSelection(_candidates)

@@ -1,14 +1,14 @@
 package com.github.kentvu.t9vietnamese.lib
 
-import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.Action
 
-class KeySequence(keys: List<Key>) {
+class ActionSequence(actions: List<Action>) {
 
-    private val keys = keys.toTypedArray()
-    private val keyString = keys.map { it.action }.joinToString("")
-    val length: Int = keys.size
+    private val keys = actions.toTypedArray()
+    private val keyString = actions.map { it.rawChar }.joinToString("")
+    val length: Int = actions.size
 
-    fun forEach(block: (Key) -> Unit) {
+    fun forEach(block: (Action) -> Unit) {
         keys.forEach(block)
     }
 
@@ -20,7 +20,7 @@ class KeySequence(keys: List<Key>) {
         if (this === other) return true
 //        if (javaClass != other?.javaClass) return false
 
-        other as KeySequence
+        other as ActionSequence
 
         if (keyString != other.keyString) return false
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
-class DawgT9Engine(val trie: Trie, input: SharedFlow<KeySequence>, scope: CoroutineScope) : T9Engine(input) {
+class DawgT9Engine(val trie: Trie, input: SharedFlow<ActionSequence>, scope: CoroutineScope) : T9Engine(input) {
     private val _output = MutableSharedFlow<T9EngineOutput>()
     override val output: Flow<T9EngineOutput> = _output.asSharedFlow()
     init {
