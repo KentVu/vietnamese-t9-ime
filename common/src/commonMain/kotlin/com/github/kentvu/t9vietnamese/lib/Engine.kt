@@ -5,6 +5,8 @@ import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlin.apply
 import kotlin.collections.toMutableList
 import kotlin.text.deleteAt
@@ -12,7 +14,11 @@ import kotlin.text.isNotEmpty
 import kotlin.text.lastIndex
 import kotlin.text.map
 
-class Engine(private val ui: UI, private val trie: Trie) {
+class Engine(
+    private val stateSource : MutableStateFlow<UI.State>,
+    private val trie: Trie,
+    private val inputConnection: InputSystemConnection,
+) {
     var candidates: CandidateSelection = CandidateSelection()
         private set
     private val fullSequence = StringBuilder(10)
@@ -35,13 +41,13 @@ class Engine(private val ui: UI, private val trie: Trie) {
     fun type(action: Action) {
         if (action == Action.Clear) {
             reset()
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Hash) {
@@ -51,52 +57,52 @@ class Engine(private val ui: UI, private val trie: Trie) {
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/
             // Hash button: select the number sequence.
             candidates = candidates.select(candidates.lastIndex())
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Space) {
             if (isComposing()) {
                 // commit current composing word with a space.
-                ui.inputConnection.commitText(candidates.selectedCandidate.text + " ")
+                inputConnection.commitText(candidates.selectedCandidate.text + " ")
             } else {
-                ui.inputConnection.commitText("${Action.Space.rawChar}")
+                inputConnection.commitText("${Action.Space.rawChar}")
             }
             reset()
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Ok) {
             if (isComposing()) {
-                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                inputConnection.commitText(candidates.selectedCandidate.text)
             } else {
-                ui.inputConnection.performEditorAction()
+                inputConnection.performEditorAction()
             }
             reset()
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Return) {
             if (isComposing()) {
                 // if we're in middle of composing a word, commit without a space.
-                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                inputConnection.commitText(candidates.selectedCandidate.text)
             } else {
-                ui.inputConnection.commitText("\n")
+                inputConnection.commitText("\n")
             }
             reset()
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Zero) {
             fullSequence.append(action.rawChar)
             prefixes = emptySet()
             candidates = CandidateSelection.from(listOf(fullSequence.toString()))
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.One) {
             fullSequence.append(Action.One.rawChar)
             if (isComposing()) {
-                ui.inputConnection.commitText(candidates.selectedCandidate.text)
+                inputConnection.commitText(candidates.selectedCandidate.text)
                 reset()
             }
             candidates = CandidateSelection.from(
@@ -106,7 +112,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
                             .map { "$it" })
                     add("${Action.One.rawChar}")
                 })
-            ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+            stateSource.update { it.copy(candidates = candidates) }
             return
             // pass through
         }
@@ -127,7 +133,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 expandPrefixesTo(_candidates)
                 updateCandidateSelection(_candidates)
             } else {
-                ui.inputConnection.deleteSurroundingText(1, 0)
+                inputConnection.deleteSurroundingText(1, 0)
             }
             return
         }
@@ -188,7 +194,7 @@ class Engine(private val ui: UI, private val trie: Trie) {
                 },
             if (preserveSel) candidates.selectedCandidateId else 0
         )
-        ui.update(UI.UpdateEvent.UpdateCandidates(candidates))
+        stateSource.update { it.copy(candidates = candidates) }
     }
 
     private fun isComposing() = candidates.isNotEmpty()

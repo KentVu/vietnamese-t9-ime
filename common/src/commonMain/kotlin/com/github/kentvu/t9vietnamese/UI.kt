@@ -1,22 +1,24 @@
 package com.github.kentvu.t9vietnamese
 
-import com.github.kentvu.t9vietnamese.lib.AppEvent
-import com.github.kentvu.t9vietnamese.lib.InputConnection
-import com.github.kentvu.t9vietnamese.model.Candidate
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
+import kotlinx.coroutines.flow.StateFlow
 
+//abstract class UI(private val state: State) {
 interface UI {
-    val inputConnection: InputConnection
-    fun subscribeKeypadEvents(block: (KeypadEvent) -> Unit)
-    fun update(event: UpdateEvent)
+    fun init(stateSource: StateFlow<State>)
 
-    sealed class UpdateEvent: AppEvent {
-        object Initialized : UpdateEvent()
-        object Close : UpdateEvent()
+    val stateSource: StateFlow<State>
+
+    data class State(
+        val initialized: Boolean = false,
+        val closed: Boolean = false,
         //object
         // SelectNextCandidate : UpdateEvent()
 
-        class UpdateCandidates(val candidates: CandidateSelection) : UpdateEvent()
-    }
+        val candidates: CandidateSelection = CandidateSelection(),
+        val confirmedText: String = "",
+        //https://slackhq.github.io/circuit/states-and-events/
+        val keypadEventSink : ((KeypadEvent) -> Unit)
+    )
     //class DefaultUI: UI {}
 }

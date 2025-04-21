@@ -22,6 +22,10 @@ class CandidateSelection(
         candidates.forEach { cand -> action(cand) }
     }
 
+    fun forEachIndexed(action: (Int, Candidate) -> Unit) {
+        candidates.forEachIndexed(action)
+    }
+
     operator fun get(i: Int): Candidate = candidates[i]
 
     fun advanceSelectedCandidate(): CandidateSelection {

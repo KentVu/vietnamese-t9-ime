@@ -9,5 +9,7 @@ sealed class KeypadEvent: AppEvent {
         val action: Action,
     ): KeypadEvent()
 
+    class CandidateSelect(i: Int) : KeypadEvent() {}
+
     object CloseRequest : KeypadEvent()
 }

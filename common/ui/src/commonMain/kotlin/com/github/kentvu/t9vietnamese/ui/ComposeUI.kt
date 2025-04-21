@@ -3,6 +3,7 @@ package com.github.kentvu.t9vietnamese.ui
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,7 +17,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.KeypadEvent
-import com.github.kentvu.t9vietnamese.lib.InputConnection
+import com.github.kentvu.t9vietnamese.UI.State
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
@@ -41,51 +45,31 @@ import com.github.kentvu.t9vietnamese.model.VNKeys.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlin.text.dropLast
 import androidx.compose.ui.input.key.Key as ComposeKey
 
-abstract class AppUI(
+class ComposeUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val app: T9App,
+    private val close: () -> Unit,
 ) : UI {
-    companion object {
-        private val log = Logger.tag("AppUI")
+
+    private val keyEventSource = MutableSharedFlow<KeyEvent>(extraBufferCapacity = 1)
+    override lateinit var stateSource : StateFlow<State>
+
+    override fun init(stateSource: StateFlow<State>) {
+        this.stateSource = stateSource
     }
+    //override val stateSource = MutableStateFlow(UI.State())
 
-    protected val eventSource = MutableSharedFlow<KeypadEvent>(extraBufferCapacity = 1)
-    protected val uiState = UIState()
-
-    override fun subscribeKeypadEvents(block: (KeypadEvent) -> Unit) {
+    /*override fun keypadEventSink(block: (KeypadEvent) -> Unit) {
         scope.launch {
             eventSource.collect {
                 block(it)
             }
         }
         log.debug("eventSource.subCount:${eventSource.subscriptionCount.value}")
-    }
+    }*/
 
-    override val inputConnection = object:InputConnection{
-        override fun commitText(text: String) {
-            uiState.apply {
-                confirmedText.value += text
-            }
-        }
-
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-            uiState.apply {
-                confirmedText.apply {
-                    value = value.dropLast(1)
-                }
-            }
-        }
-
-        override fun performEditorAction() {
-            //TODO("Not yet implemented")
-        }
-    }
-
-    override fun update(event: UI.UpdateEvent) {
+    /*override fun update(event: UI.UpdateEvent) {
         when (event) {
             is UI.UpdateEvent.Initialized -> {
                 //uiState.update { it.copy(true)  }
@@ -100,19 +84,36 @@ abstract class AppUI(
             }
             UI.UpdateEvent.Close -> app.finish()
         }
-    }
-
+    }*/
     fun onKeyEvent(keyEvent: KeyEvent): Boolean {
-        if (keyEvent.isCtrlQ()) {
-            app.finish()
-            return true
-        }
-        return onUserEvent(keyEvent)
+        return keyEventSource.tryEmit(keyEvent)
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun KeyEvent.isCtrlQ(): Boolean {
-        return type == KeyEventType.KeyUp && isCtrlPressed && key == ComposeKey.Q
+    /** Translates [KeyEvent] to [Action] */
+    private fun handleKeyEvent(
+        keyEvent: KeyEvent,
+        state: State,
+    ) {
+        if (keyEvent.isCtrlQ()) {
+            state.keypadEventSink(KeypadEvent.CloseRequest)
+        } else {
+            //onUserEvent(keyEvent, state)
+            log.debug("$keyEvent")
+            if (keyEvent.type == KeyEventType.KeyUp) {
+                if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
+                    state.keypadEventSink(KeypadEvent.KeyPress(Action.Clear))
+                }
+                if (Letter2Keypad.available(keyEvent.key)) {
+                    state.keypadEventSink(
+                        KeypadEvent.KeyPress(
+                            VNKeys.fromChar(
+                                Letter2Keypad.numForKey(keyEvent.key)!!
+                            ).action
+                        )
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -120,22 +121,6 @@ abstract class AppUI(
      */
     @OptIn(ExperimentalComposeUiApi::class)
     private fun onUserEvent(keyEvent: KeyEvent): Boolean {
-        log.debug("$keyEvent")
-        if (keyEvent.type == KeyEventType.KeyUp) {
-            if (keyEvent.isCtrlPressed && keyEvent.key == ComposeKey.C) {
-                eventSource.tryEmit(KeypadEvent.KeyPress(Action.Clear))
-            }
-            if (Letter2Keypad.available(keyEvent.key)) {
-                eventSource.tryEmit(
-                    KeypadEvent.KeyPress(
-                        VNKeys.fromChar(
-                            Letter2Keypad.numForKey(keyEvent.key)!!
-                        ).action
-                    )
-                )
-                return true
-            }
-        }
         // let other handlers receive this event
         return false
     }
@@ -181,7 +166,8 @@ abstract class AppUI(
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun AppUi() {
-        //val uiState by uiState.collectAsState()
+        val state by stateSource.collectAsState()
+        //TODO use T9Theme
         MaterialTheme {
             Scaffold(topBar = {
                 TopAppBar(title = {
@@ -193,7 +179,7 @@ abstract class AppUI(
                     verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    var confirmedText by uiState.confirmedText
+                    var confirmedText by remember { mutableStateOf("") }
                     TextField(
                         value = confirmedText,
                         modifier = Modifier.semantics { contentDescription=Semantic.testOutput },
@@ -203,22 +189,55 @@ abstract class AppUI(
                     Button({clipboardManager.setText(AnnotatedString(confirmedText))}) {
                         Text("Copy")
                     }
-                    CandidatesView(uiState.candidates.value)
-                    Keypad(
-                        Modifier
-                            .padding(innerPadding),
-                        uiState.initialized.value
-                    ) { key, isLong ->
-                        if (isLong) {
-                            if (key.longAction != null)
-                                eventSource.tryEmit(
-                                    KeypadEvent.KeyPress(key.longAction!!)
-                                )
-                        } else eventSource.tryEmit(
-                            KeypadEvent.KeyPress(key.action))
-                    }
+                    CandidateView(state,)
+                    ImeUI(state, Modifier.padding(innerPadding))
                 }
             }
+        }
+        if (state.closed) {
+            close()
+            return
+        }
+        LaunchedEffect(state) {
+            keyEventSource/*.onEach { onUserEvent(it) }.filter { it.isCtrlQ() }*/.collect {
+                handleKeyEvent(it, state)
+            }
+        }
+    }
+
+    @Composable
+    fun ImeUI(state: State, modifier: Modifier = Modifier) {
+        Keypad(
+            modifier,
+            state.initialized
+        ) { key, isLong ->
+            if (isLong) {
+                if (key.longAction != null)
+                    state.keypadEventSink(
+                        KeypadEvent.KeyPress(key.longAction!!)
+                    )
+            } else state.keypadEventSink(
+                KeypadEvent.KeyPress(key.action)
+            )
+        }
+    }
+
+    @Composable
+    fun ImeUI() {
+        val state by stateSource.collectAsState()
+        ImeUI(state)
+    }
+
+    @Composable
+    fun CandidateView() {
+        val state by stateSource.collectAsState()
+        CandidateView(state)
+    }
+
+    @Composable
+    private fun CandidateView(state: State) {
+        CandidatesView(state.candidates) {
+            state.keypadEventSink(KeypadEvent.CandidateSelect(it))
         }
     }
 
@@ -252,7 +271,7 @@ abstract class AppUI(
     }
 
     @Composable
-    protected fun CandidatesView(candidates: CandidateSelection) {
+    protected fun CandidatesView(candidates: CandidateSelection, onItemSelected: (Int) -> Unit) {
         val state = rememberLazyListState(candidates.selectedCandidateId)
         LazyRow(
             modifier = Modifier.semantics {
@@ -260,7 +279,7 @@ abstract class AppUI(
             }.background(Color.LightGray),
             state = state
         ) {
-            candidates.forEach { cand ->
+            candidates.forEachIndexed { i, cand ->
                 item(cand.text) {
                     Text(
                         cand.text,
@@ -270,17 +289,18 @@ abstract class AppUI(
                                     semantics {
                                         contentDescription = Semantic.selectedCandidate
                                     }.background(Color.Gray)
-                                else this
+                                else clickable { onItemSelected(i) }
                             }
                     )
                 }
             }
         }
         if (state.layoutInfo.visibleItemsInfo.isNotEmpty())
-            if (candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index)
-                LaunchedEffect(candidates) {
-                    state.scrollToItem(candidates.selectedCandidateId)
-                }
+        if ((candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index) ||
+            (candidates.selectedCandidateId <= state.layoutInfo.visibleItemsInfo.first().index)) //firstVisibleItemIndex
+            LaunchedEffect(candidates) {
+                state.scrollToItem(candidates.selectedCandidateId)
+            }
     }
 
     @Composable
@@ -294,14 +314,14 @@ abstract class AppUI(
                 .padding(1.dp)
                 .weight(1F)
             for (key in keys) {
-                ComposeKey(key, mod, keysEnabled, onKeyClick)
+                ComposableKey(key, mod, keysEnabled, onKeyClick)
             }
         }
     }
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    private fun ComposeKey(
+    private fun ComposableKey(
         key: Key,
         modifier: Modifier,
         keysEnabled: Boolean,
@@ -347,4 +367,12 @@ abstract class AppUI(
         const val testOutput: String = "test_output"
     }
 
+    companion object {
+        private val log = Logger.tag("AppUI")
+
+        private fun KeyEvent.isCtrlQ(): Boolean {
+            return type == KeyEventType.KeyUp && isCtrlPressed && key == ComposeKey.Q
+        }
+
+    }
 }

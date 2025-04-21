@@ -10,5 +10,4 @@ interface EnvironmentInteraction {
     val fileSystem: FileSystem
     val vnWordsSource: Source
 
-    fun  finish()
 }

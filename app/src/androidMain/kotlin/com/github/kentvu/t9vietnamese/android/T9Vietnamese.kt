@@ -4,12 +4,15 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
-import com.github.kentvu.t9vietnamese.lib.InputConnection
-import com.github.kentvu.t9vietnamese.ui.T9App
+import com.github.kentvu.t9vietnamese.UI
+import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
+import com.github.kentvu.t9vietnamese.ui.ComposeUI
+import com.github.kentvu.t9vietnamese.T9App
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
-import kotlin.text.toHexString
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class T9Vietnamese : InputMethodService() {
     companion object {
@@ -17,34 +20,37 @@ class T9Vietnamese : InputMethodService() {
     }
     private lateinit var inputView: ComposeView
     private lateinit var candidatesView: ComposeView
+    private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
+    private val scope = keyboardViewLifecycleOwner.lifecycleScope
+    private val ui by lazy {
+        ComposeUI(
+            scope,
+            { /*finish()*/ }
+        )
+    }
     private val app by lazy {
-        object : T9App(
-            env = object : AndroidEnvironmentInteraction(this){
-                // stopSelf?
-                override fun finish() = Unit
-            }
-        ){
-            override val ui: ImeServiceUI = ImeServiceUI(
-                scope,
-                this,
-                object: InputConnection {
-                    override fun commitText(text: String) {
-                        currentInputConnection.commitText(text, 0)
-                    }
-
-                    override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-                        currentInputConnection.deleteSurroundingText(beforeLength, afterLength)
-                    }
-
-                    override fun performEditorAction() {
-                        currentInputConnection.performEditorAction(currentInputEditorInfo.actionId)
-                    }
+        val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State { })
+        T9App(
+            AndroidEnvironmentInteraction(this),
+            scope,
+            ui,
+            stateSource,
+            object: InputSystemConnection {
+                override fun commitText(text: String) {
+                    currentInputConnection.commitText(text, 0)
                 }
-            )
-        }
+
+                override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
+                    currentInputConnection.deleteSurroundingText(beforeLength, afterLength)
+                }
+
+                override fun performEditorAction() {
+                    currentInputConnection.performEditorAction(currentInputEditorInfo.actionId)
+                }
+            }
+        )
     }
 
-    private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     override fun onCreate() {
         android.util.Log.d("T9VietnameseIME", "onCreate:")
         super.onCreate()
@@ -52,12 +58,12 @@ class T9Vietnamese : InputMethodService() {
         log.debug("onCreateInputView:")
         inputView = ComposeView(this).apply {
             setContent {
-                app.ui.ImeUI()
+                ui.ImeUI()
             }
         }
         candidatesView = ComposeView(this).apply {
             setContent {
-                app.ui.CandidatesView()
+                ui.CandidateView()
             }
         }
         app.start()

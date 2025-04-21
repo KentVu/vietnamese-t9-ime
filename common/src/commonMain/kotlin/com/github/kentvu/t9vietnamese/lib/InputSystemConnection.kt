@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese.lib
 
-interface InputConnection {
+/** Wrap the framework IM Service's InputConnection and expose to the domain layer. */
+interface InputSystemConnection {
 
     fun commitText(text: String)
     fun deleteSurroundingText(beforeLength: Int,

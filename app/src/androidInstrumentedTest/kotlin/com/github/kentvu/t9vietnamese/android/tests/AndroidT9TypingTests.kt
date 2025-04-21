@@ -6,7 +6,7 @@ import com.github.kentvu.sharedtest.SharedAppTests
 import com.github.kentvu.t9vietnamese.android.AndroidActivityT9App
 import com.github.kentvu.t9vietnamese.android.MainActivity
 import com.github.kentvu.t9vietnamese.android.tests.TestHelpers.unlockScreen
-import com.github.kentvu.t9vietnamese.ui.T9App
+import com.github.kentvu.t9vietnamese.T9App
 import org.junit.Before
 import org.junit.Rule
 
