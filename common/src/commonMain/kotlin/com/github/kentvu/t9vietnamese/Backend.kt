@@ -3,23 +3,20 @@ package com.github.kentvu.t9vietnamese
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.lib.Engine
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
-import com.github.kentvu.t9vietnamese.lib.T9Engine
-import com.github.kentvu.t9vietnamese.lib.update
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.Trie
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class Backend(
     private val trie: Trie,
-    private val stateSource : MutableStateFlow<UI.State>,
+    private val ui: UI,
     inputConnection: InputSystemConnection,
 ) {
     private var initialized: Boolean = false
-    private val engine = Engine(stateSource, trie, inputConnection)
+    private val engine = Engine(ui, trie, inputConnection)
 
     fun init() {
         trie.load()
-        stateSource.update { copy(
+        ui.update { copy(
             initialized = true,
             keypadEventSink = ::onUiEvent
         ) }
@@ -28,8 +25,8 @@ class Backend(
     fun onUiEvent(ev: KeypadEvent) {
         when (ev) {
             is KeypadEvent.KeyPress -> onKeyPress(ev.action)
-            KeypadEvent.CloseRequest -> stateSource.update { copy(closed = true) }
-            is KeypadEvent.CandidateSelect -> log.info("TODO onUiEvent($ev)")
+            KeypadEvent.CloseRequest -> ui.update { copy(closed = true) }
+            is KeypadEvent.CandidateSelect -> engine.selectCandidate(ev.candidateId)
         }
     }
 

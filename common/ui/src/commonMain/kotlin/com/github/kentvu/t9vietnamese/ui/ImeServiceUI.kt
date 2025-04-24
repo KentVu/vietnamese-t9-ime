@@ -1,38 +1,30 @@
-package com.github.kentvu.t9vietnamese.android
+package com.github.kentvu.t9vietnamese.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.github.kentvu.t9vietnamese.KeypadEvent
-import com.github.kentvu.t9vietnamese.lib.InputConnection
-import com.github.kentvu.t9vietnamese.ui.AppUI
-import com.github.kentvu.t9vietnamese.ui.T9App
+import com.github.kentvu.t9vietnamese.UI.State
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class ImeServiceUI(
-    scope: CoroutineScope,
-    app: T9App,
-    override val inputConnection: InputConnection
-) : AppUI(scope, app) {
-
-    /*override val inputConnection = object*/
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val stateSource: MutableStateFlow<State> = MutableStateFlow(State {}),
+    private val close: () -> Unit,
+) : ComposeUI by T9UI(scope, stateSource, close) {
 
     @Composable
     fun ImeUI() {
-        Keypad(
-            Modifier,
-            uiState.initialized.value
-          ) { key, isLong ->
-            if (isLong) {
-                if (key.longAction != null)
-                    eventSource.tryEmit(
-                        KeypadEvent.KeyPress(key.longAction!!))
-            } else eventSource.tryEmit(KeypadEvent.KeyPress(key.action))
-        }
+        val state by stateSource.collectAsState()
+        ImeUI(state)
     }
 
     @Composable
-    fun CandidatesView() {
-        CandidatesView(uiState.candidates.value)
+    fun CandidateView() {
+        val state by stateSource.collectAsState()
+        CandidateView(state)
     }
-
 }

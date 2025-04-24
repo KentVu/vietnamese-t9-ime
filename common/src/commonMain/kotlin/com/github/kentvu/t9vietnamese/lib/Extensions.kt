@@ -8,6 +8,7 @@ import kotlin.contracts.contract
 
 /** Update by assuming `this` is a [MutableStateFlow].
  * @return false if newValue is the same as old value. */
+// TODO support MutableStateFlow. 
 @OptIn(ExperimentalContracts::class)
 inline fun <T> StateFlow<T>.update(newProvider: T.() -> T): Boolean {
   contract {

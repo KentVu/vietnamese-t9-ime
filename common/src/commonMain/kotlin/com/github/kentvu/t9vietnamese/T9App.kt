@@ -13,8 +13,7 @@ class T9App(
     protected val env: EnvironmentInteraction,
     protected val scope: CoroutineScope = CoroutineScope(env.mainDispatcher + Job()),
     val ui: UI,
-    private val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State { }),
-    private val inputConnection: InputSystemConnection = DefaultInputConnection(stateSource),
+    private val inputConnection: InputSystemConnection = DefaultInputConnection(ui),
 ) {
 
     private val backend = Backend(
@@ -22,12 +21,11 @@ class T9App(
             DecomposedVietnameseWords(env.vnWordsSource),
             env.fileSystem
         ),
-        stateSource,
+        ui,
         inputConnection,
     )
 
     fun start() {
-        ui.init(stateSource)
         scope.launch(env.ioDispatcher) {
             backend.init()
         }
@@ -50,16 +48,16 @@ class T9App(
     }
 
     class DefaultInputConnection(
-        private val stateSource : MutableStateFlow<UI.State>
+        private val ui: UI,
     ): InputSystemConnection {
         override fun commitText(text: String) {
-            stateSource.update { copy(
+            ui.update { copy(
                 confirmedText = confirmedText + text
             )}
         }
 
         override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-            stateSource.update { copy(
+            ui.update { copy(
                 confirmedText = confirmedText.dropLast(1)
             ) }
         }

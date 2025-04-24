@@ -17,17 +17,21 @@ import okio.Source
 @Preview
 @Composable
 fun AppPreview() {
-    val ui = ComposeUI(CoroutineScope(Dispatchers.Default), {})
-    ui.init(MutableStateFlow(UI.State(
-        initialized = true,
-        candidates = CandidateSelection.from(listOf("aa", "cc", "dd")),
-        confirmedText = "Test UI"
-    ) { ev ->
-        when (ev) {
-            is KeypadEvent.CandidateSelect -> TODO()
-            KeypadEvent.CloseRequest -> TODO()
-            is KeypadEvent.KeyPress -> TODO()
-        }
-    }))
+    val ui = T9UI(
+        CoroutineScope(Dispatchers.Default),
+        MutableStateFlow(
+            UI.State(
+                initialized = true,
+                candidates = CandidateSelection.from(listOf("aa", "cc", "dd")),
+                confirmedText = "Test UI"
+            ) { ev ->
+                when (ev) {
+                    is KeypadEvent.CandidateSelect -> TODO()
+                    KeypadEvent.CloseRequest -> TODO()
+                    is KeypadEvent.KeyPress -> TODO()
+                }
+            }),
+        {}
+    )
     ui.AppUi()
 }

@@ -11,23 +11,21 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.ui.ComposeUI
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.android.AndroidEnvironmentInteraction
+import com.github.kentvu.t9vietnamese.ui.T9UI
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
 
     private val ui by lazy {
-        ComposeUI(
+        T9UI(
             lifecycleScope,
-            { finish() }
-        )
+        ) { finish() }
     }
     private val app by lazy {
-        val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State { })
         T9App/*.create*/(
             AndroidEnvironmentInteraction(this),
             lifecycleScope,
             ui,
-            stateSource,
         )
     }
     override fun onCreate(savedInstanceState: Bundle?) {

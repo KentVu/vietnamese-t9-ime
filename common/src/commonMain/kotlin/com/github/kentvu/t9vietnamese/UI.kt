@@ -1,13 +1,11 @@
 package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
-import kotlinx.coroutines.flow.StateFlow
 
 //abstract class UI(private val state: State) {
 interface UI {
-    fun init(stateSource: StateFlow<State>)
 
-    val stateSource: StateFlow<State>
+    fun update(manipulator: State.() -> State)
 
     data class State(
         val initialized: Boolean = false,

@@ -45,46 +45,31 @@ import com.github.kentvu.t9vietnamese.model.VNKeys.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.update
 import androidx.compose.ui.input.key.Key as ComposeKey
 
-class ComposeUI(
+interface ComposeUI: UI {
+    @Composable
+    fun AppUi()
+
+    @Composable
+    fun ImeUI(state: State, modifier: Modifier = Modifier)
+    @Composable
+    fun CandidateView(state: State)
+}
+
+class T9UI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    private val stateSource: MutableStateFlow<State> = MutableStateFlow(State {}),
     private val close: () -> Unit,
-) : UI {
+) : ComposeUI {
 
     private val keyEventSource = MutableSharedFlow<KeyEvent>(extraBufferCapacity = 1)
-    override lateinit var stateSource : StateFlow<State>
 
-    override fun init(stateSource: StateFlow<State>) {
-        this.stateSource = stateSource
+    override fun update(manipulator: State.() -> State) {
+        this.stateSource.update { it.manipulator() }
     }
-    //override val stateSource = MutableStateFlow(UI.State())
 
-    /*override fun keypadEventSink(block: (KeypadEvent) -> Unit) {
-        scope.launch {
-            eventSource.collect {
-                block(it)
-            }
-        }
-        log.debug("eventSource.subCount:${eventSource.subscriptionCount.value}")
-    }*/
-
-    /*override fun update(event: UI.UpdateEvent) {
-        when (event) {
-            is UI.UpdateEvent.Initialized -> {
-                //uiState.update { it.copy(true)  }
-                //uiState.value = uiState.value.copy(true)
-                uiState.initialized.value = true
-            }
-            is UI.UpdateEvent.UpdateCandidates -> {
-                Logger.tag("AppUI").debug("UpdateCandidates: ${event.candidates}")
-                //println("UpdateCandidates: ${event.candidates}")
-                //uiState.update { it.copy(candidates = event.candidates) }
-                uiState.candidates.value = event.candidates
-            }
-            UI.UpdateEvent.Close -> app.finish()
-        }
-    }*/
     fun onKeyEvent(keyEvent: KeyEvent): Boolean {
         return keyEventSource.tryEmit(keyEvent)
     }
@@ -114,15 +99,6 @@ class ComposeUI(
                 }
             }
         }
-    }
-
-    /**
-     * @return event handled.
-     */
-    @OptIn(ExperimentalComposeUiApi::class)
-    private fun onUserEvent(keyEvent: KeyEvent): Boolean {
-        // let other handlers receive this event
-        return false
     }
 
     object Letter2Keypad {
@@ -165,7 +141,7 @@ class ComposeUI(
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AppUi() {
+    override fun AppUi() {
         val state by stateSource.collectAsState()
         //TODO use T9Theme
         MaterialTheme {
@@ -206,7 +182,7 @@ class ComposeUI(
     }
 
     @Composable
-    fun ImeUI(state: State, modifier: Modifier = Modifier) {
+    override fun ImeUI(state: State, modifier: Modifier) {
         Keypad(
             modifier,
             state.initialized
@@ -223,19 +199,7 @@ class ComposeUI(
     }
 
     @Composable
-    fun ImeUI() {
-        val state by stateSource.collectAsState()
-        ImeUI(state)
-    }
-
-    @Composable
-    fun CandidateView() {
-        val state by stateSource.collectAsState()
-        CandidateView(state)
-    }
-
-    @Composable
-    private fun CandidateView(state: State) {
+    override fun CandidateView(state: State) {
         CandidatesView(state.candidates) {
             state.keypadEventSink(KeypadEvent.CandidateSelect(it))
         }

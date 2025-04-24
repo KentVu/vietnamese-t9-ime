@@ -15,7 +15,7 @@ import kotlin.text.lastIndex
 import kotlin.text.map
 
 class Engine(
-    private val stateSource : MutableStateFlow<UI.State>,
+    private val ui: UI,
     private val trie: Trie,
     private val inputConnection: InputSystemConnection,
 ) {
@@ -41,13 +41,13 @@ class Engine(
     fun type(action: Action) {
         if (action == Action.Clear) {
             reset()
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Hash) {
@@ -57,7 +57,7 @@ class Engine(
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/
             // Hash button: select the number sequence.
             candidates = candidates.select(candidates.lastIndex())
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Space) {
@@ -68,7 +68,7 @@ class Engine(
                 inputConnection.commitText("${Action.Space.rawChar}")
             }
             reset()
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Ok) {
@@ -78,7 +78,7 @@ class Engine(
                 inputConnection.performEditorAction()
             }
             reset()
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Return) {
@@ -89,14 +89,14 @@ class Engine(
                 inputConnection.commitText("\n")
             }
             reset()
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.Zero) {
             fullSequence.append(action.rawChar)
             prefixes = emptySet()
             candidates = CandidateSelection.from(listOf(fullSequence.toString()))
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
         }
         if (action == Action.One) {
@@ -112,7 +112,7 @@ class Engine(
                             .map { "$it" })
                     add("${Action.One.rawChar}")
                 })
-            stateSource.update { it.copy(candidates = candidates) }
+            ui.update { copy(candidates = this@Engine.candidates) }
             return
             // pass through
         }
@@ -194,7 +194,7 @@ class Engine(
                 },
             if (preserveSel) candidates.selectedCandidateId else 0
         )
-        stateSource.update { it.copy(candidates = candidates) }
+        ui.update { copy(candidates = this@Engine.candidates) }
     }
 
     private fun isComposing() = candidates.isNotEmpty()
@@ -204,6 +204,15 @@ class Engine(
         candidates = CandidateSelection()
         fullSequence.clear()
         shiftMode = false
+    }
+
+    fun selectCandidate(candidateId: Int) {
+        candidates = candidates.select(candidateId)
+        ui.update {
+            copy(
+                candidates = this@Engine.candidates
+            )
+        }
     }
 
 }

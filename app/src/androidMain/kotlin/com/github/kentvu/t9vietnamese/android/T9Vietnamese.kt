@@ -11,6 +11,7 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.ui.ComposeUI
 import com.github.kentvu.t9vietnamese.T9App
+import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -23,18 +24,15 @@ class T9Vietnamese : InputMethodService() {
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     private val scope = keyboardViewLifecycleOwner.lifecycleScope
     private val ui by lazy {
-        ComposeUI(
+        ImeServiceUI(
             scope,
-            { /*finish()*/ }
-        )
+        ) { /*finish()*/ }
     }
     private val app by lazy {
-        val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State { })
         T9App(
             AndroidEnvironmentInteraction(this),
             scope,
             ui,
-            stateSource,
             object: InputSystemConnection {
                 override fun commitText(text: String) {
                     currentInputConnection.commitText(text, 0)
