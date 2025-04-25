@@ -1,28 +1,36 @@
 package com.github.kentvu.t9vietnamese.android
 
+import android.content.Intent
+import android.inputmethodservice.InputMethodService
 import android.os.Bundle
+import android.provider.Settings
 import android.view.KeyEvent
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
-import com.github.kentvu.t9vietnamese.UI
-import com.github.kentvu.t9vietnamese.ui.ComposeUI
 import com.github.kentvu.t9vietnamese.T9App
-import com.github.kentvu.t9vietnamese.android.AndroidEnvironmentInteraction
-import com.github.kentvu.t9vietnamese.ui.T9UI
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.github.kentvu.t9vietnamese.ui.AndroidUI
 
 class MainActivity : ComponentActivity() {
 
     private val ui by lazy {
-        T9UI(
+        AndroidUI(
             lifecycleScope,
-        ) { finish() }
+            close = { finish() },
+            launchSystemImSettings = {
+                startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+            },
+            launchImePicker = {
+                getSystemService(InputMethodManager::class.java)
+                    .showInputMethodPicker()
+            },
+        )
     }
     private val app by lazy {
-        T9App/*.create*/(
+        T9App(
             AndroidEnvironmentInteraction(this),
             lifecycleScope,
             ui,

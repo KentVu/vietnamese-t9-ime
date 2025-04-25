@@ -9,10 +9,9 @@ import com.github.kentvu.t9vietnamese.model.Trie
 class Backend(
     private val trie: Trie,
     private val ui: UI,
-    inputConnection: InputSystemConnection,
 ) {
     private var initialized: Boolean = false
-    private val engine = Engine(ui, trie, inputConnection)
+    private val engine = Engine(ui, trie)
 
     fun init() {
         trie.load()

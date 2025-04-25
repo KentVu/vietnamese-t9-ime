@@ -17,14 +17,13 @@ import kotlin.text.map
 class Engine(
     private val ui: UI,
     private val trie: Trie,
-    private val inputConnection: InputSystemConnection,
 ) {
-    var candidates: CandidateSelection = CandidateSelection()
-        private set
+    private val inputConnection: InputSystemConnection = ui.inputConnection
+    private var candidates: CandidateSelection = CandidateSelection()
     private val fullSequence = StringBuilder(10)
     private var prefixes: Set<String> = emptySet()
     private val prefixesCache= mutableMapOf<String, Set<String>>()
-    var shiftMode: Boolean = false
+    private var shiftMode: Boolean = false
 
     /*fun type(keySequence: String) {
         keySequence.forEach { k ->
@@ -100,11 +99,11 @@ class Engine(
             return
         }
         if (action == Action.One) {
-            fullSequence.append(Action.One.rawChar)
             if (isComposing()) {
                 inputConnection.commitText(candidates.selectedCandidate.text)
                 reset()
             }
+            fullSequence.append(Action.One.rawChar)
             candidates = CandidateSelection.from(
                 buildList {
                     addAll(
