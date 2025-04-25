@@ -26,14 +26,7 @@ class T9Vietnamese : InputMethodService() {
     private val ui by lazy {
         ImeServiceUI(
             scope,
-        ) { /*finish()*/ }
-    }
-    private val app by lazy {
-        T9App(
-            AndroidEnvironmentInteraction(this),
-            scope,
-            ui,
-            object: InputSystemConnection {
+            inputConnection = object : InputSystemConnection {
                 override fun commitText(text: String) {
                     currentInputConnection.commitText(text, 0)
                 }
@@ -45,7 +38,14 @@ class T9Vietnamese : InputMethodService() {
                 override fun performEditorAction() {
                     currentInputConnection.performEditorAction(currentInputEditorInfo.actionId)
                 }
-            }
+            },
+        )
+    }
+    private val app by lazy {
+        T9App(
+            AndroidEnvironmentInteraction(this),
+            scope,
+            ui,
         )
     }
 

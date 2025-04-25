@@ -22,6 +22,7 @@
 
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
     android:supportsSwitchingToNextInputMethod="true"
+    android:settingsActivity="com.github.kentvu.t9vietnamese.android.MainActivity"
     >
     <!--    <subtype
             android:label="@string/label_subtype_en_US"

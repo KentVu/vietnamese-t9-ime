@@ -1,9 +1,12 @@
 package com.github.kentvu.t9vietnamese
 
+import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 
 //abstract class UI(private val state: State) {
 interface UI {
+
+    val inputConnection: InputSystemConnection
 
     fun update(manipulator: State.() -> State)
 
@@ -14,7 +17,6 @@ interface UI {
         // SelectNextCandidate : UpdateEvent()
 
         val candidates: CandidateSelection = CandidateSelection(),
-        val confirmedText: String = "",
         //https://slackhq.github.io/circuit/states-and-events/
         val keypadEventSink : ((KeypadEvent) -> Unit)
     )

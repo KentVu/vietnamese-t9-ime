@@ -13,7 +13,6 @@ class T9App(
     protected val env: EnvironmentInteraction,
     protected val scope: CoroutineScope = CoroutineScope(env.mainDispatcher + Job()),
     val ui: UI,
-    private val inputConnection: InputSystemConnection = DefaultInputConnection(ui),
 ) {
 
     private val backend = Backend(
@@ -22,7 +21,6 @@ class T9App(
             env.fileSystem
         ),
         ui,
-        inputConnection,
     )
 
     fun start() {
@@ -34,40 +32,6 @@ class T9App(
     fun stop() {
     }
 
-    companion object {
-        /*fun create(
-            env: EnvironmentInteraction,
-            scope: CoroutineScope = CoroutineScope(env.mainDispatcher + Job()),
-            stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State { }),
-            ui: UI,
-        ): T9App {
-            return T9App(env, scope, stateSource, ui).also {
-                ui.init(stateSource)
-            }
-        }*/
-    }
-
-    class DefaultInputConnection(
-        private val ui: UI,
-    ): InputSystemConnection {
-        override fun commitText(text: String) {
-            ui.update { copy(
-                confirmedText = confirmedText + text
-            )}
-        }
-
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-            ui.update { copy(
-                confirmedText = confirmedText.dropLast(1)
-            ) }
-        }
-
-        override fun performEditorAction() {
-            log.info("TODO(performEditorAction)")
-        }
-        companion object {
-            private val log = Logger.tag("DefaultInputConnection")
-        }
-    }
+    companion object
 
 }
