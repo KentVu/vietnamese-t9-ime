@@ -20,5 +20,8 @@ interface UI {
         //https://slackhq.github.io/circuit/states-and-events/
         val keypadEventSink : ((KeypadEvent) -> Unit)
     )
-    //class DefaultUI: UI {}
+    companion object {
+        inline fun UI.updateIt(crossinline manipulator: (State) -> State) =
+            update { manipulator(this) }
+    }
 }

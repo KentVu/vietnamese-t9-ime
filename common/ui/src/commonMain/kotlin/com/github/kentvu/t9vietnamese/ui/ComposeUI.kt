@@ -43,14 +43,11 @@ import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
-import com.github.kentvu.t9vietnamese.model.VNKeys.*
-import com.github.kentvu.t9vietnamese.ui.ComposeUI.Companion.isCtrlQ
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.update
-import androidx.compose.ui.input.key.Key as ComposeKey
 
 interface ComposeUI: UI {
 
@@ -65,10 +62,4 @@ interface ComposeUI: UI {
         const val testOutput: String = "test_output"
     }
 
-    companion object {
-
-        fun KeyEvent.isCtrlQ(): Boolean {
-            return type == KeyEventType.KeyUp && isCtrlPressed && key == ComposeKey.Q
-        }
-    }
 }

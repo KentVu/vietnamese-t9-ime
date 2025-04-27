@@ -26,12 +26,10 @@ import androidx.compose.ui.unit.dp
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.UI.State
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
-import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
-import com.github.kentvu.t9vietnamese.model.VNKeys.*
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -181,13 +179,13 @@ class ImeServiceUI(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    key.action.symbol,
+                    key.action.displaySymbol,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 val rawChar = key.action.rawChar
                 Text(
                     if (key.longAction != null) {
-                        key.longAction!!.symbol
+                        key.longAction!!.displaySymbol
                     } else if (rawChar != null) { /*if (key.action.type == Control)*/
                         if (rawChar.isDigit()) {
                             NumericSubstitution.VN.forNum(rawChar)

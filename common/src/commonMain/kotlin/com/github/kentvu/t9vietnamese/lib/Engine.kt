@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.UI
+import com.github.kentvu.t9vietnamese.UI.Companion.updateIt
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
@@ -40,13 +41,13 @@ class Engine(
     fun type(action: Action) {
         if (action == Action.Clear) {
             reset()
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Hash) {
@@ -56,7 +57,7 @@ class Engine(
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/
             // Hash button: select the number sequence.
             candidates = candidates.select(candidates.lastIndex())
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Space) {
@@ -67,7 +68,7 @@ class Engine(
                 inputConnection.commitText("${Action.Space.rawChar}")
             }
             reset()
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Ok) {
@@ -77,7 +78,7 @@ class Engine(
                 inputConnection.performEditorAction()
             }
             reset()
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Return) {
@@ -88,14 +89,14 @@ class Engine(
                 inputConnection.commitText("\n")
             }
             reset()
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Zero) {
             fullSequence.append(action.rawChar)
             prefixes = emptySet()
             candidates = CandidateSelection.from(listOf(fullSequence.toString()))
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.One) {
@@ -111,7 +112,7 @@ class Engine(
                             .map { "$it" })
                     add("${Action.One.rawChar}")
                 })
-            ui.update { copy(candidates = this@Engine.candidates) }
+            ui.updateIt { it.copy(candidates = candidates) }
             return
             // pass through
         }
@@ -193,7 +194,7 @@ class Engine(
                 },
             if (preserveSel) candidates.selectedCandidateId else 0
         )
-        ui.update { copy(candidates = this@Engine.candidates) }
+        ui.updateIt { it.copy(candidates = candidates) }
     }
 
     private fun isComposing() = candidates.isNotEmpty()
@@ -207,11 +208,7 @@ class Engine(
 
     fun selectCandidate(candidateId: Int) {
         candidates = candidates.select(candidateId)
-        ui.update {
-            copy(
-                candidates = this@Engine.candidates
-            )
-        }
+        ui.updateIt { it.copy(candidates = candidates) }
     }
 
 }

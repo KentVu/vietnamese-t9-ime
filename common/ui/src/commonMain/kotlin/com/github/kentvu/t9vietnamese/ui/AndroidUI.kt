@@ -39,7 +39,6 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.VNKeys
-import com.github.kentvu.t9vietnamese.ui.ComposeUI.Companion.isCtrlQ
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,9 +78,9 @@ class AndroidUI(
                 if (Letter2Keypad.available(keyEvent.key)) {
                     state.keypadEventSink(
                         KeypadEvent.KeyPress(
-                            VNKeys.fromChar(
+                            Action.fromChar(
                                 Letter2Keypad.numForKey(keyEvent.key)!!
-                            ).action
+                            )
                         )
                     )
                 }
@@ -229,5 +228,8 @@ class AndroidUI(
     companion object {
         private val log = Logger.tag("AppUI")
 
+        fun KeyEvent.isCtrlQ(): Boolean {
+            return (type == KeyEventType.KeyUp) && isCtrlPressed && (key == Key.Q)
+        }
     }
 }

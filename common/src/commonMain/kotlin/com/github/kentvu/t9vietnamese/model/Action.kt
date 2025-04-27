@@ -3,7 +3,7 @@ package com.github.kentvu.t9vietnamese.model
 enum class Action(
     /** null if this is non-typing action, i.e. control action. */
     val rawChar: Char?,
-    val displayText: String = "", // can't use Char since 🆗 is not accepted by the JVM??
+    private val symbol: String = "", // can't use Char since 🆗 is not accepted by the JVM??
 ) {
     Clear(null, 'C'),
     Backspace(null, '⌫'),
@@ -25,6 +25,14 @@ enum class Action(
     Return(null, '⏎'),;
     constructor(rawChar: Char?, displayText: Char)
             : this(rawChar, "$displayText")
-    val symbol: String
-        get() = displayText.takeIf { it.isNotEmpty() } ?: "$rawChar"
+    val displaySymbol: String
+        get() = symbol.takeIf { it.isNotEmpty() } ?: "$rawChar"
+
+    companion object {
+        private val charMap =
+            entries.associateBy { it.rawChar }
+        fun fromChar(c: Char): Action {
+            return charMap[c] ?: throw IllegalArgumentException("No Key for char '$c'.")
+        }
+    }
 }

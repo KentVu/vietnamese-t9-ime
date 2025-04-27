@@ -2,7 +2,6 @@ package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.lib.Engine
-import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.Trie
 
@@ -30,7 +29,7 @@ class Backend(
     }
 
     private fun onKeyPress(action: Action) {
-        log.debug("type: ${action.symbol}")
+        log.debug("type: ${action.displaySymbol}")
         engine.type(action)
     }
 
