@@ -27,12 +27,14 @@ import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.UI.State
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
+import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -41,6 +43,8 @@ class ImeServiceUI(
     private val stateSource: MutableStateFlow<State> = MutableStateFlow(State {}),
     override val inputConnection: InputSystemConnection,
 ) : ComposeUI {
+
+    private val imServiceEventSource = MutableSharedFlow<EditorInfo>(extraBufferCapacity = 1)
 
     override fun update(manipulator: State.() -> State) {
         this.stateSource.update { it.manipulator() }
@@ -62,7 +66,8 @@ class ImeServiceUI(
     override fun ImeUI(state: State, modifier: Modifier) {
         Keypad(
             modifier,
-            state.initialized
+            state.initialized,
+            state.mode,
         ) { key, isLong ->
             if (isLong) {
                 if (key.longAction != null)
@@ -73,12 +78,18 @@ class ImeServiceUI(
                 KeypadEvent.KeyPress(key.action)
             )
         }
+        LaunchedEffect(state) {
+            imServiceEventSource.collect {
+                state.keypadEventSink(KeypadEvent.InputViewStart(it))
+            }
+        }
     }
 
     @Composable
     fun Keypad(
         modifier: Modifier = Modifier,
         keysEnabled: Boolean,
+        mode: EditorInfo.Class,
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         //Napier.d("Recompose ${getThreadId()}")
@@ -93,12 +104,15 @@ class ImeServiceUI(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.End,
             ) {
+                @Composable
+                fun KeyboardRow(vararg keys: Key) =
+                    KeyboardRow(onKeyClick, keysEnabled, mode, *keys)
                 with(VNKeys) {
-                    KeyboardRow(onKeyClick, keysEnabled, Shift, keyOk, keyBackspace)
-                    KeyboardRow(onKeyClick, keysEnabled, key1, key2, key3)
-                    KeyboardRow(onKeyClick, keysEnabled, key4, key5, key6)
-                    KeyboardRow(onKeyClick, keysEnabled, key7, key8, key9)
-                    KeyboardRow(onKeyClick, keysEnabled, keyStar, key0, keyHash)
+                    KeyboardRow(Shift, keyOk, keyBackspace)
+                    KeyboardRow(key1, key2, key3)
+                    KeyboardRow(key4, key5, key6)
+                    KeyboardRow(key7, key8, key9)
+                    KeyboardRow(keyStar, key0, keyHash)
                 }
             }
         }
@@ -148,6 +162,7 @@ class ImeServiceUI(
     private fun KeyboardRow(
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
         keysEnabled: Boolean,
+        mode: EditorInfo.Class,
         vararg keys: Key
     ) {
         Row {
@@ -155,7 +170,7 @@ class ImeServiceUI(
                 .padding(1.dp)
                 .weight(1F)
             for (key in keys) {
-                ComposableKey(key, mod, keysEnabled, onKeyClick)
+                ComposableKey(key, mod, keysEnabled, mode, onKeyClick)
             }
         }
     }
@@ -166,6 +181,7 @@ class ImeServiceUI(
         key: Key,
         modifier: Modifier,
         keysEnabled: Boolean,
+        mode: EditorInfo.Class,
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         Button(
@@ -188,7 +204,10 @@ class ImeServiceUI(
                         key.longAction!!.displaySymbol
                     } else if (rawChar != null) { /*if (key.action.type == Control)*/
                         if (rawChar.isDigit()) {
-                            NumericSubstitution.VN.forNum(rawChar)
+                            when (mode) {
+                                EditorInfo.Class.Normal -> NumericSubstitution.VN.forNum(rawChar)
+                                EditorInfo.Class.Number -> ""
+                            }
                         } else "$rawChar"
                     } else "",
                     style = MaterialTheme.typography.bodySmall
@@ -200,5 +219,9 @@ class ImeServiceUI(
                 Color.LightGray
             )*/
         }
+    }
+
+    fun onStartInputView(info: EditorInfo): Boolean {
+        return imServiceEventSource.tryEmit(info)
     }
 }

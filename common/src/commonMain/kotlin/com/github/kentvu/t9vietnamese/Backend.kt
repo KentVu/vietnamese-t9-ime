@@ -25,6 +25,7 @@ class Backend(
             is KeypadEvent.KeyPress -> onKeyPress(ev.action)
             KeypadEvent.CloseRequest -> ui.update { copy(closed = true) }
             is KeypadEvent.CandidateSelect -> engine.selectCandidate(ev.candidateId)
+            is KeypadEvent.InputViewStart -> engine.switchMode(ev.editorInfo)
         }
     }
 

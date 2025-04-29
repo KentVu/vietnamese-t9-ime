@@ -55,7 +55,6 @@ class AndroidUI(
 ) : ComposeUI by ImeServiceUI(scope, stateSource, _ic) {
 
     private val keyEventSource = MutableSharedFlow<KeyEvent>(extraBufferCapacity = 1)
-    //override val inputConnection = InputConnection()
 
     fun onKeyEvent(keyEvent: KeyEvent): Boolean {
         return keyEventSource.tryEmit(keyEvent)

@@ -5,13 +5,9 @@ import com.github.kentvu.t9vietnamese.UI.Companion.updateIt
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
-import com.github.kentvu.t9vietnamese.model.VNKeys
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlin.apply
-import kotlin.collections.toMutableList
 import kotlin.text.deleteAt
-import kotlin.text.isNotEmpty
+import kotlin.text.last
 import kotlin.text.lastIndex
 import kotlin.text.map
 
@@ -19,6 +15,7 @@ class Engine(
     private val ui: UI,
     private val trie: Trie,
 ) {
+    private var mode = EditorInfo(EditorInfo.Class.Normal)
     private val inputConnection: InputSystemConnection = ui.inputConnection
     private var candidates: CandidateSelection = CandidateSelection()
     private val fullSequence = StringBuilder(10)
@@ -93,10 +90,9 @@ class Engine(
             return
         }
         if (action == Action.Zero) {
-            fullSequence.append(action.rawChar)
+            fullSequence.append(Action.Zero.rawChar)
             prefixes = emptySet()
-            candidates = CandidateSelection.from(listOf(fullSequence.toString()))
-            ui.updateIt { it.copy(candidates = candidates) }
+            updateCandidateSelection(emptySet())
             return
         }
         if (action == Action.One) {
@@ -105,14 +101,7 @@ class Engine(
                 reset()
             }
             fullSequence.append(Action.One.rawChar)
-            candidates = CandidateSelection.from(
-                buildList {
-                    addAll(
-                        NumericSubstitution.VN.forNum(Action.One.rawChar!!)
-                            .map { "$it" })
-                    add("${Action.One.rawChar}")
-                })
-            ui.updateIt { it.copy(candidates = candidates) }
+            updateCandidateSelection(getPunctuationMarks())
             return
             // pass through
         }
@@ -120,8 +109,10 @@ class Engine(
         if (action == Action.Shift) {
             shiftMode = !shiftMode
             if (isComposing()) {
-                expandPrefixesTo(_candidates)
-                updateCandidateSelection(_candidates, preserveSel = true)
+                updateCandidateSelection(
+                    sortByLength(expandPrefixes(prefixes)).toSet(),
+                    preserveSel = true,
+                )
             }
             return
         }
@@ -130,8 +121,13 @@ class Engine(
             if (isComposing()) {
                 fullSequence.apply { deleteAt(lastIndex) }
                 prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
-                expandPrefixesTo(_candidates)
-                updateCandidateSelection(_candidates)
+                updateCandidateSelection(
+                    if (prefixes.isNotEmpty())
+                        sortByLength(expandPrefixes(prefixes)).toSet()
+                    else if (fullSequence.toString().lastOrNull() == Action.One.rawChar)
+                        getPunctuationMarks()
+                    else emptySet()
+                )
             } else {
                 inputConnection.deleteSurroundingText(1, 0)
             }
@@ -166,32 +162,50 @@ class Engine(
             prefixes = _prefixes
             prefixesCache[fullSequence.toString()] = _prefixes
         }
-        expandPrefixesTo(_candidates)
-        updateCandidateSelection(_candidates)
+        updateCandidateSelection(
+            sortByLength(
+                expandPrefixes(prefixes)
+            ).toSet()
+        )
     }
 
-    private fun expandPrefixesTo(_candidates: LinkedHashSet<String>) {
-        prefixes.forEach { pf ->
-            if (trie.containsPrefix(pf)) {
-                _candidates.addAll(
-                    trie.prefixSearch(pf)
-                )
+    private fun getPunctuationMarks(): Set<String> = buildSet {
+        addAll(
+            NumericSubstitution.VN.forNum(Action.One.rawChar!!)
+                .map { "$it" })
+        //add("${Action.One.rawChar}")
+    }
+
+    private fun expandPrefixes(prefixes: Set<String>): Set<String> {
+        return buildSet {
+            prefixes.forEach { pf ->
+                if (trie.containsPrefix(pf))
+                    addAll(trie.prefixSearch(pf))
             }
         }
     }
 
+    private fun expandPrefixesTo(_candidates: LinkedHashSet<String>) {
+        _candidates.addAll(
+            expandPrefixes(prefixes)
+        )
+    }
+
+    private fun sortByLength(cands: Set<String>) = cands
+        .groupBy { it.length }
+        .values.flatten().run {
+            if (!shiftMode) this
+            else map { it.replaceFirstChar(Char::uppercaseChar) }
+        }
+
     private fun updateCandidateSelection(cands: Set<String>, preserveSel: Boolean = false) {
         candidates = CandidateSelection.from(
-            cands
-                .groupBy { it.length }
-                .values.flatten().run {
-                    if (!shiftMode) this
-                    else map { it.replaceFirstChar(Char::uppercaseChar) }
-                }
+            buildList {
+                addAll(cands)
                 // Put number sequence as the last candidate.
-                .toMutableList().also {
-                    it.add(fullSequence.toString())
-                },
+                if (fullSequence.isNotEmpty())
+                    add(fullSequence.toString())
+            },
             if (preserveSel) candidates.selectedCandidateId else 0
         )
         ui.updateIt { it.copy(candidates = candidates) }
@@ -209,6 +223,11 @@ class Engine(
     fun selectCandidate(candidateId: Int) {
         candidates = candidates.select(candidateId)
         ui.updateIt { it.copy(candidates = candidates) }
+    }
+
+    fun switchMode(editorInfo: EditorInfo) {
+        mode = editorInfo
+        ui.update { copy(mode = editorInfo.aClass) }
     }
 
 }

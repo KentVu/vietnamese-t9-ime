@@ -1,24 +1,20 @@
 package com.github.kentvu.t9vietnamese.android
 
 import android.inputmethodservice.InputMethodService
+import android.text.InputType
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
-import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
-import com.github.kentvu.t9vietnamese.ui.ComposeUI
 import com.github.kentvu.t9vietnamese.T9App
+import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
-import kotlinx.coroutines.flow.MutableStateFlow
+import android.view.inputmethod.EditorInfo as AEditorInfo
 
 class T9Vietnamese : InputMethodService() {
-    companion object {
-        private val log = Logger.tag("T9VietnameseIME")
-    }
     private lateinit var inputView: ComposeView
     private lateinit var candidatesView: ComposeView
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
@@ -85,10 +81,12 @@ class T9Vietnamese : InputMethodService() {
         return candidatesView
     }
 
-    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
+    override fun onStartInputView(info: AEditorInfo?, restarting: Boolean) {
         keyboardViewLifecycleOwner.onResume()
         log.debug("onStartInputView:EditorInfo=type=${info?.inputType?.toString(16)}")
-    }
+        if (info == null) return
+        ui.onStartInputView(EditorInfo.fromNative(info))
+      }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         keyboardViewLifecycleOwner.onPause()
@@ -99,4 +97,16 @@ class T9Vietnamese : InputMethodService() {
         keyboardViewLifecycleOwner.onDestroy()
     }
 
+    companion object {
+        private fun EditorInfo.Companion.fromNative(info: AEditorInfo): EditorInfo {
+            return EditorInfo(when(info.inputType and InputType.TYPE_MASK_CLASS){
+                InputType.TYPE_CLASS_NUMBER,
+                InputType.TYPE_CLASS_DATETIME,
+                InputType.TYPE_CLASS_PHONE -> EditorInfo.Class.Number
+                else ->  EditorInfo.Class.Normal
+            })
+        }
+        private val log = Logger.tag("T9VietnameseIME")
+    }
 }
+

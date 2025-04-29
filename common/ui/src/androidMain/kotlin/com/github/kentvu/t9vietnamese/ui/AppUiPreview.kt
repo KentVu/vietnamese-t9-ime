@@ -24,6 +24,7 @@ fun AppPreview() {
                     is KeypadEvent.CandidateSelect -> TODO()
                     KeypadEvent.CloseRequest -> TODO()
                     is KeypadEvent.KeyPress -> TODO()
+                    is KeypadEvent.InputViewStart -> TODO()
                 }
               }
         ),

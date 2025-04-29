@@ -1,5 +1,6 @@
 package com.github.kentvu.t9vietnamese.model
 
+/** Collections of key slots. */
 class KeyPad(
     val Shift: Key,
     val keyBackspace: Key,
