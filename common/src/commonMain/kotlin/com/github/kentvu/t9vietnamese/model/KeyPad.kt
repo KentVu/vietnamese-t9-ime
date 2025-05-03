@@ -1,7 +1,7 @@
 package com.github.kentvu.t9vietnamese.model
 
 /** Collections of key slots. */
-class KeyPad(
+abstract class KeyPad(
     val Shift: Key,
     val keyBackspace: Key,
     val keyStar: Key,
@@ -18,7 +18,8 @@ class KeyPad(
     val key9: Key,
     val key0: Key,
 ) {
-    
+
+    abstract val punctualMarksKey: Key
     private val keys = setOf(
         key1, key2, key3,
         key4, key5, key6,
@@ -26,10 +27,24 @@ class KeyPad(
         key0,
     )
 
+    fun findKey(a: Action): Key {
+        return keys.firstOrNull { key ->
+            key.action == a
+        } ?: throw IllegalArgumentException("KeyPad: No key found for $a!")
+    }
+
     fun findKey(c: Char): Key {
         return keys.firstOrNull { key ->
             key.action.rawChar == c
-        } ?: throw IllegalArgumentException("No key found for $c!")
+        } ?: throw IllegalArgumentException("KeyPad: No key found for $c!")
+    }
+
+    fun numericSubstitution(c: Char): String {
+        return findKey(c).subChars ?: error("Not a number($c)!!")
+    }
+
+    fun numericSubstitution(a: Action): String {
+        return findKey(a).subChars ?: error("Not a number($a)!!")
     }
 
     fun describe(): String {

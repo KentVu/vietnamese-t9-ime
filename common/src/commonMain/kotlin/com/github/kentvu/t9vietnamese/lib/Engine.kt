@@ -1,7 +1,6 @@
 package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.UI
-import com.github.kentvu.t9vietnamese.UI.Companion.updateIt
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
@@ -16,6 +15,7 @@ class Engine(
     private val trie: Trie,
 ) {
     private var mode = EditorInfo(EditorInfo.Class.Normal)
+    private var keyPad = VNKeys
     private val inputConnection: InputSystemConnection = ui.inputConnection
     private var candidates: CandidateSelection = CandidateSelection()
     private val fullSequence = StringBuilder(10)
@@ -36,15 +36,101 @@ class Engine(
     }
 
     fun type(action: Action) {
+        if (mode.aClass == EditorInfo.Class.Normal)
+            typeNormal(action)
+        if (mode.aClass == EditorInfo.Class.Number)
+            typeNumber(action)
+    }
+
+    private fun typeNumber(action: Action) {
+        if (action == Action.Ok) {
+            inputConnection.performEditorAction()
+            return
+        }
+        if (action == Action.Return) {
+            inputConnection.commitText(candidates.selectedCandidate.text)
+            return
+        }
+        if (action == Action.One) {
+            if (isComposing()) {
+                inputConnection.commitText(candidates.selectedCandidate.text)
+                reset()
+            }
+            fullSequence.append(Action.One.rawChar)
+            updateCandidateSelection(getPunctuationMarks())
+            return
+            // pass through
+        }
+        val _candidates = linkedSetOf<String>()
+        if (action == Action.Shift) {
+            shiftMode = !shiftMode
+            if (isComposing()) {
+                updateCandidateSelection(
+                    sortByLength(expandPrefixes(prefixes)).toSet(),
+                    preserveSel = true,
+                )
+            }
+            return
+        }
+
+        if (action == Action.Backspace) {
+            if (isComposing()) {
+                fullSequence.apply { deleteAt(lastIndex) }
+                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
+                updateCandidateSelection(
+                    if (prefixes.isNotEmpty())
+                        sortByLength(expandPrefixes(prefixes)).toSet()
+                    else if (fullSequence.toString().lastOrNull() == Action.One.rawChar)
+                        getPunctuationMarks()
+                    else emptySet()
+                )
+            } else {
+                inputConnection.deleteSurroundingText(1, 0)
+            }
+            return
+        }
+
+        fullSequence.append(action.rawChar)
+        val _prefixes = linkedSetOf<String>()
+        val subChars = keyPad.numericSubstitution(action)
+        if (fullSequence.length == 1) {
+            // Only start searching from 2nd key to prevent too many candidates
+            subChars.map { "$it" }.forEach { c ->
+              if (trie.containsPrefix(c)) {
+                  _candidates.add(c)
+                  _prefixes.add(c)
+              }
+          }
+            prefixes = _prefixes
+            prefixesCache[fullSequence.toString()] = _prefixes
+        } else {
+            prefixes.forEach { pf ->
+                subChars.forEach { sc ->
+                    if (trie.containsPrefix(pf + sc)) {
+                        _prefixes.add(pf + sc)
+                    }
+                }
+            }
+            prefixes = _prefixes
+            prefixesCache[fullSequence.toString()] = _prefixes
+        }
+        updateCandidateSelection(
+            sortByLength(
+                expandPrefixes(prefixes)
+            ).toSet()
+        )
+    }
+
+    fun typeNormal(action: Action) {
         if (action == Action.Clear) {
             reset()
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Star) {
             //ui.update(UI.UpdateEvent.SelectNextCandidate)
             candidates = candidates.advanceSelectedCandidate()
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Hash) {
@@ -54,7 +140,7 @@ class Engine(
             ui.update(UI.UpdateEvent.UpdateCandidates(candidates))*/
             // Hash button: select the number sequence.
             candidates = candidates.select(candidates.lastIndex())
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Space) {
@@ -65,7 +151,7 @@ class Engine(
                 inputConnection.commitText("${Action.Space.rawChar}")
             }
             reset()
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Ok) {
@@ -75,7 +161,7 @@ class Engine(
                 inputConnection.performEditorAction()
             }
             reset()
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Return) {
@@ -86,7 +172,7 @@ class Engine(
                 inputConnection.commitText("\n")
             }
             reset()
-            ui.updateIt { it.copy(candidates = candidates) }
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
         if (action == Action.Zero) {
@@ -136,11 +222,7 @@ class Engine(
 
         fullSequence.append(action.rawChar)
         val _prefixes = linkedSetOf<String>()
-        // TODO inject subChars
-        val subChars = // TODO move to Action
-            NumericSubstitution.VN.forNum(
-            action.rawChar ?: error("Should be typing action here")
-        )
+        val subChars = keyPad.numericSubstitution(action)
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
             subChars.map { "$it" }.forEach { c ->
@@ -171,8 +253,8 @@ class Engine(
 
     private fun getPunctuationMarks(): Set<String> = buildSet {
         addAll(
-            NumericSubstitution.VN.forNum(Action.One.rawChar!!)
-                .map { "$it" })
+            keyPad.punctualMarksKey.subChars
+                ?.map { "$it" } ?: error("Punctual marks key should define punctual marks!!"))
         //add("${Action.One.rawChar}")
     }
 
@@ -208,7 +290,7 @@ class Engine(
             },
             if (preserveSel) candidates.selectedCandidateId else 0
         )
-        ui.updateIt { it.copy(candidates = candidates) }
+        ui.updateState { it.copy(candidates = candidates) }
     }
 
     private fun isComposing() = candidates.isNotEmpty()
@@ -222,12 +304,19 @@ class Engine(
 
     fun selectCandidate(candidateId: Int) {
         candidates = candidates.select(candidateId)
-        ui.updateIt { it.copy(candidates = candidates) }
+        ui.updateState { it.copy(candidates = candidates) }
     }
 
     fun switchMode(editorInfo: EditorInfo) {
         mode = editorInfo
-        ui.update { copy(mode = editorInfo.aClass) }
+        keyPad = when (mode.aClass) {
+            EditorInfo.Class.Normal -> VNKeys
+            EditorInfo.Class.Number -> TODO("Number KeyPad")
+        }
+        ui.updateState { it.copy(
+            mode = editorInfo.aClass,
+            keyPad = it.keyPad
+        ) }
     }
 
 }

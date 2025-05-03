@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,8 +30,8 @@ import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
-import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,8 +47,8 @@ class ImeServiceUI(
 
     private val imServiceEventSource = MutableSharedFlow<EditorInfo>(extraBufferCapacity = 1)
 
-    override fun update(manipulator: State.() -> State) {
-        this.stateSource.update { it.manipulator() }
+    override fun updateState(manipulator: (State) -> State) {
+        this.stateSource.update { manipulator(it) }
     }
 
     @Composable
@@ -67,7 +68,7 @@ class ImeServiceUI(
         Keypad(
             modifier,
             state.initialized,
-            state.mode,
+            state.keyPad,
         ) { key, isLong ->
             if (isLong) {
                 if (key.longAction != null)
@@ -89,7 +90,7 @@ class ImeServiceUI(
     fun Keypad(
         modifier: Modifier = Modifier,
         keysEnabled: Boolean,
-        mode: EditorInfo.Class,
+        keyPad: KeyPad,
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         //Napier.d("Recompose ${getThreadId()}")
@@ -106,8 +107,8 @@ class ImeServiceUI(
             ) {
                 @Composable
                 fun KeyboardRow(vararg keys: Key) =
-                    KeyboardRow(onKeyClick, keysEnabled, mode, *keys)
-                with(VNKeys) {
+                    KeyboardRow(onKeyClick, keysEnabled, *keys)
+                with(keyPad) {
                     KeyboardRow(Shift, keyOk, keyBackspace)
                     KeyboardRow(key1, key2, key3)
                     KeyboardRow(key4, key5, key6)
@@ -162,7 +163,6 @@ class ImeServiceUI(
     private fun KeyboardRow(
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
         keysEnabled: Boolean,
-        mode: EditorInfo.Class,
         vararg keys: Key
     ) {
         Row {
@@ -170,7 +170,7 @@ class ImeServiceUI(
                 .padding(1.dp)
                 .weight(1F)
             for (key in keys) {
-                ComposableKey(key, mod, keysEnabled, mode, onKeyClick)
+                ComposableKey(key, mod, keysEnabled, onKeyClick)
             }
         }
     }
@@ -181,7 +181,6 @@ class ImeServiceUI(
         key: Key,
         modifier: Modifier,
         keysEnabled: Boolean,
-        mode: EditorInfo.Class,
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
         Button(
@@ -202,14 +201,7 @@ class ImeServiceUI(
                 Text(
                     if (key.longAction != null) {
                         key.longAction!!.displaySymbol
-                    } else if (rawChar != null) { /*if (key.action.type == Control)*/
-                        if (rawChar.isDigit()) {
-                            when (mode) {
-                                EditorInfo.Class.Normal -> NumericSubstitution.VN.forNum(rawChar)
-                                EditorInfo.Class.Number -> ""
-                            }
-                        } else "$rawChar"
-                    } else "",
+                    } else key.subChars.orEmpty(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
