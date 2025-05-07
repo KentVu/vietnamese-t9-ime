@@ -85,7 +85,8 @@ class T9Vietnamese : InputMethodService() {
         keyboardViewLifecycleOwner.onResume()
         log.debug("onStartInputView:EditorInfo=type=${info?.inputType?.toString(16)}")
         if (info == null) return
-        ui.onStartInputView(EditorInfo.fromNative(info))
+        if (ui.onStartInputView(EditorInfo.fromNative(info)).not())
+            log.error("Can't send onStartInputView")
       }
 
     override fun onFinishInputView(finishingInput: Boolean) {

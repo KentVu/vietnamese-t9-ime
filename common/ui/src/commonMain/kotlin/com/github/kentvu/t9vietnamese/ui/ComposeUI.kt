@@ -42,7 +42,6 @@ import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
-import com.github.kentvu.t9vietnamese.model.VNKeys
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

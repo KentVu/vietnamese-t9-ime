@@ -2,7 +2,7 @@ package com.github.kentvu.t9vietnamese.model
 
 /** Collections of key slots. */
 abstract class KeyPad(
-    val Shift: Key,
+    val Shift: Key?,
     val keyBackspace: Key,
     val keyStar: Key,
     val keyHash: Key,
@@ -24,7 +24,7 @@ abstract class KeyPad(
         key1, key2, key3,
         key4, key5, key6,
         key7, key8, key9,
-        key0,
+        keyStar, key0, keyHash
     )
 
     fun findKey(a: Action): Key {

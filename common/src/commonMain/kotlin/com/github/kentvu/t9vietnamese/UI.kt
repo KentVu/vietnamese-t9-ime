@@ -4,7 +4,7 @@ import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.KeyPad
-import com.github.kentvu.t9vietnamese.model.VNKeys
+import com.github.kentvu.t9vietnamese.model.KeyPads
 
 //abstract class UI(private val state: State) {
 interface UI {
@@ -17,8 +17,7 @@ interface UI {
         val initialized: Boolean = false,
         val closed: Boolean = false,
 
-        val mode: EditorInfo.Class = EditorInfo.Class.Normal,
-        val keyPad: KeyPad = VNKeys,
+        val keyPad: KeyPad = KeyPads.VN,
         val candidates: CandidateSelection = CandidateSelection(),
         //https://slackhq.github.io/circuit/states-and-events/
         val keypadEventSink : ((KeypadEvent) -> Unit)

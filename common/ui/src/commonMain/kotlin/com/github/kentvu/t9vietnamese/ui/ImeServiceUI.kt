@@ -17,13 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.UI.State
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
@@ -31,13 +32,13 @@ import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
-import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ImeServiceUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
@@ -46,6 +47,14 @@ class ImeServiceUI(
 ) : ComposeUI {
 
     private val imServiceEventSource = MutableSharedFlow<EditorInfo>(extraBufferCapacity = 1)
+    init {
+        scope.launch {
+            imServiceEventSource.collect {
+                log.debug("imServiceEventSource:new:$it")
+                stateSource.value.keypadEventSink(KeypadEvent.InputViewStart(it))
+            }
+        }
+    }
 
     override fun updateState(manipulator: (State) -> State) {
         this.stateSource.update { manipulator(it) }
@@ -79,10 +88,8 @@ class ImeServiceUI(
                 KeypadEvent.KeyPress(key.action)
             )
         }
-        LaunchedEffect(state) {
-            imServiceEventSource.collect {
-                state.keypadEventSink(KeypadEvent.InputViewStart(it))
-            }
+        rememberCoroutineScope().launch {
+            // moved to init block.
         }
     }
 
@@ -106,7 +113,7 @@ class ImeServiceUI(
                 horizontalAlignment = Alignment.End,
             ) {
                 @Composable
-                fun KeyboardRow(vararg keys: Key) =
+                fun KeyboardRow(vararg keys: Key?) =
                     KeyboardRow(onKeyClick, keysEnabled, *keys)
                 with(keyPad) {
                     KeyboardRow(Shift, keyOk, keyBackspace)
@@ -163,7 +170,7 @@ class ImeServiceUI(
     private fun KeyboardRow(
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
         keysEnabled: Boolean,
-        vararg keys: Key
+        vararg keys: Key?
     ) {
         Row {
             val mod = Modifier
@@ -178,14 +185,15 @@ class ImeServiceUI(
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun ComposableKey(
-        key: Key,
+        key: Key?,
         modifier: Modifier,
         keysEnabled: Boolean,
         onKeyClick: (key: Key, isLong: Boolean) -> Unit,
     ) {
+        //if (key == null)
         Button(
-            onClick = { onKeyClick(key, false) },
-            onLongClick = { onKeyClick(key, true) },
+            onClick = { key?.let { onKeyClick(it, false) } },
+            onLongClick = { key?.let { onKeyClick(it, true) } },
             modifier = modifier,/*.semantics { text = buildAnnotatedString { append(key.symbol) } }*/
             enabled = keysEnabled
         ) {
@@ -194,14 +202,13 @@ class ImeServiceUI(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    key.action.displaySymbol,
+                    key?.action?.displaySymbol.orEmpty(),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                val rawChar = key.action.rawChar
                 Text(
-                    if (key.longAction != null) {
+                    if (key?.longAction != null) {
                         key.longAction!!.displaySymbol
-                    } else key.subChars.orEmpty(),
+                    } else key?.subChars.orEmpty(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -215,5 +222,9 @@ class ImeServiceUI(
 
     fun onStartInputView(info: EditorInfo): Boolean {
         return imServiceEventSource.tryEmit(info)
+    }
+
+    companion object {
+        private val log = Logger.tag("ImeServiceUI")
     }
 }

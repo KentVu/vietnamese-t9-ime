@@ -7,8 +7,8 @@ enum class Action(
 ) {
     Clear(null, 'C'),
     Backspace(null, '⌫'),
-    Star(null, '*'),
-    Hash(null, '#'),
+    Star('*'),
+    Hash('#'),
     Shift(null, '⇧'),
     Ok(null, "🆗"), // ✔,↵,
     One('1'),
@@ -22,7 +22,7 @@ enum class Action(
     Nine('9'),
     Zero('0'),
     Space(' ', '␣'),
-    Return(null, '⏎'),;
+    Return('\n', '⏎'),;
     constructor(rawChar: Char?, displayText: Char)
             : this(rawChar, "$displayText")
     val displaySymbol: String

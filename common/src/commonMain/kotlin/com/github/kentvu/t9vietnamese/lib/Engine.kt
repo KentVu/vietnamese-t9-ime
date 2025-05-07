@@ -1,21 +1,26 @@
 package com.github.kentvu.t9vietnamese.lib
 
+import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
+import com.github.kentvu.t9vietnamese.model.KeyPad
+import com.github.kentvu.t9vietnamese.model.KeyPads
 import com.github.kentvu.t9vietnamese.model.NumericSubstitution
+import kotlin.Exception
 import kotlin.apply
 import kotlin.text.deleteAt
 import kotlin.text.last
 import kotlin.text.lastIndex
 import kotlin.text.map
+import kotlin.text.orEmpty
 
 class Engine(
     private val ui: UI,
     private val trie: Trie,
 ) {
     private var mode = EditorInfo(EditorInfo.Class.Normal)
-    private var keyPad = VNKeys
+    private lateinit var keyPad: KeyPad
     private val inputConnection: InputSystemConnection = ui.inputConnection
     private var candidates: CandidateSelection = CandidateSelection()
     private val fullSequence = StringBuilder(10)
@@ -44,81 +49,57 @@ class Engine(
 
     private fun typeNumber(action: Action) {
         if (action == Action.Ok) {
-            inputConnection.performEditorAction()
-            return
-        }
-        if (action == Action.Return) {
-            inputConnection.commitText(candidates.selectedCandidate.text)
-            return
-        }
-        if (action == Action.One) {
             if (isComposing()) {
                 inputConnection.commitText(candidates.selectedCandidate.text)
                 reset()
-            }
-            fullSequence.append(Action.One.rawChar)
-            updateCandidateSelection(getPunctuationMarks())
+                ui.updateState { it.copy(candidates = candidates) }
+            } else inputConnection.performEditorAction()
             return
-            // pass through
         }
-        val _candidates = linkedSetOf<String>()
-        if (action == Action.Shift) {
-            shiftMode = !shiftMode
+        if (action == Action.Return) {
             if (isComposing()) {
-                updateCandidateSelection(
-                    sortByLength(expandPrefixes(prefixes)).toSet(),
-                    preserveSel = true,
-                )
+                inputConnection.commitText(candidates.selectedCandidate.text)
+                reset()
+                ui.updateState { it.copy(candidates = candidates) }
+            } else inputConnection.commitText("${Action.Return.rawChar}")
+            return
+        }
+        if (action == Action.Star) {
+            if (isComposing()) {
+                candidates = candidates.advanceSelectedCandidate()
+                ui.updateState { it.copy(candidates = candidates) }
+                return
             }
+        }
+        if (action == Action.Hash) {
+            // Hash button: Go to last candidate.
+            candidates = candidates.select(candidates.lastIndex())
+            ui.updateState { it.copy(candidates = candidates) }
             return
         }
 
         if (action == Action.Backspace) {
-            if (isComposing()) {
-                fullSequence.apply { deleteAt(lastIndex) }
-                prefixes = prefixesCache[fullSequence.toString()] ?: emptySet()
-                updateCandidateSelection(
-                    if (prefixes.isNotEmpty())
-                        sortByLength(expandPrefixes(prefixes)).toSet()
-                    else if (fullSequence.toString().lastOrNull() == Action.One.rawChar)
-                        getPunctuationMarks()
-                    else emptySet()
-                )
-            } else {
-                inputConnection.deleteSurroundingText(1, 0)
-            }
+            inputConnection.deleteSurroundingText(1, 0)
             return
         }
 
-        fullSequence.append(action.rawChar)
-        val _prefixes = linkedSetOf<String>()
-        val subChars = keyPad.numericSubstitution(action)
-        if (fullSequence.length == 1) {
-            // Only start searching from 2nd key to prevent too many candidates
-            subChars.map { "$it" }.forEach { c ->
-              if (trie.containsPrefix(c)) {
-                  _candidates.add(c)
-                  _prefixes.add(c)
-              }
-          }
-            prefixes = _prefixes
-            prefixesCache[fullSequence.toString()] = _prefixes
-        } else {
-            prefixes.forEach { pf ->
-                subChars.forEach { sc ->
-                    if (trie.containsPrefix(pf + sc)) {
-                        _prefixes.add(pf + sc)
-                    }
-                }
-            }
-            prefixes = _prefixes
-            prefixesCache[fullSequence.toString()] = _prefixes
+        val subChars = try {
+            keyPad.numericSubstitution(action)
+        } catch (e: Exception) {
+            null
         }
-        updateCandidateSelection(
-            sortByLength(
-                expandPrefixes(prefixes)
-            ).toSet()
-        )
+        if (subChars != null) {
+            candidates = CandidateSelection.from(buildList {
+                addAll(subChars.map { "$it" })
+                add("${action.rawChar}")
+            })
+            log.debug("updateState:$candidates")
+            ui.updateState { it.copy(candidates = candidates) }
+        } else {
+            inputConnection.commitText("${action.rawChar}")
+            reset()
+            ui.updateState { it.copy(candidates = candidates) }
+        }
     }
 
     fun typeNormal(action: Action) {
@@ -185,9 +166,11 @@ class Engine(
             if (isComposing()) {
                 inputConnection.commitText(candidates.selectedCandidate.text)
                 reset()
+                ui.updateState { it.copy(candidates = candidates) }
+            } else {
+                fullSequence.append(Action.One.rawChar)
+                updateCandidateSelection(getPunctuationMarks())
             }
-            fullSequence.append(Action.One.rawChar)
-            updateCandidateSelection(getPunctuationMarks())
             return
             // pass through
         }
@@ -309,14 +292,17 @@ class Engine(
 
     fun switchMode(editorInfo: EditorInfo) {
         mode = editorInfo
+        //keyPad = KeyPads.VN
         keyPad = when (mode.aClass) {
-            EditorInfo.Class.Normal -> VNKeys
-            EditorInfo.Class.Number -> TODO("Number KeyPad")
+            EditorInfo.Class.Normal -> KeyPads.VN
+            EditorInfo.Class.Number -> KeyPads.Numeric
         }
         ui.updateState { it.copy(
-            mode = editorInfo.aClass,
-            keyPad = it.keyPad
+            keyPad = keyPad
         ) }
     }
 
+    companion object {
+        private val log = Logger.tag("Engine")
+    }
 }
