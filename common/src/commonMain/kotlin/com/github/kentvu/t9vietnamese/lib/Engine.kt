@@ -83,6 +83,12 @@ class Engine(
             return
         }
 
+        if(isComposing()) {
+            inputConnection.commitText(candidates.selectedCandidate.text)
+            reset()
+            ui.updateState { it.copy(candidates = candidates) }
+        }
+
         val subChars = try {
             keyPad.numericSubstitution(action)
         } catch (e: Exception) {

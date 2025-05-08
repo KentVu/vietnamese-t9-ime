@@ -31,15 +31,8 @@ kotlin {
         }
         named("androidMain") {
             kotlin.srcDirs("src/jvmMain/kotlin")
-            dependencies {
-                api(libs.androidx.appcompat)
-                api(libs.androidx.core.ktx)
-            }
         }
         val jvmMain by getting {
-            dependencies {
-                //implementation("com.squareup.okio:okio:3.2.0")
-            }
         }
         val commonTest by getting {
             dependencies {
