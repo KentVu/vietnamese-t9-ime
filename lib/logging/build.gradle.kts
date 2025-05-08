@@ -13,6 +13,9 @@ kotlin {
     }
   }
   jvm()
+  js(IR) {
+    browser()
+  }
 
   /*iosX64()
   iosArm64()

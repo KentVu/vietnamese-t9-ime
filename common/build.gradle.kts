@@ -13,16 +13,15 @@ kotlin {
             }
         }
     }
-    /*js(IR) {
+    js(IR) {
         browser()
-    }*/
+    }
 
     sourceSets {
         named("commonMain") {
             dependencies {
                 implementation(project(":dawg-kotlin"))
                 implementation(project(":lib:logging"))
-                //implementation(kotlin("coroutines"))
                 implementation(libs.kotlinx.coroutines.core)
                 //implementation("org.jetbrains:annotations:15.0")
                 api(libs.okio)

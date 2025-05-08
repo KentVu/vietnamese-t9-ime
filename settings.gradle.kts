@@ -1,14 +1,14 @@
 rootProject.name = "T9Vietnamese"
 
 include(":dawg-kotlin")
-include(":lib")
+//include(":lib")
 include(":lib:logging")
 include(":common")
 include(":common:ui")
 include(":app")
 include(":console")
 include(":desktop")
-//include(":web")
+include(":webDemo")
 //include(":sharedJvmTest")
 
 pluginManagement {
