@@ -16,4 +16,5 @@ shared/shared.podspec
 # MSOffice working file?
 ~$*
 .kotlin/sessions/
+.kotlin/metadata/kotlinTransformedMetadataLibraries
 *.dawg
