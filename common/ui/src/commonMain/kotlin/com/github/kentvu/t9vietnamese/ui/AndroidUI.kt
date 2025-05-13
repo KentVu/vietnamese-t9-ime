@@ -2,7 +2,6 @@ package com.github.kentvu.t9vietnamese.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +10,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -40,9 +37,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
+import com.github.kentvu.t9vietnamese.FakeInputConnection
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.UI
-import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
@@ -54,7 +51,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class AndroidUI(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State {}),
-    private val _ic: InputConnection = InputConnection(),
+    private val _ic: FakeInputConnection = FakeInputConnection(),
     private val close: () -> Unit,
     private val launchSystemImSettings: () -> Unit,
     private val launchImePicker: () -> Unit,
@@ -129,25 +126,6 @@ class AndroidUI(
             return map[key]
         }
 
-    }
-
-    /** Fake InputConnection for demonstrating this IM's functions. */
-    class InputConnection(): InputSystemConnection {
-        var confirmedText by mutableStateOf("")
-        override fun commitText(text: String) {
-            confirmedText = confirmedText + text
-        }
-
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-            confirmedText = confirmedText.dropLast(1)
-        }
-
-        override fun performEditorAction() {
-            log.info("TODO(performEditorAction)")
-        }
-        companion object {
-            private val log = Logger.tag("DefaultInputConnection")
-        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

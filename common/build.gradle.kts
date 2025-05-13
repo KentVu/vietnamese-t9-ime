@@ -23,7 +23,8 @@ kotlin {
                 implementation(project(":dawg-kotlin"))
                 implementation(project(":lib:logging"))
                 implementation(libs.kotlinx.coroutines.core)
-                //implementation("org.jetbrains:annotations:15.0")
+                //just want to use the library without applying the plugin.
+                implementation("org.jetbrains.compose.runtime:runtime:" + libs.versions.compose.multiplatform.get())
                 api(libs.okio)
                 implementation(libs.doistx.normalize)
             }

@@ -1,5 +1,7 @@
 package com.github.kentvu.t9vietnamese.web
 
+import androidx.compose.runtime.Composable
+import com.github.kentvu.lib.logging.NapierLogger
 import org.jetbrains.compose.web.attributes.value
 import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.css.em
@@ -17,11 +19,10 @@ import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 
 fun main() {
+  NapierLogger.init()
   renderComposable(rootElementId = "root") {
     Main {
-      Div({
-        classes("container", "py-5")
-      }) {
+      Div({ classes("container", "py-5") }) {
         H2({
           classes("pb-2", "px-4", "border-bottom")
         }) {
@@ -62,9 +63,7 @@ fun main() {
                 }
               }
               Div({ classes("keypad") }) {
-                Button({ classes("key", "key-1"); value("1") }) {
-                  Text("1")
-                }
+                Key()
                 Button({ classes("key", "key-2"); value("2") }) {
                   Text("2 ")
                   Small { Text("abc") }
@@ -105,5 +104,12 @@ fun main() {
         }
       }
     }
+  }
+}
+
+@Composable
+private fun Key() {
+  Button({ classes("key", "key-1"); value("1") }) {
+    Text("1")
   }
 }

@@ -2,7 +2,6 @@ package com.github.kentvu.t9vietnamese.jvm
 
 import com.github.kentvu.t9vietnamese.lib.DawgTrie
 import com.github.kentvu.t9vietnamese.model.Trie
-import com.github.kentvu.t9vietnamese.model.VietnameseWordList
 import okio.FileSystem
 import kotlin.test.Test
 
@@ -11,7 +10,8 @@ internal class DawgTrieTest {
     fun trieTest() {
         val trie: Trie =
             DawgTrie(
-                VietnameseWordList,
+                DecomposedVietnameseWords(
+    DecomposedVietnameseWords::class.java.classLoader?.getResourceAsStream("vi-DauMoi.dic")!!.source()),
                 FileSystem.SYSTEM
             )
         trie.load()
