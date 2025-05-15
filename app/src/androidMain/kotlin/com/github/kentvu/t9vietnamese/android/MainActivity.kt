@@ -1,7 +1,6 @@
 package com.github.kentvu.t9vietnamese.android
 
 import android.content.Intent
-import android.inputmethodservice.InputMethodService
 import android.os.Bundle
 import android.provider.Settings
 import android.view.KeyEvent
@@ -12,12 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.T9App
-import com.github.kentvu.t9vietnamese.ui.AndroidUI
+import com.github.kentvu.t9vietnamese.ui.AndroidPresenter
 
 class MainActivity : ComponentActivity() {
 
     private val ui by lazy {
-        AndroidUI(
+        AndroidPresenter(
             lifecycleScope,
             close = { finish() },
             launchSystemImSettings = {

@@ -1,22 +1,19 @@
 package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.lib.logging.Logger
-import com.github.kentvu.t9vietnamese.UI
+import com.github.kentvu.t9vietnamese.Presenter
 import com.github.kentvu.t9vietnamese.model.*
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.KeyPads
-import com.github.kentvu.t9vietnamese.model.NumericSubstitution
 import kotlin.Exception
 import kotlin.apply
 import kotlin.text.deleteAt
-import kotlin.text.last
 import kotlin.text.lastIndex
 import kotlin.text.map
-import kotlin.text.orEmpty
 
 class Engine(
-    private val ui: UI,
+    private val ui: Presenter,
     private val trie: Trie,
 ) {
     private var mode = EditorInfo(EditorInfo.Class.Normal)

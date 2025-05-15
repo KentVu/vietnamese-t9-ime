@@ -39,23 +39,22 @@ import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.FakeInputConnection
 import com.github.kentvu.t9vietnamese.KeypadEvent
-import com.github.kentvu.t9vietnamese.UI
+import com.github.kentvu.t9vietnamese.Presenter
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class AndroidUI(
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-    private val stateSource: MutableStateFlow<UI.State> = MutableStateFlow(UI.State {}),
+class AndroidPresenter(
+    private val scope: CoroutineScope,
+    private val stateSource: MutableStateFlow<Presenter.State> = MutableStateFlow(Presenter.State {}),
     private val _ic: FakeInputConnection = FakeInputConnection(),
     private val close: () -> Unit,
     private val launchSystemImSettings: () -> Unit,
     private val launchImePicker: () -> Unit,
-) : ComposeUI by ImeServiceUI(scope, stateSource, _ic) {
+) : ComposeUI by ImeServicePresenter(scope, stateSource, _ic) {
 
     private val keyEventSource = MutableSharedFlow<KeyEvent>(extraBufferCapacity = 1)
 
@@ -66,7 +65,7 @@ class AndroidUI(
     /** Translates [KeyEvent] to [Action] */
     private fun handleKeyEvent(
         keyEvent: KeyEvent,
-        state: UI.State,
+        state: Presenter.State,
     ) {
         if (keyEvent.isCtrlQ()) {
             state.keypadEventSink(KeypadEvent.CloseRequest)

@@ -25,6 +25,8 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 //just want to use the library without applying the plugin.
                 implementation("org.jetbrains.compose.runtime:runtime:" + libs.versions.compose.multiplatform.get())
+                //could've done this but I don't want to apply the pkugin.
+                //implementation(compose.runtime)
                 api(libs.okio)
                 implementation(libs.doistx.normalize)
             }

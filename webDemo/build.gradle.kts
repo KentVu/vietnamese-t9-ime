@@ -49,7 +49,8 @@ kotlin {
         implementation(project(":lib:logging"))
         implementation(compose.html.core)
         implementation(compose.runtime)
-        implementation(npm("highlight.js", "10.7.2"))
+        implementation(libs.kotlinx.coroutines.core)
+        implementation(libs.okio.fakefilesystem)
       }
     }
   }

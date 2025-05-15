@@ -10,7 +10,7 @@ import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.model.EditorInfo
-import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
+import com.github.kentvu.t9vietnamese.ui.ImeServicePresenter
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
 import android.view.inputmethod.EditorInfo as AEditorInfo
 
@@ -20,7 +20,7 @@ class T9Vietnamese : InputMethodService() {
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     private val scope = keyboardViewLifecycleOwner.lifecycleScope
     private val ui by lazy {
-        ImeServiceUI(
+        ImeServicePresenter(
             scope,
             inputConnection = object : InputSystemConnection {
                 override fun commitText(text: String) {

@@ -1,21 +1,21 @@
 package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.lib.logging.Logger
-import com.github.kentvu.t9vietnamese.UI.Companion.update
+import com.github.kentvu.t9vietnamese.Presenter.Companion.update
 import com.github.kentvu.t9vietnamese.lib.Engine
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.Trie
 
 class Backend(
     private val trie: Trie,
-    private val ui: UI,
+    private val presenter: Presenter,
 ) {
     private var initialized: Boolean = false
-    private val engine = Engine(ui, trie)
+    private val engine = Engine(presenter, trie)
 
     fun init() {
         trie.load()
-        ui.update { copy(
+        presenter.update { copy(
             initialized = true,
             keypadEventSink = ::onUiEvent
         ) }
@@ -24,7 +24,7 @@ class Backend(
     fun onUiEvent(ev: KeypadEvent) {
         when (ev) {
             is KeypadEvent.KeyPress -> onKeyPress(ev.action)
-            KeypadEvent.CloseRequest -> ui.update { copy(closed = true) }
+            KeypadEvent.CloseRequest -> presenter.update { copy(closed = true) }
             is KeypadEvent.CandidateSelect -> engine.selectCandidate(ev.candidateId)
             is KeypadEvent.InputViewStart -> engine.switchMode(ev.editorInfo)
         }

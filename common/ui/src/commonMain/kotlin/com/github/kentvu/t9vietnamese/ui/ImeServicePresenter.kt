@@ -26,7 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.KeypadEvent
-import com.github.kentvu.t9vietnamese.UI.State
+import com.github.kentvu.t9vietnamese.Presenter.State
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
@@ -34,14 +34,13 @@ import com.github.kentvu.t9vietnamese.model.Key
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.ui.ComposeUI.Semantic
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ImeServiceUI(
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+class ImeServicePresenter(
+    private val scope: CoroutineScope,
     private val stateSource: MutableStateFlow<State> = MutableStateFlow(State {}),
     override val inputConnection: InputSystemConnection,
 ) : ComposeUI {
