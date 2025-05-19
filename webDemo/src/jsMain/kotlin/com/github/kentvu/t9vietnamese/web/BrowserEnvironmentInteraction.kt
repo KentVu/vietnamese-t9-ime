@@ -6,8 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import okio.FileSystem
 import okio.Source
 import okio.fakefilesystem.FakeFileSystem
+import t9vietnamese.common.generated.resources.Res
 
-class BrowserEnvironmentInteraction: EnvironmentInteraction {
+object BrowserEnvironmentInteraction: EnvironmentInteraction {
   override val mainDispatcher: CoroutineDispatcher
     = Dispatchers.Main
   override val ioDispatcher: CoroutineDispatcher
@@ -15,5 +16,5 @@ class BrowserEnvironmentInteraction: EnvironmentInteraction {
   override val fileSystem: FileSystem
     = FakeFileSystem()
   override val vnWordsSource: Source
-    = TODO("Not yet implemented")
+    get() = Res.getUri("files/vi-DauMoi.dic")
 }

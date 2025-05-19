@@ -2,18 +2,23 @@ package com.github.kentvu.t9vietnamese.web
 
 import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.T9App
+import com.github.kentvu.t9vietnamese.web.BrowserEnvironmentInteraction
 import kotlinx.coroutines.MainScope
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H2
 import org.jetbrains.compose.web.dom.Img
 import org.jetbrains.compose.web.dom.Main
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
+import t9vietnamese.common.generated.resources.Res
 
+@OptIn(ExperimentalResourceApi::class)
 fun main() {
   val scope = MainScope()
-  val app = T9App()
-  val ui = WebPresenter(scope)
+  val env = BrowserEnvironmentInteraction
+  //val app = T9App()
+  val ui = WebPresenter(/*scope*/)
   NapierLogger.init()
 
   renderComposable(rootElementId = "root") {
@@ -37,6 +42,7 @@ fun main() {
             Div({
               classes("feature-icon", "d-inline-flex", "align-items-center", "justify-content-center", "text-bg-primary", "bg-gradient", "fs-2", "mb-3")
             }) {
+              Text(Res.getUri("files/vi-DauMoi.dic"))
             }
           }
         }

@@ -1,16 +1,19 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.multiplatform)
+    // For compose-resource
+    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
     //applyDefaultHierarchyTemplate()
     jvm()
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = libs.versions.jvmTarget.get()
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
         }
     }
     js(IR) {
@@ -23,10 +26,9 @@ kotlin {
                 implementation(project(":dawg-kotlin"))
                 implementation(project(":lib:logging"))
                 implementation(libs.kotlinx.coroutines.core)
-                //just want to use the library without applying the plugin.
-                implementation("org.jetbrains.compose.runtime:runtime:" + libs.versions.compose.multiplatform.get())
-                //could've done this but I don't want to apply the pkugin.
-                //implementation(compose.runtime)
+                implementation(compose.runtime)
+                // For sharing vnWordList
+                api(compose.components.resources)
                 api(libs.okio)
                 implementation(libs.doistx.normalize)
             }
@@ -53,6 +55,12 @@ kotlin {
     }
 }
 
+compose.resources {
+    //packageOfResClass = "com.finggallink.mmwave.notification.ui"
+    //generateResClass = always
+    publicResClass = true
+}
+
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     namespace = "com.github.kentvu.t9vietnamese.common"
@@ -64,16 +72,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    sourceSets {
-        named("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-            res.srcDirs("src/androidMain/res")
-            // Share resources from commonMain
-            // https://luisramos.dev/how-to-share-resources-kmm
-            resources {
-                srcDir("src/commonMain/resources")
-            }
-        }
     }
 }

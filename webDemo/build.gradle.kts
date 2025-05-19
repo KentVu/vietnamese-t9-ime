@@ -49,6 +49,7 @@ kotlin {
         implementation(project(":lib:logging"))
         implementation(compose.html.core)
         implementation(compose.runtime)
+        implementation(compose.components.resources)
         implementation(libs.kotlinx.coroutines.core)
         implementation(libs.okio.fakefilesystem)
       }

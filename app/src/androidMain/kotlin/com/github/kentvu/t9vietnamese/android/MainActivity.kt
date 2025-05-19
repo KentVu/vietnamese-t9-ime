@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.Text
 import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
@@ -38,9 +39,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         NapierLogger.init()
-        app.start()
-        setContent {
-            ui.AppUi()
+        try {
+            app.start()
+            setContent {
+                ui.AppUi()
+            }
+        } catch (e: Exception) {
+            setContent {
+                Text("Error: $e")
+            }
         }
     }
 
