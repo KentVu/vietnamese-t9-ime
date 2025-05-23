@@ -14,12 +14,16 @@ class Backend(
     private val engine = Engine(presenter, trie)
 
     fun init() {
-        trie.load()
-        presenter.update { copy(
-            initialized = true,
-            keypadEventSink = ::onUiEvent
-        ) }
-        initialized = true
+        try {
+            trie.load()
+            presenter.update { copy(
+                initialized = true,
+                keypadEventSink = ::onUiEvent
+            ) }
+            initialized = true
+        } catch (e: Exception) {
+            presenter.update { copy(error = Exception("Cannot load trie!", e)) }
+        }
     }
     fun onUiEvent(ev: KeypadEvent) {
         when (ev) {

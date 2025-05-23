@@ -2,11 +2,12 @@ package com.github.kentvu.t9vietnamese.model
 
 import doist.x.normalize.Form
 import doist.x.normalize.normalize
+import kotlinx.coroutines.flow.Flow
 import okio.Source
 import okio.buffer
 import okio.use
 
-class DecomposedVietnameseWords(private val ins: Source) : WordList {
+class DecomposedVietnameseWords(private val ins: Flow<Result<Source>>) : WordList {
 
     private val sortedWords by lazy {
         // use String's "natural" ordering
@@ -23,10 +24,6 @@ class DecomposedVietnameseWords(private val ins: Source) : WordList {
     }
     override val name: String
         get() = "DecomposedVietnameseWords"
-
-    override fun iterable(): Iterable<String> {
-        return sortedWords
-    }
 
     override fun toSet(): Set<String> {
         return sortedWords

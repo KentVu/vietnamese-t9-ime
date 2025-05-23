@@ -7,7 +7,11 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
             }
         } catch (e: Exception) {
             setContent {
-                Text("Error: $e")
+                Text("Error: $e", Modifier.padding(8.dp), Color.Red)
             }
         }
     }

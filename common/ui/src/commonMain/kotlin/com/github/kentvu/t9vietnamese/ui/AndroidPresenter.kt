@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -142,6 +143,8 @@ class AndroidPresenter(
                     verticalArrangement = Arrangement.Bottom,
                     modifier = Modifier.fillMaxSize().padding(innerPadding)
                 ) {
+                    if (state.error != null)
+                        Text("Error: ${state.error}", Modifier, Color.Red)
                     GuideUserUI(/*Modifier.weight(1f)*/)
                     Row(Modifier.selectableGroup(), Arrangement.spacedBy(16.dp)) {
                         val radioOptions = EditorInfo.Class.entries

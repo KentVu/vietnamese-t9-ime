@@ -13,6 +13,7 @@ interface Presenter {
 
     data class State(
         val initialized: Boolean = false,
+        val error: Exception? = null,
         val closed: Boolean = false,
 
         val keyPad: KeyPad = KeyPads.VN,
