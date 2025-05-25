@@ -3,30 +3,30 @@ package com.github.kentvu.t9vietnamese.model
 import doist.x.normalize.Form
 import doist.x.normalize.normalize
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
 import okio.Source
 import okio.buffer
 import okio.use
 
 class DecomposedVietnameseWords(private val ins: Flow<Result<Source>>) : WordList {
 
-    private val sortedWords by lazy {
-        // use String's "natural" ordering
-        mutableSetOf<String>().apply {
-            println("Building sortedWords...")
-            ins.use { ins ->
-                ins.buffer().use {
-                    while (true) {
-                        add(it.readUtf8Line()?.decomposeVietnamese() ?: break)
+    override val name: String
+        get() = "DecomposedVietnameseWords"
+
+    override fun lineSequence(): Flow<String> {
+        return flow {
+            val result = ins.single()
+            if (result.isSuccess) {
+                result.getOrThrow().use { ins ->
+                    ins.buffer().use {
+                        while (true) {
+                            emit(it.readUtf8Line()?.decomposeVietnamese() ?: break)
+                        }
                     }
                 }
             }
         }
-    }
-    override val name: String
-        get() = "DecomposedVietnameseWords"
-
-    override fun toSet(): Set<String> {
-        return sortedWords
     }
 
     private fun String.decomposeVietnamese(): String {

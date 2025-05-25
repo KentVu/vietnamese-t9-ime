@@ -13,7 +13,7 @@ class Backend(
     private var initialized: Boolean = false
     private val engine = Engine(presenter, trie)
 
-    fun init() {
+    suspend fun init() {
         try {
             trie.load()
             presenter.update { copy(

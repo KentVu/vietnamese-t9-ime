@@ -1,13 +1,10 @@
 package com.github.kentvu.t9vietnamese.model
 
+import kotlinx.coroutines.flow.Flow
+
 interface WordList {
     val name: String
 
-    fun toSet(): Set<String>
+    fun lineSequence(): Flow<String>
 
-    class SetWordList(private val list: Set<String>, override val name: String): WordList {
-        override fun toSet(): Set<String> {
-            return list
-        }
-    }
 }
