@@ -22,10 +22,8 @@ class T9App(
         presenter,
     )
 
-    fun start() {
-        scope.launch(env.ioDispatcher) {
-            backend.init()
-        }
+    suspend fun start() {
+        backend.init()
     }
 
     fun stop() {
