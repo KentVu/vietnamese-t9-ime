@@ -4,10 +4,12 @@ import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.KeyPads
+import kotlinx.coroutines.flow.StateFlow
 
 interface Presenter {
 
     val inputConnection: InputSystemConnection
+    val stateSource: StateFlow<State>
 
     fun updateState(manipulator: (State) -> State)
 

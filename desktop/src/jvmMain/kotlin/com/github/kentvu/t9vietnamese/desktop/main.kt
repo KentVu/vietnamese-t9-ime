@@ -8,6 +8,11 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.lib.logging.NapierLogger
+import com.github.kentvu.t9vietnamese.T9App
+import com.github.kentvu.t9vietnamese.ui.DesktopPresenter
+import com.github.kentvu.t9vietnamese.ui.DesktopUI
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 fun main() {
     NapierLogger.init()
@@ -16,8 +21,17 @@ fun main() {
             componentContext = DefaultComponentContext(lifecycle = lifecycle),
         )
     }*/
+    val scope = CoroutineScope(Dispatchers.Main)
+    val presenter = DesktopPresenter()
+    val ui = DesktopUI(presenter)
+    val app by lazy {
+        T9App(
+            DesktopEnvironmentInteraction,
+            scope,
+            presenter,
+        )
+    }
     application {
-        val app = DesktopT9App(this)
         LaunchedEffect(1) {
             app.start()
         }
@@ -32,7 +46,7 @@ fun main() {
                 app.onKeyEvent(it)
             }
         ) {
-            app.ui.AppUi()
+            ui.AppUi()
         }
     }
 }

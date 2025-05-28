@@ -11,7 +11,9 @@ import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.ui.ImeServicePresenter
+import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
+import kotlinx.coroutines.launch
 import android.view.inputmethod.EditorInfo as AEditorInfo
 
 class T9Vietnamese : InputMethodService() {
@@ -19,7 +21,7 @@ class T9Vietnamese : InputMethodService() {
     private lateinit var candidatesView: ComposeView
     private val keyboardViewLifecycleOwner = KeyboardViewLifecycleOwner()
     private val scope = keyboardViewLifecycleOwner.lifecycleScope
-    private val ui by lazy {
+    private val presenter by lazy {
         ImeServicePresenter(
             scope,
             inputConnection = object : InputSystemConnection {
@@ -37,11 +39,14 @@ class T9Vietnamese : InputMethodService() {
             },
         )
     }
+    private val ui by lazy {
+        ImeServiceUI(presenter)
+    }
     private val app by lazy {
         T9App(
             AndroidEnvironmentInteraction(this),
             scope,
-            ui,
+            presenter,
         )
     }
 
@@ -60,7 +65,9 @@ class T9Vietnamese : InputMethodService() {
                 ui.CandidateView()
             }
         }
-        app.start()
+        scope.launch {
+            app.start()
+        }
         keyboardViewLifecycleOwner.onCreate()
     }
 

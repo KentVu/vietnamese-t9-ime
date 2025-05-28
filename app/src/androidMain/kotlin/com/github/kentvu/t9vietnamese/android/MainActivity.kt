@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -16,14 +17,23 @@ import androidx.lifecycle.lifecycleScope
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.T9App
-import com.github.kentvu.t9vietnamese.ui.AndroidPresenter
+import com.github.kentvu.t9vietnamese.ui.AndroidUI
+import com.github.kentvu.t9vietnamese.ui.DesktopPresenter
+import com.github.kentvu.t9vietnamese.ui.DesktopUI
 
 class MainActivity : ComponentActivity() {
 
-    private val ui by lazy {
-        AndroidPresenter(
+    private val presenter by lazy {
+        DesktopPresenter(
             lifecycleScope,
-            close = { finish() },
+        )
+    }
+    val ui =
+        AndroidUI(
+            DesktopUI(
+                presenter,
+                close = { finish() },
+            ),
             launchSystemImSettings = {
                 startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
             },
@@ -32,20 +42,21 @@ class MainActivity : ComponentActivity() {
                     .showInputMethodPicker()
             },
         )
-    }
     private val app by lazy {
         T9App(
             AndroidEnvironmentInteraction(this),
             lifecycleScope,
-            ui,
+            presenter,
         )
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         NapierLogger.init()
         try {
-            app.start()
             setContent {
+                LaunchedEffect(app) {
+                    app.start()
+                }
                 ui.AppUi()
             }
         } catch (e: Exception) {

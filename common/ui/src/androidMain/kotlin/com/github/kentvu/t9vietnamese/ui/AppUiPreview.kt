@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Preview
 @Composable
 fun AppPreview() {
-    val presenter = remember { AndroidPresenter(
+    val presenter = remember { DesktopPresenter(
         CoroutineScope(Dispatchers.Default),
         MutableStateFlow(
             Presenter.State(
@@ -28,9 +28,15 @@ fun AppPreview() {
                 }
               }
         ),
-        close = {},
-        launchSystemImSettings = {},
-        launchImePicker = {},
     ) }
-    presenter.AppUi()
+    val ui =
+        AndroidUI(
+            DesktopUI(
+                presenter,
+                close = {},
+            ),
+            launchSystemImSettings = {},
+            launchImePicker = {},
+        )
+    ui.AppUi()
 }
