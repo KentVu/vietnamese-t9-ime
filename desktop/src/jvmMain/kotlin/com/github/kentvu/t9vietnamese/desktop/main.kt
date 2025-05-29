@@ -22,8 +22,7 @@ fun main() {
         )
     }*/
     val scope = CoroutineScope(Dispatchers.Main)
-    val presenter = DesktopPresenter()
-    val ui = DesktopUI(presenter)
+    val presenter = DesktopPresenter(scope)
     val app by lazy {
         T9App(
             DesktopEnvironmentInteraction,
@@ -32,18 +31,19 @@ fun main() {
         )
     }
     application {
+        val ui = DesktopUI(presenter) { exitApplication() }
         LaunchedEffect(1) {
             app.start()
         }
         Window(
-            onCloseRequest = app::finish,
+            onCloseRequest = app::stop,
             title = "Compose for Desktop",
             state = rememberWindowState(width = 300.dp, height = 600.dp),
             onKeyEvent = {
                 if (it.awtEventOrNull?.keyChar == '*') {
-                    app.onKeyEvent(KeyEvent(it.nativeKeyEvent))
+                    ui.onKeyEvent(KeyEvent(it.nativeKeyEvent))
                 }
-                app.onKeyEvent(it)
+                ui.onKeyEvent(it)
             }
         ) {
             ui.AppUi()

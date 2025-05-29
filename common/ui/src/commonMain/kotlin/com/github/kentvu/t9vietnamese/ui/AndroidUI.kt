@@ -21,7 +21,7 @@ class AndroidUI(
         val state by stateSource.collectAsState()
         AppUiWrapper(state) {
             GuideUserUI(/*Modifier.weight(1f)*/)
-            SelectModeUI(state)
+            SelectModeUI()
             TestTextField(Modifier.weight(1f))
             CandidateView(state,)
             ImeUI(state, Modifier)
@@ -29,7 +29,7 @@ class AndroidUI(
     }
 
     @Composable
-    private fun /*ColumnScope.*/GuideUserUI(
+    private fun GuideUserUI(
         modifier: Modifier = Modifier,
     ) {
         Column(

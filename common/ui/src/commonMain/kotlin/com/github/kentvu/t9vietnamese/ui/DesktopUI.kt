@@ -22,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
@@ -38,13 +37,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
-import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.Presenter.State
-import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class DesktopUI(
     presenter: DesktopPresenter,
@@ -83,10 +78,14 @@ class DesktopUI(
     fun AppUi() {
         val state by stateSource.collectAsState()
         AppUiWrapper(state) {
-            SelectModeUI(state)
+            SelectModeUI()
             TestTextField(Modifier.weight(1f))
             CandidateView(state,)
             ImeUI(state, Modifier)
+        }
+        // Call onStartInputView once to init the keypad (mimicking IM service)
+        LaunchedEffect(1) {
+            onStartInputView(EditorInfo(EditorInfo.Class.Normal))
         }
     }
 
@@ -118,7 +117,14 @@ class DesktopUI(
     }
 
     @Composable
-    internal fun SelectModeUI(state: State) {
+    internal fun SelectModeUI() {
+        SelectModeUI {
+            onStartInputView(EditorInfo(it))
+        }
+    }
+
+    @Composable
+    internal fun SelectModeUI(onModeSelected: (EditorInfo.Class) -> Unit) {
         Row(Modifier.selectableGroup(), Arrangement.spacedBy(16.dp)) {
             val radioOptions = EditorInfo.Class.entries
             val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
@@ -139,7 +145,7 @@ class DesktopUI(
                 }
             }
             LaunchedEffect(selectedOption) {
-                state.keypadEventSink(KeypadEvent.InputViewStart(EditorInfo(selectedOption)))
+                onModeSelected(selectedOption)
             }
         }
     }

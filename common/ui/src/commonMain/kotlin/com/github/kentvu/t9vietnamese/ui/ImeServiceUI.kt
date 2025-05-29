@@ -45,16 +45,6 @@ import kotlinx.coroutines.flow.StateFlow
 class ImeServiceUI(presenter: Presenter) : CommonUI {
     private val stateSource: StateFlow<State> = presenter.stateSource
     private val keyEventSource = MutableSharedFlow<KeyEvent>(extraBufferCapacity = 1)
-    private val imServiceEventSource = MutableSharedFlow<EditorInfo>(extraBufferCapacity = 1)
-
-    init {
-        /*scope.launch {
-            imServiceEventSource.collect {
-                log.debug("imServiceEventSource:new:$it")
-                stateSource.value.keypadEventSink(KeypadEvent.InputViewStart(it))
-            }
-        }*/
-    }
 
     override fun onKeyEvent(keyEvent: KeyEvent): Boolean {
         log.debug("onKeyEvent:$keyEvent")
@@ -62,19 +52,17 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
     }
 
     /** Translates [KeyEvent] to [Action] */
-    private fun translateKeyEvent(
-        keyEvent: KeyEvent,
-    ): KeypadEvent? {
-        return if (keyEvent.isCtrlQ()) {
+    private fun KeyEvent.translate2Domain(): KeypadEvent? {
+        return if (isCtrlQ()) {
             KeypadEvent.CloseRequest
         } else {
-            if (keyEvent.type == KeyEventType.KeyUp) {
-                if (keyEvent.isCtrlPressed && keyEvent.key == Key.C) {
+            if (type == KeyEventType.KeyUp) {
+                if (isCtrlPressed && key == Key.C) {
                     KeypadEvent.KeyPress(Action.Clear)
-                } else if (Letter2Keypad.available(keyEvent.key)) {
+                } else if (Letter2Keypad.available(key)) {
                     KeypadEvent.KeyPress(
                             Action.fromChar(
-                                Letter2Keypad.numForKey(keyEvent.key)!!
+                                Letter2Keypad.numForKey(key)!!
                             )
                         )
                 } else null
@@ -120,8 +108,10 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
 
     }
 
-    fun onStartInputView(info: EditorInfo): Boolean {
-        return imServiceEventSource.tryEmit(info)
+    override fun onStartInputView(info: EditorInfo): Boolean {
+        //return imServiceEventSource.tryEmit(info)
+        stateSource.value.keypadEventSink(KeypadEvent.InputViewStart(info))
+        return true
     }
 
     @Composable
@@ -153,9 +143,9 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
             )
         }
         LaunchedEffect(state) {
-            keyEventSource/*.onEach { onUserEvent(it) }.filter { it.isCtrlQ() }*/.collect {
-                translateKeyEvent(it)
-                ?.let { state.keypadEventSink(it) }
+            keyEventSource.collect { ke ->
+                ke.translate2Domain()
+                    ?.let { state.keypadEventSink(it) }
             }
         }
     }
