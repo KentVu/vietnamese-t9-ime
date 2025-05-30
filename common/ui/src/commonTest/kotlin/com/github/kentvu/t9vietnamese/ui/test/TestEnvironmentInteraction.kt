@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese.desktop
+package com.github.kentvu.t9vietnamese.ui.test
 
 import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import java.io.File
@@ -14,7 +14,7 @@ import okio.source
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import t9vietnamese.common.generated.resources.Res
 
-object DesktopEnvironmentInteraction : EnvironmentInteraction {
+object TestEnvironmentInteraction : EnvironmentInteraction {
     override val mainDispatcher: CoroutineDispatcher
         get() = Dispatchers.Main
     override val ioDispatcher: CoroutineDispatcher

@@ -28,24 +28,23 @@ kotlin {
                 api(project(":common"))
                 implementation(project(":lib:logging"))
                 // Needed only for preview.
-//                implementation(compose.preview)
+                //implementation(compose.preview)
             }
         }
         named("commonTest") {
             dependencies {
-                implementation(libs.junit)
-                implementation(libs.kotlin.test)
                 //implementation(libs.kotlin.test.junit)
                 implementation(kotlin("test")) // This brings all the platform dependencies automatically
                 implementation(libs.kotlinx.coroutines.test)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
                 //implementation(libs.mockative)
             }
         }
         named("jvmTest") {
             dependencies {
-                implementation(kotlin("test")) // This brings all the platform dependencies automatically
-                // Test rules and transitive dependencies:
-                implementation(compose.desktop.uiTestJUnit4)
+                implementation(project(":common"))
+                implementation(compose.desktop.currentOs)
             }
         }
         named("androidMain") {
@@ -91,6 +90,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.ui.test.android)
     //debugImplementation(libs.androidx.compose.ui.tooling)
     //https://stackoverflow.com/a/68224436/1562087
     //debugImplementation(compose.uiTooling)

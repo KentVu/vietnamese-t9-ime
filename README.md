@@ -70,8 +70,8 @@ TODO
 ====
 * [x] ~~Decompose accented character~~.
 * [x] Implement number-to-word based on wordlist (saved in database).
-* [ ] Implement select candidate key.
-* [ ] Support suggestion
+* [x] Implement select candidate key.
+* [x] Support suggestion
 * [ ] Flexibility via settings (accents right after character/accent at end of word)
 * [ ] Support add new word to dictionary
 * [ ] Flick input mode (for registering new word)
@@ -86,3 +86,4 @@ References-Acknowledgement
 * syllables https://gist.github.com/hieuthi/0f5adb7d3f79e7fb67e0e499004bf558
 * spell check dictionary https://saomaicenter.org/en/blog/access-tech/custom-dictionary-for-word
 * https://github.com/yweweler/c-t9
+* Web [T9 Predictive Text Input Emulator](https://github.com/arifwn/t9-emulator).

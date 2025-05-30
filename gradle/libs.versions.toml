@@ -29,6 +29,7 @@ koin = "4.0.2" # https://github.com/InsertKoinIO/koin#setup--current-version
 sqlDelight = "2.0.2" # https://github.com/cashapp/sqldelight/releases
 datetime = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
 kotlinxSerialization = "1.6.3"
+uiTestAndroid = "1.8.2"
 
 [plugins]
 
@@ -63,3 +64,4 @@ napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }
 okio = { group = "com.squareup.okio", name = "okio", version = "3.8.0" }
 okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version = "3.8.0" }
 doistx-normalize = { group = "com.doist.x", name = "normalize", version = "1.0.5" }
+androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }

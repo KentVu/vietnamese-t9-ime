@@ -9,6 +9,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.T9App
+import com.github.kentvu.t9vietnamese.ui.DesktopEnvironmentInteraction
 import com.github.kentvu.t9vietnamese.ui.DesktopPresenter
 import com.github.kentvu.t9vietnamese.ui.DesktopUI
 import kotlinx.coroutines.CoroutineScope

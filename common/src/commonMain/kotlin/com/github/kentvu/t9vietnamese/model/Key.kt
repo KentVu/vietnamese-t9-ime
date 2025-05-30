@@ -5,3 +5,4 @@ data class Key(
     val subChars: String? = null,
     val longAction: Action? = null
 ) {}
+
