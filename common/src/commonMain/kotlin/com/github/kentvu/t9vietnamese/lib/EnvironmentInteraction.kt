@@ -10,5 +10,6 @@ interface EnvironmentInteraction {
     val ioDispatcher: CoroutineDispatcher
     val fileSystem: FileSystem
     val vnWordsSource: Flow<Result<Source>>
+    val vnTrieSource: Flow<Result<Source>>
 
 }

@@ -29,7 +29,6 @@ koin = "4.0.2" # https://github.com/InsertKoinIO/koin#setup--current-version
 sqlDelight = "2.0.2" # https://github.com/cashapp/sqldelight/releases
 datetime = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
 kotlinxSerialization = "1.6.3"
-uiTestAndroid = "1.8.2"
 
 [plugins]
 
@@ -49,6 +48,7 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose-ui" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
 androidx-compose-ui-uiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose-ui" }
+androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "compose-ui" }
 
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
@@ -64,4 +64,3 @@ napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }
 okio = { group = "com.squareup.okio", name = "okio", version = "3.8.0" }
 okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version = "3.8.0" }
 doistx-normalize = { group = "com.doist.x", name = "normalize", version = "1.0.5" }
-androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }

@@ -51,6 +51,8 @@ class T9AppTest {
         override val fileSystem: FileSystem = FakeFileSystem()
         override val vnWordsSource: Flow<Result<Source>>
             get() = flowOf(Result.success(Buffer().write("test\ntis".encodeUtf8())))
+        override val vnTrieSource: Flow<Result<Source>>
+            get() = TODO("Not yet implemented")
 
     }
 }

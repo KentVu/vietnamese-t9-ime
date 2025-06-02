@@ -1,8 +1,6 @@
 package com.github.kentvu.t9vietnamese.android
 
-import android.app.Activity
 import android.content.Context
-import androidx.core.net.toUri
 import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -14,8 +12,6 @@ import okio.Source
 import okio.source
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import t9vietnamese.common.generated.resources.Res
-import java.io.File
-import java.net.URL
 import kotlin.text.removePrefix
 
 class AndroidEnvironmentInteraction(private val context: Context) : EnvironmentInteraction {
@@ -27,12 +23,19 @@ class AndroidEnvironmentInteraction(private val context: Context) : EnvironmentI
         get() = AndroidFileSystem(context)
     @OptIn(ExperimentalResourceApi::class)
     override val vnWordsSource: Flow<Result<Source>>
-        get() = flow {
+        get() = sourceFrom(Res.getUri("files/vi-DauMoi.dic"))
+    @OptIn(ExperimentalResourceApi::class)
+    override val vnTrieSource: Flow<Result<Source>>
+        get() = sourceFrom(Res.getUri("files/vi-DauMoi.dawg"))
+
+    private fun sourceFrom(resUri: String): Flow<Result<Source>> {
+        return flow {
             emit(Result.success(context.assets.open(
-                Res.getUri("files/vi-DauMoi.dic")
+                resUri
                     // This Uri is only supported in WebView, there's no way to open the file as stream via compose-resources
                     // https://stackoverflow.com/questions/5030448/android-how-to-find-the-absolute-path-of-the-assets-folder?noredirect=1&lq=1
-                    .removePrefix("file:///android_aset/")
+                    .removePrefix("file:///android_asset/")
             ).source()))
         }.catch { Result.failure<Source>(it) }
+    }
 }

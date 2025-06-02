@@ -25,7 +25,7 @@ class DecomposedVietnameseWords(private val ins: Flow<Result<Source>>) : WordLis
                         }
                     }
                 }
-            } else TODO()
+            } else throw IllegalStateException("Can't read wordlist.", result.exceptionOrNull())
         }
     }
 
