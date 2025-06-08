@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 interface WordList {
     val name: String
 
-    fun lineSequence(): Flow<String>
+    fun lineSequence(): Sequence<String>
 
 }

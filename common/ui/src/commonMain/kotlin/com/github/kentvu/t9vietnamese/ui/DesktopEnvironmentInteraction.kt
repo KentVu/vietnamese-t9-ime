@@ -17,10 +17,7 @@ class DesktopEnvironmentInteraction(
     override val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
     override val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
     override val fileSystem: FileSystem = FileSystem.SYSTEM,
-    override val vnWordsSource: Flow<Result<Source>> =
-        flowSourceFrom("files/vi-DauMoi.dic"),
-    override val vnTrieSource: Flow<Result<Source>> =
-        flowSourceFrom("files/vi-DauMoi.dawg")
+    //override val vnTrieSource: Flow<Result<Source>> = flowSourceFrom("files/vi-DauMoi.dawg")
 ) : EnvironmentInteraction {
 
     companion object {
@@ -33,5 +30,10 @@ class DesktopEnvironmentInteraction(
                 emit(Result.success(URI(Res.getUri(resPath)).toURL().openStream().source()))
             }.catch { emit(Result.failure(it)) }
         }
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    override suspend fun readVnTrie(): ByteArray {
+      return Res.readBytes("files/vi-DauMoi.dawg")
     }
 }

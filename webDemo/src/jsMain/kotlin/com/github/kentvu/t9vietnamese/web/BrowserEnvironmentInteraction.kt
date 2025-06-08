@@ -4,6 +4,7 @@ import com.github.kentvu.t9vietnamese.lib.EnvironmentInteraction
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import okio.FileSystem
 import okio.Source
 import okio.fakefilesystem.FakeFileSystem
@@ -17,7 +18,10 @@ object BrowserEnvironmentInteraction: EnvironmentInteraction {
     = Dispatchers.Default
   override val fileSystem: FileSystem
     = FakeFileSystem()
-  @get:OptIn(ExperimentalResourceApi::class)
-  override val vnWordsSource: Source
-    get() = window.fetch(Res.getUri("files/vi-DauMoi.dic"))
+
+  @OptIn(ExperimentalResourceApi::class)
+  override suspend fun readVnTrie(): ByteArray {
+    return Res.readBytes("files/vi-DauMoi.dawg")
+  }
+
 }

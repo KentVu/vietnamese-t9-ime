@@ -4,28 +4,22 @@ import doist.x.normalize.Form
 import doist.x.normalize.normalize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
-import okio.Source
+import okio.Buffer
 import okio.buffer
 import okio.use
 
-class DecomposedVietnameseWords(private val ins: Flow<Result<Source>>) : WordList {
+class DecomposedVietnameseWords(private val ins: ByteArray) : WordList {
 
     override val name: String
         get() = "DecomposedVietnameseWords"
 
-    override fun lineSequence(): Flow<String> {
-        return flow {
-            val result = ins.single()
-            if (result.isSuccess) {
-                result.getOrThrow().use { ins ->
-                    ins.buffer().use {
-                        while (true) {
-                            emit(it.readUtf8Line()?.decomposeVietnamese() ?: break)
-                        }
-                    }
+    override fun lineSequence(): Sequence<String> {
+        return sequence {
+            Buffer().write(ins).use {
+                while (true) {
+                    yield(it.readUtf8Line()?.decomposeVietnamese() ?: break)
                 }
-            } else throw IllegalStateException("Can't read wordlist.", result.exceptionOrNull())
+            }
         }
     }
 

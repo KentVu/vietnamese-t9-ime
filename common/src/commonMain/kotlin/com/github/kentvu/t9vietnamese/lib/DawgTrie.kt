@@ -1,31 +1,25 @@
 package com.github.kentvu.t9vietnamese.lib
 
 import com.github.kentvu.t9vietnamese.model.Trie
-import com.github.kentvu.t9vietnamese.model.WordList
 import kotlinx.coroutines.flow.toList
+import okio.Buffer
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import org.chalup.dawg.Dawg
 
 class DawgTrie(
-    private val source: WordList,
     private val fileSystem: FileSystem
 ) : Trie {
     //val modifiableDAWGSet = ModifiableDAWGSet()
     lateinit var dawg: Dawg
-    private val dawgSavePath = "${source.name}.dawg".toPath()
 
-    override suspend fun load() {
+    override suspend fun load(ba: ByteArray) {
+        //val dawgSavePath = "${ba.name}.dawg".toPath()
         //modifiableDAWGSet.addAll(source.iterable())
-        dawg = if (fileSystem.exists(dawgSavePath)) {
-            Dawg.decode(fileSystem.source(dawgSavePath))
-        } else Dawg.generate(source.lineSequence().toList()).also {
-            it.encode(fileSystem.sink(dawgSavePath))
-        }
+        dawg = Dawg.decode(Buffer().write(ba))
     }
 
     override fun prefixSearch(prefix: String): Set<String> =
-    //return modifiableDAWGSet.prefixSet(prefix)
         dawg.prefixSearch(prefix).toSet()
 
     override fun containsPrefix(prefix: String): Boolean = dawg.containsPrefix(prefix)

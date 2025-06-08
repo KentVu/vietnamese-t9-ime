@@ -13,9 +13,9 @@ class Backend(
     private var initialized: Boolean = false
     private val engine = Engine(presenter, trie)
 
-    suspend fun init() {
+    suspend fun init(dawg: ByteArray) {
         try {
-            trie.load()
+            trie.load(dawg)
             presenter.update { copy(
                 initialized = true,
                 keypadEventSink = ::onUiEvent

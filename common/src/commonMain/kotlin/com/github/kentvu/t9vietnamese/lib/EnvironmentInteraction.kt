@@ -9,7 +9,8 @@ interface EnvironmentInteraction {
     val mainDispatcher: CoroutineDispatcher
     val ioDispatcher: CoroutineDispatcher
     val fileSystem: FileSystem
-    val vnWordsSource: Flow<Result<Source>>
-    val vnTrieSource: Flow<Result<Source>>
+    suspend fun readVnTrie(): ByteArray
+    //suspend fun openResourceAsText(): Flow<Sequen>
+    //suspend fun readResourceFile(path: String): ByteArray
 
 }

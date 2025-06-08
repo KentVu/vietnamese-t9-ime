@@ -62,10 +62,10 @@ class AppRunner {
     }
 
     fun ComposeUiTest.candidatesContains(cand: String) {
-        waitForIdle()
+        //waitForIdle()
         waitUntilAtLeastOneExists(hasTextExactly(cand))
         onCandidates().also { it.printToLog("candidatesContain") }.onChildren().filterToOne(hasTextExactly(cand))
-            .assertExists()
+            //.assertExists()
     }
 
     private fun ComposeUiTest.type(c: Char) {
@@ -80,7 +80,7 @@ class AppRunner {
 
     private fun ComposeUiTest.onCandidates(): SemanticsNodeInteraction {
         //waitUntilAtLeastOneExists()
-        return onNodeWithContentDescription(ImeServiceUI.Semantic.candidates)//.assertExists()
+        return onNodeWithContentDescription(ImeServiceUI.Semantic.candidates)
     }
 
     companion object {

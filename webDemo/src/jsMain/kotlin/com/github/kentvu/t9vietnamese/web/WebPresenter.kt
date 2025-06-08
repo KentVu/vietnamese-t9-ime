@@ -1,8 +1,13 @@
 package com.github.kentvu.t9vietnamese.web
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.github.kentvu.t9vietnamese.FakeInputConnection
+import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.Presenter
+import com.github.kentvu.t9vietnamese.model.EditorInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import org.jetbrains.compose.web.attributes.value
@@ -15,7 +20,7 @@ import org.jetbrains.compose.web.dom.Text
 
 class WebPresenter(
   //private val scope: CoroutineScope = MainScope(),
-  private val stateSource: MutableStateFlow<Presenter.State> = MutableStateFlow(Presenter.State {}),
+  override val stateSource: MutableStateFlow<Presenter.State> = MutableStateFlow(Presenter.State {}),
 ) : Presenter {
   override val inputConnection = FakeInputConnection()
 
@@ -25,6 +30,12 @@ class WebPresenter(
 
   @Composable
   fun Emulator() {
+    val state by stateSource.collectAsState()
+    // Call onStartInputView once to init the keypad (mimicking IM service)
+    LaunchedEffect(this) {
+      state.keypadEventSink(KeypadEvent.InputViewStart(
+        EditorInfo(EditorInfo.Class.Normal)))
+    }
     Div({ classes("emulator") }) {
       Div({ classes("screen") }) {
         Span({ classes("prev-text") }); Span({ classes("current-text") })
@@ -41,7 +52,13 @@ class WebPresenter(
       }
       Div({ classes("keypad") }) {
         Key()
-        Button({ classes("key", "key-2"); value("2") }) {
+        Button({
+          onClick { state.keypadEventSink(
+            KeypadEvent.KeyPress(state.keyPad.key2.action)
+          ) }
+          classes("key", "key-2")
+          value("2")
+        }) {
           Text("2 ")
           Small { Text("abc") }
         }
