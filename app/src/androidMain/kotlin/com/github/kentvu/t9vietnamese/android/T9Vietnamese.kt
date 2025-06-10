@@ -10,7 +10,7 @@ import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.model.EditorInfo
-import com.github.kentvu.t9vietnamese.ui.ImeServicePresenter
+import com.github.kentvu.t9vietnamese.ImeServicePresenter
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import com.stackoverflow.android.KeyboardViewLifecycleOwner
 import kotlinx.coroutines.launch

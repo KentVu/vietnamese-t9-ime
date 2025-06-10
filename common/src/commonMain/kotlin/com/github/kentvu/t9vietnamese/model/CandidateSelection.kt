@@ -4,11 +4,19 @@ package com.github.kentvu.t9vietnamese.model
 class CandidateSelection(
     private val candidates: List<Candidate>,
     val selectedCandidateId: Int = 0
-) {
+): Iterable<Candidate> by candidates {
 
     companion object {
         fun from(candidates: List<String>, selectedCandidateId: Int = 0): CandidateSelection =
             CandidateSelection(candidates.map { Candidate(it) }, selectedCandidateId)
+
+        fun CandidateSelection.forEach(action: (Candidate) -> Unit) {
+            candidates.forEach(action)
+        }
+
+        fun forEachIndexed(candidateSelection: CandidateSelection, action: (Int, Candidate) -> Unit) {
+            candidateSelection.candidates.forEachIndexed(action)
+        }
     }
     //constructor(candidates: Set<String>) :
     //        this(candidates.map { Candidate(it) }.toSet())
@@ -17,14 +25,6 @@ class CandidateSelection(
 
     val selectedCandidate: Candidate
         get() = candidates[selectedCandidateId]
-
-    fun forEach(action: (Candidate) -> Unit) {
-        candidates.forEach { cand -> action(cand) }
-    }
-
-    fun forEachIndexed(action: (Int, Candidate) -> Unit) {
-        candidates.forEachIndexed(action)
-    }
 
     operator fun get(i: Int): Candidate = candidates[i]
 

@@ -8,7 +8,8 @@ import com.github.kentvu.t9vietnamese.lib.InputSystemConnection
 
 /** Fake InputConnection for demonstrating this IM's functions. */
 class FakeInputConnection(): InputSystemConnection {
-    var confirmedText by mutableStateOf("")
+    val confirmedTextState = mutableStateOf("")
+    var confirmedText by confirmedTextState
     override fun commitText(text: String) {
         confirmedText = confirmedText + text
     }

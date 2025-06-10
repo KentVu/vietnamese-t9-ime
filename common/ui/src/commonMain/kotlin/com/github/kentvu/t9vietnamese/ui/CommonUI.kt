@@ -5,9 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEvent
 import com.github.kentvu.t9vietnamese.Presenter
 import com.github.kentvu.t9vietnamese.Presenter.State
+import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 
-interface CommonUI {
+interface CommonUI: UI {
 
     @Composable
     fun ImeUI(state: State, modifier: Modifier = Modifier)
@@ -15,6 +16,4 @@ interface CommonUI {
     fun CandidateView(state: State)
     /** Notify key events to domain layers. */
     fun onKeyEvent(keyEvent: KeyEvent): Boolean
-    /** Notify IM service events to domain layer. */
-    fun onStartInputView(info: EditorInfo): Boolean
 }

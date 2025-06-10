@@ -1,4 +1,4 @@
-package com.github.kentvu.t9vietnamese.ui
+package com.github.kentvu.t9vietnamese
 
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.KeypadEvent
@@ -14,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class ImeServicePresenter(
     private val scope: CoroutineScope,
-    override val stateSource: MutableStateFlow<State> = MutableStateFlow(State {}),
+    override val stateSource: MutableStateFlow<State> =
+        MutableStateFlow(State {log.warn("Empty keypadEventSink:$it")}),
     override val inputConnection: InputSystemConnection,
 ) : Presenter {
 

@@ -84,7 +84,7 @@ class DesktopUI(
             ImeUI(state, Modifier)
         }
         // Call onStartInputView once to init the keypad (mimicking IM service)
-        LaunchedEffect(this) {
+        LaunchedEffect(state.keypadEventSink) {
             onStartInputView(EditorInfo(EditorInfo.Class.Normal))
         }
     }

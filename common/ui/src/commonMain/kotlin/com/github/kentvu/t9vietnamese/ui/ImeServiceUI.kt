@@ -199,7 +199,7 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
             }.background(Color.LightGray),
             state = state
         ) {
-            candidates.forEachIndexed { i, cand ->
+            CandidateSelection.forEachIndexed(candidates) { i, cand ->
                 item(cand.text) {
                     Text(
                         cand.text,

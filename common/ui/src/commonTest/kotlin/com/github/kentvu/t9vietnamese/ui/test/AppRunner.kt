@@ -1,5 +1,7 @@
 package com.github.kentvu.t9vietnamese.ui.test
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -21,79 +23,89 @@ import com.github.kentvu.t9vietnamese.ui.DesktopEnvironmentInteraction
 import com.github.kentvu.t9vietnamese.ui.DesktopPresenter
 import com.github.kentvu.t9vietnamese.ui.DesktopUI
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import kotlin.also
+import kotlin.test.assertTrue
 import kotlin.text.forEach
 
 @OptIn(ExperimentalTestApi::class)
 class AppRunner {
 
-    private val env = DesktopEnvironmentInteraction()
-    private val scope = TestScope()
-    private val presenter = DesktopPresenter(scope)
-    private val app = T9App(
-        env,
-        scope,
-        presenter,
+  private val env = DesktopEnvironmentInteraction()
+  private val scope = TestScope()
+  private val presenter = DesktopPresenter(scope)
+  private val app = T9App(
+    env,
+    scope,
+    presenter,
+  )
+  private val ui = DesktopUI(presenter) { println("app close called") }
+
+  fun ComposeUiTest.startApp() {
+    NapierLogger.init()
+    //scope.launch
+    //runTest
+    setContent {
+      LaunchedEffect(this@AppRunner) {
+        app.start()
+      }
+      ui.AppUi()
+    }
+  }
+
+  fun ComposeUiTest.hasKeypadEnabled() {
+    val key = presenter.stateSource.value.keyPad.key1
+    hasKeyEnabled(key)
+  }
+
+  fun ComposeUiTest.type(seq: String) {
+    seq.forEach {
+      type(it)
+    }
+  }
+
+  fun ComposeUiTest.candidatesContains(cand: String) {
+    //waitForIdle()
+    waitUntilAtLeastOneExists(hasTextExactly(cand))
+    onCandidates().onChildren().filterToOne(hasTextExactly(cand))
+    //.assertExists()
+  }
+
+  private fun ComposeUiTest.type(c: Char) {
+    val keypad = presenter.stateSource.value.keyPad
+    type(keypad.findKey(c))
+  }
+
+  private fun ComposeUiTest.type(key: Key) {
+    onNode(hasText(key.action.displaySymbol) and hasText(key.subChars.orEmpty()))
+    .performClick()
+  }
+
+  private fun ComposeUiTest.onCandidates(): SemanticsNodeInteraction {
+    //waitUntilAtLeastOneExists()
+    return onNodeWithContentDescription(ImeServiceUI.Semantic.candidates)
+  }
+
+  fun ComposeUiTest.candidatesAllMatches(regex: Regex) {
+    assertTrue(
+      onCandidates().also { it.printToLog("candidatesContain") }.onChildren().fetchSemanticsNodes()
+        .all { sn ->
+          sn.config[SemanticsProperties.Text].any { regex.matches(it) }
+        }, "Not all candidate matches $regex"
     )
-    private val ui = DesktopUI(presenter) { println("app close called") }
+  }
 
-    fun ComposeUiTest.startApp() {
-        runTest {
-            NapierLogger.init()
-            app.start()
-            setContent {
-                ui.AppUi()
-            }
+  companion object {
+    private fun ComposeUiTest.hasKeyEnabled(key: Key) {
+      val matcher= hasText(key.action.displaySymbol) and hasText(key.subChars!!)
+      onNode(matcher).also {
+        waitUntil("Init", 30_000) {
+          onAllNodes(matcher and isEnabled()).fetchSemanticsNodes().isNotEmpty()
         }
+      }.assertHasClickAction()
+      .assertIsEnabled()
+      //.performClick()
+      //awaitIdle()
     }
-
-    fun ComposeUiTest.hasKeypadEnabled() {
-        val key = presenter.stateSource.value.keyPad.key1
-        hasKeyEnabled(key)
-    }
-
-    fun ComposeUiTest.type(seq: String) {
-        seq.forEach {
-            type(it)
-        }
-    }
-
-    fun ComposeUiTest.candidatesContains(cand: String) {
-        //waitForIdle()
-        waitUntilAtLeastOneExists(hasTextExactly(cand))
-        onCandidates().also { it.printToLog("candidatesContain") }.onChildren().filterToOne(hasTextExactly(cand))
-            //.assertExists()
-    }
-
-    private fun ComposeUiTest.type(c: Char) {
-        val keypad = presenter.stateSource.value.keyPad
-        type(keypad.findKey(c))
-    }
-            
-    private fun ComposeUiTest.type(key: Key) {
-        onNode(hasText(key.action.displaySymbol) and hasText(key.subChars.orEmpty()))
-            .performClick()
-    }
-
-    private fun ComposeUiTest.onCandidates(): SemanticsNodeInteraction {
-        //waitUntilAtLeastOneExists()
-        return onNodeWithContentDescription(ImeServiceUI.Semantic.candidates)
-    }
-
-    companion object {
-        private fun ComposeUiTest.hasKeyEnabled(key: Key) {
-            val matcher= hasText(key.action.displaySymbol) and hasText(key.subChars!!)
-            onNode(matcher).also {
-                waitUntil("Init", 30_000) {
-                    onAllNodes(matcher and isEnabled()).fetchSemanticsNodes().isNotEmpty()
-                }
-            }.assertHasClickAction()
-                .assertIsEnabled()
-            //.performClick()
-            //awaitIdle()
-        }
-    }
+  }
 }

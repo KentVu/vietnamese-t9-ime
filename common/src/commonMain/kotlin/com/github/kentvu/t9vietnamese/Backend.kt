@@ -18,13 +18,15 @@ class Backend(
             trie.load(dawg)
             presenter.update { copy(
                 initialized = true,
-                keypadEventSink = ::onUiEvent
+                keypadEventSink = ::onUiEvent,
             ) }
             initialized = true
+            log.debug("initialized")
         } catch (e: Exception) {
             presenter.update { copy(error = Exception("Cannot load trie!", e)) }
         }
     }
+    //TODO make asynchronous
     fun onUiEvent(ev: KeypadEvent) {
         when (ev) {
             is KeypadEvent.KeyPress -> onKeyPress(ev.action)

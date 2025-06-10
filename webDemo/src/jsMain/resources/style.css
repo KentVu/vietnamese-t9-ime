@@ -55,6 +55,17 @@
 	height: 30px;
 }
 
+.candidates {
+	margin-top: 7px;
+	width: 280px;
+	padding: 5px;
+  overflow: auto;
+}
+
+.loading {
+	width: 280px;
+}
+
 .keypad {
 	position: relative;
 	margin-top: 10px;
