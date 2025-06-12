@@ -1,6 +1,8 @@
 package com.github.kentvu.t9vietnamese.ui.test
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.runComposeUiTest
 import kotlin.test.Test
 import kotlin.text.Regex
@@ -31,8 +33,12 @@ class T9AppEndToEndTest {
     with(runner) {
       startApp()
       type("2")
-      candidatesAllMatches(Regex("^\\w$"))
+      candidatesAllMatches(textHasLength1)
     }
+  }
+
+  private val textHasLength1 = SemanticsMatcher("${SemanticsProperties.Text.name} has length 1",) { node ->
+    node.config[SemanticsProperties.Text].any { it.length == 1 }
   }
 
 }

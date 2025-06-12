@@ -36,7 +36,6 @@ fun main() {
     app.start()
   }
   renderComposable(rootElementId = "root") {
-    LaunchedEffect(app) { }
     Main {
       Div({ classes("container", "py-5") }) {
         H2({ classes("pb-2", "px-4", "border-bottom") }) {

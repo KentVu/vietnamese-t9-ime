@@ -14,6 +14,8 @@ import okio.ByteString.Companion.toByteString
 import okio.FileSystem
 import okio.Source
 import okio.fakefilesystem.FakeFileSystem
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import t9vietnamese.common.generated.resources.Res
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,10 +51,10 @@ class T9AppTest {
         override val ioDispatcher: CoroutineDispatcher
             get() = Dispatchers.Default
         override val fileSystem: FileSystem = FakeFileSystem()
-        override val vnWordsSource: Flow<Result<Source>>
-            get() = flowOf(Result.success(Buffer().write("test\ntis".encodeUtf8())))
-        override val vnTrieSource: Flow<Result<Source>>
-            get() = TODO("Not yet implemented")
 
+        @OptIn(ExperimentalResourceApi::class)
+        override suspend fun readVnTrie(): ByteArray {
+            return Res.readBytes("files/vi-DauMoi.dawg")
+        }
     }
 }

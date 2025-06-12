@@ -1,10 +1,11 @@
 package com.github.kentvu.t9vietnamese.model
 
 
+/** Impl. Collection for inheriting isEmpty and forEach etc. */
 class CandidateSelection(
     private val candidates: List<Candidate>,
     val selectedCandidateId: Int = 0
-): Iterable<Candidate> by candidates {
+): Collection<Candidate> by candidates {
 
     companion object {
         fun from(candidates: List<String>, selectedCandidateId: Int = 0): CandidateSelection =
@@ -37,7 +38,6 @@ class CandidateSelection(
         )
     }
 
-    fun isNotEmpty() = candidates.isNotEmpty()
     fun select(id: Int): CandidateSelection {
         return CandidateSelection(candidates, id)
     }

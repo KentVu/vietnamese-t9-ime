@@ -4,7 +4,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.filterToOne
@@ -87,12 +89,14 @@ class AppRunner {
   }
 
   fun ComposeUiTest.candidatesAllMatches(regex: Regex) {
-    assertTrue(
-      onCandidates().also { it.printToLog("candidatesContain") }.onChildren().fetchSemanticsNodes()
-        .all { sn ->
-          sn.config[SemanticsProperties.Text].any { regex.matches(it) }
-        }, "Not all candidate matches $regex"
-    )
+    candidatesAllMatches(SemanticsMatcher("${SemanticsProperties.Text.name} matches $regex",) { node ->
+      node.config[SemanticsProperties.Text].any { regex.matches(it) }
+    })
+  }
+
+  fun ComposeUiTest.candidatesAllMatches(matcher: SemanticsMatcher) {
+    onCandidates().also { it.printToLog("candidatesContain") }
+      .onChildren().assertAll(matcher)
   }
 
   companion object {

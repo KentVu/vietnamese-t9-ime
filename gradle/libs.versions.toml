@@ -12,6 +12,7 @@ android-targetSdk = "34"
 
 compose-multiplatform = "1.7.3" # https://github.com/JetBrains/compose-multiplatform/releases
 compose-ui = "1.7.8" # https://developer.android.com/jetpack/androidx/releases/compose-ui
+#uiTestAndroid = "1.8.2"
 
 coroutines = "1.10.1" # https://github.com/Kotlin/kotlinx.coroutines
 coroutines-test = "1.10.1" # https://github.com/Kotlin/kotlinx.coroutines

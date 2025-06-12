@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.I
+import org.jetbrains.compose.web.dom.Li
 import org.jetbrains.compose.web.dom.Small
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
@@ -72,6 +73,10 @@ class BrowserUI(
       Div({ classes("candidates") }) {
         Ul({ classes("list-group", "list-group-horizontal") }) {
           val candidates = state.candidates
+          if (candidates.isEmpty())
+            Li({classes("list-group-item", "disabled")}){
+              Text("Please type...")
+            }
           candidates.forEachIndexed { i, candidate ->
             A("#", {
               onClick {

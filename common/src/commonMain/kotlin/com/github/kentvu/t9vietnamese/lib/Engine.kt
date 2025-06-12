@@ -175,9 +175,7 @@ class Engine(
                 updateCandidateSelection(getPunctuationMarks())
             }
             return
-            // pass through
         }
-        val _candidates = linkedSetOf<String>()
         if (action == Action.Shift) {
             shiftMode = !shiftMode
             if (isComposing()) {
@@ -211,14 +209,17 @@ class Engine(
         val subChars = keyPad.numericSubstitution(action)
         if (fullSequence.length == 1) {
             // Only start searching from 2nd key to prevent too many candidates
+            val _candidates = linkedSetOf<String>()
             subChars.map { "$it" }.forEach { c ->
-              if (trie.containsPrefix(c)) {
-                  _candidates.add(c)
-                  _prefixes.add(c)
-              }
-          }
+                if (trie.containsPrefix(c)) {
+                    _candidates.add(c)
+                    _prefixes.add(c)
+                }
+            }
             prefixes = _prefixes
             prefixesCache[fullSequence.toString()] = _prefixes
+            updateCandidateSelection(_candidates)
+            return
         } else {
             prefixes.forEach { pf ->
                 subChars.forEach { sc ->
