@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.KeypadEvent
 import com.github.kentvu.t9vietnamese.Presenter
@@ -21,6 +24,7 @@ import org.jetbrains.compose.web.dom.Small
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Ul
+import kotlin.collections.elementAt
 import kotlin.collections.forEachIndexed
 import kotlin.text.orEmpty
 
@@ -33,10 +37,16 @@ class BrowserUI(
   @Composable
   fun Emulator(confirmedText: String) {
     val state by stateSource.collectAsState()
+    val radioOptions = EditorInfo.Class.entries
+    var currentMode by remember { mutableStateOf(EditorInfo.Class.Normal) }
     // Call onStartInputView once to init the keypad (mimicking IM service)
     LaunchedEffect(state.keypadEventSink) {
-      onStartInputView(EditorInfo(EditorInfo.Class.Normal))
+      onStartInputView(EditorInfo(currentMode))
     }
+    if (state.error != null)
+      Div({classes("alert", "alert-danger")}) {
+        Text("Error: ${state.error}")
+      }
     Div({ classes("emulator") }) {
       Div({ classes("screen") }) {
         Span({ classes("prev-text") }) {
@@ -47,7 +57,7 @@ class BrowserUI(
             Text(state.candidates.selectedCandidate.text)
         }
       }
-      val onKeyClick: (key: Key, isLong: Boolean) -> Unit = { key, isLong ->
+      fun onKeyClick(key: Key, isLong: Boolean = false) {
         state.keypadEventSink(
           KeypadEvent.KeyPress(
             if (!isLong) key.action
@@ -56,14 +66,22 @@ class BrowserUI(
       }
       Div({ classes("controller") }) {
         Button({
-          onClick { onKeyClick(state.keyPad.keyHash, false) }
+          onClick {
+            //onKeyClick(state.keyPad.keyHash, false)
+            currentMode = radioOptions.rotateNext(currentMode)
+            onStartInputView(EditorInfo(currentMode))
+          }
           classes("prediction-cycle", "btn", "btn-primary")
+          title("Switch mode")
         }) {
-          I({ classes("bi", "bi-arrow-clockwise") })
-          Text(" cycle")
+          I({ classes("bi", "bi-arrow-clockwise") })  // hash
+          Text(" swmd")
+        }
+        Span({classes("px-2")}) {
+          Text(currentMode.name)
         }
         Button({
-          onClick { onKeyClick(state.keyPad.keyBackspace, false) }
+          onClick { onKeyClick(state.keyPad.keyBackspace) }
           classes("delete", "float-end", "btn", "btn-primary")
         }) {
           I({ classes("bi", "bi-arrow-left-circle") })
@@ -73,6 +91,7 @@ class BrowserUI(
       Div({ classes("candidates") }) {
         Ul({ classes("list-group", "list-group-horizontal") }) {
           val candidates = state.candidates
+          // Add a placeholder to prevent keypad being brought up.
           if (candidates.isEmpty())
             Li({classes("list-group-item", "disabled")}){
               Text("Please type...")
@@ -90,7 +109,7 @@ class BrowserUI(
                 }
               }) 
               if (candidates.selectedCandidate == candidate) ref { htmlElm ->
-                htmlElm.scrollIntoView()
+                htmlElm.scrollIntoView(/*alignToTop*/false)
                 onDispose {  }
               }
             }) {
@@ -109,7 +128,7 @@ class BrowserUI(
         val keypad = state.keyPad
         with(keypad) {
           @Composable
-          fun Key(key: Key) = Key(key, onKeyClick)
+          fun Key(key: Key) = Key(key, ::onKeyClick)
           Key(key1)
           Key(key2)
           Key(key3)
@@ -120,7 +139,7 @@ class BrowserUI(
           Key(key8)
           Key(key9)
           //Key(key0)
-          Key(com.github.kentvu.t9vietnamese.model.Key(Action.Zero))
+          Key(Key(Action.Zero))
           /*Button({
             onClick{ onKeyClick(key0, true) }
             classes("key", "key-0")
@@ -129,20 +148,21 @@ class BrowserUI(
             Text("0")
           }*/
           Button({
-            onClick{ onKeyClick(keyStar, false) }
+            onClick{ onKeyClick(keyStar) }
             classes("key", "key-star")
             value("symbol")
+            title("cycle")
           }) {
             Text("*")
           }
           Button({
-            onClick{ onKeyClick(key0, false) }
+            onClick{ onKeyClick(Key(Action.Space)) }
             //onLongClick {}
             classes("key", "key-space")
             value("0")
           }) {
-            Text("${key0.action.displaySymbol}")
-            Small { Text("${key0.longAction?.displaySymbol.orEmpty()}") }
+            Text("${Action.Space.displaySymbol}")
+            //Small { Text("${key0.longAction?.displaySymbol.orEmpty()}") }
           }
         }
       }
@@ -170,8 +190,19 @@ class BrowserUI(
   }
 
   override fun onStartInputView(info: EditorInfo): Boolean {
-    stateSource.value.keypadEventSink(KeypadEvent.InputViewStart(
-      EditorInfo(EditorInfo.Class.Normal)))
+    stateSource.value.keypadEventSink(
+      KeypadEvent.InputViewStart(info)
+    )
     return true
   }
+}
+
+private fun <E> Collection<E>.rotateNext(curItem: E): E {
+  forEachIndexed { i, e ->
+    if (e == curItem) return elementAt(
+      if (i >= (size - 1)) 0
+      else i+1
+    )
+  }
+  error("$curItem is not in $this")
 }

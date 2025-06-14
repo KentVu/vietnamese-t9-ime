@@ -11,7 +11,29 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
   </head>
   <body>
-    <div id="root"/>
+    <main>
+      <div class="container py-5">
+        <h2 class="pb-2 px-4 border-bottom">
+          <img src="ic_t9.svg" alt="icon" class="bi" width="32" height="32" />
+          T9 keypad demo
+        </h2>
+        <div class="row">
+          <div class="col-md-4">
+            <div id="root"/>
+          </div>
+        </div>
+        <div class="row g-4 row-cols-1 row-cols-lg-3">
+          <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"> </div>
+            <h3 class="fs-2 text-body-emphasis"><!--Featured title--></h3>
+            <p>
+              This is the demo of my project <a href="https://github.com/KentVu/vietnamese-t9-ime/">vietnamese-t9-ime</a>.
+              It uses the same common code which is also used in the desktop and Android app using Kotlin-multiplatform.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
   </body>
   <script src="webDemo.js"></script>
 </html>

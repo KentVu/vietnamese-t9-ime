@@ -295,6 +295,7 @@ class Engine(
     }
 
     fun switchMode(editorInfo: EditorInfo) {
+        log.debug("Switching mode: $editorInfo")
         mode = editorInfo
         //keyPad = KeyPads.VN
         keyPad = when (mode.aClass) {

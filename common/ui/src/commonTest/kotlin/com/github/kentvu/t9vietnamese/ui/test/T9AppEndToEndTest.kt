@@ -38,7 +38,7 @@ class T9AppEndToEndTest {
   }
 
   private val textHasLength1 = SemanticsMatcher("${SemanticsProperties.Text.name} has length 1",) { node ->
-    node.config[SemanticsProperties.Text].any { it.length == 1 }
+    node.config[SemanticsProperties.Text].any { it.length == 1 } // TODO can be extracted to a matcher parameter
   }
 
 }
