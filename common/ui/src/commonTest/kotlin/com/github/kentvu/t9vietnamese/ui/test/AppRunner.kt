@@ -12,6 +12,7 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTextExactly
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -97,6 +98,14 @@ class AppRunner {
   fun ComposeUiTest.candidatesAllMatches(matcher: SemanticsMatcher) {
     onCandidates().also { it.printToLog("candidatesContain") }
       .onChildren().assertAll(matcher)
+  }
+
+  fun ComposeUiTest.tapReportButton() {
+    onNodeWithContentDescription(ImeServiceUI.Semantic.report_button).performClick()
+  }
+
+  fun ComposeUiTest.showsReportUi() {
+    onNodeWithContentDescription(ImeServiceUI.Semantic.report_ui).isDisplayed()
   }
 
   companion object {

@@ -281,6 +281,8 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         const val candidates = "Candidates"
         const val selectedCandidate: String = "selected_candidate"
         const val testOutput: String = "test_output"
+        const val report_button = "report_button"
+        const val report_ui = "report_ui"
     }
 
     companion object {
