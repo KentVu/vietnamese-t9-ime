@@ -42,7 +42,7 @@ class T9AppTest {
     @Test
     fun displayInitializedWhenTrieLoaded() = runTest {
         app.start()
-        assertTrue(presenter.stateHistory.last().initialized)
+        assertTrue(presenter.stateSource.value.initialized)
     }
 
     class FakeEnvironmentInteraction : EnvironmentInteraction {

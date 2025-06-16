@@ -21,21 +21,9 @@ class AndroidEnvironmentInteraction(private val context: Context) : EnvironmentI
         get() = Dispatchers.IO
     override val fileSystem: FileSystem
         get() = AndroidFileSystem(context)
-    @OptIn(ExperimentalResourceApi::class)
-    override val vnWordsSource: Flow<Result<Source>>
-        get() = sourceFrom(Res.getUri("files/vi-DauMoi.dic"))
-    @OptIn(ExperimentalResourceApi::class)
-    override val vnTrieSource: Flow<Result<Source>>
-        get() = sourceFrom(Res.getUri("files/vi-DauMoi.dawg"))
 
-    private fun sourceFrom(resUri: String): Flow<Result<Source>> {
-        return flow {
-            emit(Result.success(context.assets.open(
-                resUri
-                    // This Uri is only supported in WebView, there's no way to open the file as stream via compose-resources
-                    // https://stackoverflow.com/questions/5030448/android-how-to-find-the-absolute-path-of-the-assets-folder?noredirect=1&lq=1
-                    .removePrefix("file:///android_asset/")
-            ).source()))
-        }.catch { Result.failure<Source>(it) }
+    @OptIn(ExperimentalResourceApi::class)
+    override suspend fun readVnTrie(): ByteArray {
+      return Res.readBytes("files/vi-DauMoi.dawg")
     }
 }
