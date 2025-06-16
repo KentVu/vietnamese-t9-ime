@@ -18,14 +18,8 @@ internal class DawgTrieTest {
     @OptIn(ExperimentalResourceApi::class)
     @Test
     fun trieTest() = runTest {
-        val trie: Trie =
-            DawgTrie(
-                DecomposedVietnameseWords(
-                    flow { emit(Result.success(File(URI(Res.getUri("files/vi-DauMoi.dic"))).source())) }
-                        .catch { emit(Result.failure(it)) }),
-                FileSystem.SYSTEM
-            )
-        trie.load()
+        val trie: Trie = DawgTrie(FileSystem.SYSTEM)
+        trie.load(Res.readBytes("files/vi-DauMoi.dawg"))
         val search = trie.prefixSearch("chà")
         search.forEach { println(it) }
     }

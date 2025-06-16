@@ -43,6 +43,9 @@ kotlin {
     binaries.executable()
   }
   sourceSets {
+    commonTest.dependencies {
+      implementation(kotlin("test")) // This makes test annotations and functionality available in JS
+    }
     val jsMain by getting {
       dependencies {
         implementation(project(":common"))
