@@ -27,6 +27,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key as ModelKey
 import com.github.kentvu.t9vietnamese.model.KeyPad
+import com.github.kentvu.t9vietnamese.ui.CommonUI.Semantic.Companion.attach
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -194,9 +196,9 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
     protected fun CandidatesView(candidates: CandidateSelection, onItemSelected: (Int) -> Unit) {
         val state = rememberLazyListState(candidates.selectedCandidateId)
         LazyRow(
-            modifier = Modifier.semantics {
-                contentDescription = Semantic.candidates
-            }.background(Color.LightGray),
+            modifier = Modifier
+                .semantics { attach(Semantic.Candidates) }
+                .background(Color.LightGray),
             state = state
         ) {
             CandidateSelection.forEachIndexed(candidates) { i, cand ->
@@ -206,9 +208,8 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                         Modifier.padding(start = 4.dp)
                             .run {
                                 if (candidates.selectedCandidate == cand)
-                                    semantics {
-                                        contentDescription = Semantic.selectedCandidate
-                                    }.background(Color.Gray)
+                                    semantics { attach(Semantic.selected_candidate) }
+                                        .background(Color.Gray)
                                 else clickable { onItemSelected(i) }
                             }
                     )
@@ -277,13 +278,16 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         }
     }
 
-    object Semantic {
-        const val candidates = "Candidates"
-        const val selectedCandidate: String = "selected_candidate"
-        const val testOutput: String = "test_output"
-        const val report_button = "report_button"
-        const val report_ui = "report_ui"
-    }
+    enum class Semantic: CommonUI.Semantic {
+        Candidates,
+        selected_candidate,
+        report_button,
+        `report_ui`,
+        ;
+        // Example of receiver hell :sigh:
+        //val attach: SemanticsPropertyReceiver.() -> Unit = {
+        //fun SemanticsPropertyReceiver.attach () {
+        //fun attach(receiver: SemanticsPropertyReceiver) = receiver.contentDescription = name }
 
     companion object {
         private val log = Logger.tag("ImeServiceUI")

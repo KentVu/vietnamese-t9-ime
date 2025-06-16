@@ -18,21 +18,6 @@ class TestPresenter : Presenter {
     private val stateHistory = mutableSetOf(stateSource.value)
     val evHistory = mutableSetOf<KeypadEvent>()
 
-    object NullInputSystemConnection : InputSystemConnection {
-        override fun commitText(text: String) {
-            TODO("Not yet implemented")
-        }
-
-        override fun deleteSurroundingText(beforeLength: Int, afterLength: Int) {
-            TODO("Not yet implemented")
-        }
-
-        override fun performEditorAction() {
-            TODO("Not yet implemented")
-        }
-
-    }
-
     override fun updateState(manipulator: (Presenter.State) -> Presenter.State) {
         //manipulator(stateSource.value)
         stateSource.update(manipulator)

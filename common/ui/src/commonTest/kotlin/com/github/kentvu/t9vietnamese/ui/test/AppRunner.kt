@@ -86,7 +86,7 @@ class AppRunner {
 
   private fun ComposeUiTest.onCandidates(): SemanticsNodeInteraction {
     //waitUntilAtLeastOneExists()
-    return onNodeWithContentDescription(ImeServiceUI.Semantic.candidates)
+    return onNodeWithContentDescription(ImeServiceUI.Semantic.Candidates.name)
   }
 
   fun ComposeUiTest.candidatesAllMatches(regex: Regex) {
@@ -101,11 +101,11 @@ class AppRunner {
   }
 
   fun ComposeUiTest.tapReportButton() {
-    onNodeWithContentDescription(ImeServiceUI.Semantic.report_button).performClick()
+    onNodeWithContentDescription(ImeServiceUI.Semantic.report_button.name).performClick()
   }
 
   fun ComposeUiTest.showsReportUi() {
-    onNodeWithContentDescription(ImeServiceUI.Semantic.report_ui).isDisplayed()
+    onNodeWithContentDescription(ImeServiceUI.Semantic.report_ui.name).isDisplayed()
   }
 
   companion object {
