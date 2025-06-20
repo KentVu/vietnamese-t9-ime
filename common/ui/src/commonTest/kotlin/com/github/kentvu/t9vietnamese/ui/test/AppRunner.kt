@@ -22,6 +22,7 @@ import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.ui.CommonUI
 import com.github.kentvu.t9vietnamese.ui.DesktopEnvironmentInteraction
 import com.github.kentvu.t9vietnamese.ui.DesktopPresenter
 import com.github.kentvu.t9vietnamese.ui.DesktopUI
@@ -89,24 +90,17 @@ class AppRunner {
     return onNodeWithContentDescription(ImeServiceUI.Semantic.Candidates.name)
   }
 
-  fun ComposeUiTest.candidatesAllMatches(regex: Regex) {
-    candidatesAllMatches(SemanticsMatcher("${SemanticsProperties.Text.name} matches $regex",) { node ->
-      node.config[SemanticsProperties.Text].any { regex.matches(it) }
-    })
-  }
-
   fun ComposeUiTest.candidatesAllMatches(matcher: SemanticsMatcher) {
     onCandidates().also { it.printToLog("candidatesContain") }
       .onChildren().assertAll(matcher)
   }
 
-  fun ComposeUiTest.tapReportButton() {
-    onNodeWithContentDescription(ImeServiceUI.Semantic.report_button.name).performClick()
-  }
-
   fun ComposeUiTest.showsReportUi() {
     onNodeWithContentDescription(ImeServiceUI.Semantic.report_ui.name).isDisplayed()
   }
+
+  fun ComposeUiTest.find(semantic: CommonUI.Semantic): SemanticsNodeInteraction =
+    onNodeWithContentDescription(semantic.name)
 
   companion object {
     private fun ComposeUiTest.hasKeyEnabled(key: Key) {

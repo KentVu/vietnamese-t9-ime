@@ -215,6 +215,15 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                     )
                 }
             }
+            item(Semantic.report_button) {
+                Text(
+                    "+",
+                    Modifier
+                        .padding(start = 6.dp)
+                        .clickable { TODO() }
+                        .semantics { attach(Semantic.report_button) }
+                )
+            }
         }
         if (state.layoutInfo.visibleItemsInfo.isNotEmpty())
         if ((candidates.selectedCandidateId >= state.layoutInfo.visibleItemsInfo.last().index) ||
@@ -287,7 +296,8 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         // Example of receiver hell :sigh:
         //val attach: SemanticsPropertyReceiver.() -> Unit = {
         //fun SemanticsPropertyReceiver.attach () {
-        //fun attach(receiver: SemanticsPropertyReceiver) = receiver.contentDescription = name }
+        //fun attach(receiver: SemanticsPropertyReceiver) = receiver.contentDescription = name
+    }
 
     companion object {
         private val log = Logger.tag("ImeServiceUI")
