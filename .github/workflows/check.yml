@@ -1,0 +1,44 @@
+# https://github.com/DeployGate/deploygate-upload-github-action
+name: JVM Tests
+
+on:
+  pull_request:
+    branches:
+      - v2-compose
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Run tests.
+        run: ./gradlew :common:jvmTest :common:ui:jvmTest :webDemo:jsBrowserTest
+
+      - name: Build Release Bundle
+        run: ./gradlew :app:bundleDebug
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: (!cancelled())
+        with:
+          files: |
+            common/build/test-results/**/*.xml
+            common/ui/build/test-results/**/*.xml
+            webDemo/build/test-results/**/*.xml
+

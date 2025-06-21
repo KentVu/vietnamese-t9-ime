@@ -42,6 +42,8 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
           cache: 'gradle'
+      - name: Check JS
+        run: ./gradlew :webDemo:jsBrowserTest
       - name: Build JS
         run: ./gradlew :webDemo:build
       - name: Upload artifact
