@@ -4,9 +4,13 @@ vietnamese-t9-ime
 [![Join the chat at https://gitter.im/KentVu/vietnamese-t9-ime](https://badges.gitter.im/KentVu/vietnamese-t9-ime.svg)](https://gitter.im/KentVu/vietnamese-t9-ime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Android CI](https://github.com/KentVu/vietnamese-t9-ime/actions/workflows/android.yml/badge.svg)](https://github.com/KentVu/vietnamese-t9-ime/actions/workflows/android.yml)
 [![Build Status](https://travis-ci.org/KentVu/vietnamese-t9-ime.svg?branch=master)](https://travis-ci.org/KentVu/vietnamese-t9-ime)
+[![Run Multiplatforms Tests](https://github.com/KentVu/vietnamese-t9-ime/actions/workflows/check.yml/badge.svg)](https://github.com/KentVu/vietnamese-t9-ime/actions/workflows/check.yml)
 [ ![Download](https://api.bintray.com/packages/kentvu/t9vietnamese/t9-vietnamese-ime/images/download.svg) ](https://bintray.com/kentvu/t9vietnamese/t9-vietnamese-ime/_latestVersion)
+[<img src="https://dply.me/hkm15t/button/large" alt="Try it on your device via DeployGate">](https://dply.me/hkm15t#install)
 
 An old-fashioned keypad based input method (T9) for Vietnamese, support accents
+
+You can try it online here: http://kentvu.github.io/vietnamese-t9-ime/
 
 The T9 input method
 ===================
