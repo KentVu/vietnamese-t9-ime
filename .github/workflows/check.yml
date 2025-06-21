@@ -6,6 +6,8 @@ on:
     branches:
       - v2-compose
     types: [opened, synchronize]
+    paths:
+      - '!.github/workflows'
   workflow_dispatch:
 
 permissions:

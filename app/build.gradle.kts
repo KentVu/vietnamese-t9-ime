@@ -56,6 +56,24 @@ android {
 
   buildFeatures { compose = true }
 
+  signingConfigs {
+    // https://github.com/Julow/Unexpected-Keyboard/blob/master/CONTRIBUTING.md#specifying-a-debug-signing-certificate-on-github-actions
+    // Debug builds will always be signed. If no environment variables are set, a default
+    // keystore will be initialized by the task initDebugKeystore and used. This keystore
+    // can be uploaded to GitHub secrets by following instructions in CONTRIBUTING.md
+    // in order to always receive correctly signed debug APKs from the CI.
+    getByName("debug") {
+      val keystorePath = System.getenv("DEBUG_KEYSTORE")
+      if (keystorePath != null) {
+        storeFile = file(keystorePath)
+        storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")// ?: "debug0"
+        keyAlias = System.getenv("DEBUG_KEY_ALIAS")// ?: "debug"
+        keyPassword = System.getenv("DEBUG_KEY_PASSWORD")// ?: "debug0"
+      }
+    }
+
+  }
+
   buildTypes {
     release {
       isMinifyEnabled = false
