@@ -23,6 +23,22 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      # https://github.com/Julow/Unexpected-Keyboard/blob/master/.github/workflows/make-apk.yml
+      - name: Restore debug keystore from GitHub Secrets
+        run: |
+          # Check if exist and use the secret named DEBUG_KEYSTORE
+          # The contents of the secret can be obtained -
+          #  from the debug.keystore.asc from you local folder 
+          #  (refer to CONTRIBUTING.md Using the local debug.keystore on the Github CI actions)
+          if [[ ! "${{ secrets.DEBUG_KEYSTORE }}" = "" ]]; then
+              echo "${{ secrets.DEBUG_KEYSTORE }}" > "debug.keystore.asc"
+              if [[ -s "debug.keystore.asc" ]]; then
+                  echo "Restoring debug keystore from GitHub secrets"
+                  mkdir -pv ~/.android
+                  gpg -d --passphrase "debug0" --batch "debug.keystore.asc" > ~/.android/debug.keystore
+              fi
+          fi
+
       - name: UI Test
         run: ./gradlew :common:jvmTest :common:ui:jvmTest
 
