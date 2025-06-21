@@ -3,7 +3,9 @@ plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.compose.compiler)
+  id("deploygate")
 }
+//apply(plugin = "deploygate")
 
 kotlin {
   androidTarget {
@@ -68,5 +70,9 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.compose.ui.tooling.preview)
 }
+
+/*deploygate {
+  appOwnerName = "me"
+}*/

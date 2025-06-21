@@ -18,6 +18,15 @@ pluginManagement {
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
   }
+  resolutionStrategy {
+      eachPlugin {
+          when (requested.id.id) {
+              "deploygate" ->
+                  useModule("com.deploygate:gradle:2.9.0") //${required.version}
+                  //useModule("${libs.}:${required.version}")
+          }
+      }
+  }
 }
 
 dependencyResolutionManagement {
