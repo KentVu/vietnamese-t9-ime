@@ -31,6 +31,7 @@ import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
@@ -202,7 +203,7 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                 TextButton(onClick = {
                     handler.openUri(uri)
                     state.keypadEventSink(KeypadEvent.ReportClick)
-                }) { Text(uri) }
+                }, Semantic.ReportButton.modifier()) { Text(uri) }
             }
         else CandidatesView(state.candidates, modifier, onReportClick = {
             state.keypadEventSink(KeypadEvent.ShowReportClick)
@@ -317,6 +318,10 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         ReportUi,
         ReportButton,
         ;
+
+        fun modifier(org: Modifier = Modifier): Modifier {
+            return org.semantics { contentDescription = name }
+        }
         // Example of receiver hell :sigh:
         //val attach: SemanticsPropertyReceiver.() -> Unit = {
         //fun SemanticsPropertyReceiver.attach () {

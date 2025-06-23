@@ -95,8 +95,8 @@ class AppRunner {
       .onChildren().assertAll(matcher)
   }
 
-  fun ComposeUiTest.showsReportUi() {
-    onNodeWithContentDescription(ImeServiceUI.Semantic.ReportUi.name).isDisplayed()
+  fun ComposeUiTest.onReportUi(): SemanticsNodeInteraction {
+    return onNodeWithContentDescription(ImeServiceUI.Semantic.ReportUi.name)
   }
 
   fun ComposeUiTest.find(semantic: CommonUI.Semantic): SemanticsNodeInteraction =
