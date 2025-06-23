@@ -80,9 +80,11 @@ class AppRunner {
     type(keypad.findKey(c))
   }
 
-  private fun ComposeUiTest.type(key: Key) {
-    onNode(hasText(key.action.displaySymbol) and hasText(key.subChars.orEmpty()))
-    .performClick()
+  fun ComposeUiTest.type(key: Key) {
+    (key.action.rawChar?.let { rawChar ->
+      onNode(hasText("$rawChar") and hasText(key.subChars.orEmpty()))
+    } ?: onNode(hasText(key.action.displaySymbol)))
+        .performClick()
   }
 
   private fun ComposeUiTest.onCandidates(): SemanticsNodeInteraction {

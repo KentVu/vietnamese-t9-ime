@@ -201,7 +201,7 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                 .background(Color.LightGray),
             state = state
         ) {
-            CandidateSelection.forEachIndexed(candidates) { i, cand ->
+            candidates.forEachIndexed { i, cand ->
                 item(cand.text) {
                     Text(
                         cand.text,
@@ -214,15 +214,15 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                             }
                     )
                 }
-            }
-            item(Semantic.report_button) {
-                Text(
-                    "+",
-                    Modifier
-                        .padding(start = 6.dp)
-                        .clickable { TODO() }
-                        .semantics { attach(Semantic.report_button) }
-                )
+                if (i == candidates.lastIndex()) item(Semantic.report_button) {
+                    Text(
+                        "+",
+                        Modifier
+                            .padding(start = 6.dp)
+                            .clickable { TODO() }
+                            .semantics { attach(Semantic.report_button) }
+                    )
+                }
             }
         }
         if (state.layoutInfo.visibleItemsInfo.isNotEmpty())

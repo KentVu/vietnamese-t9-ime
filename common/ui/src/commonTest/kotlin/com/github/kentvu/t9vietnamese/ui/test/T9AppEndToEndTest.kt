@@ -3,9 +3,11 @@ package com.github.kentvu.t9vietnamese.ui.test
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
+import com.github.kentvu.t9vietnamese.model.KeyPads
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import kotlin.test.Test
 import kotlin.text.Regex
@@ -41,10 +43,21 @@ class T9AppEndToEndTest {
   }
 
   @Test
+  fun reportMissingWord_whenCandidatesEmpty_doNotDisplay() = runComposeUiTest {
+    with(runner) {
+      startApp()
+      find(ImeServiceUI.Semantic.report_button).assertDoesNotExist()
+      type("2")
+      find(ImeServiceUI.Semantic.report_button).assertIsDisplayed()
+      type(KeyPads.VN.keyBackspace)
+      find(ImeServiceUI.Semantic.report_button).assertDoesNotExist()
+    }
+  }
+
+  @Test
   fun reportMissingWord_open() = runComposeUiTest {
     with(runner) {
       startApp()
-      find(ImeServiceUI.Semantic.report_button).assertIsNotDisplayed()
       type("2")
       find(ImeServiceUI.Semantic.report_button).performClick()
       showsReportUi()
