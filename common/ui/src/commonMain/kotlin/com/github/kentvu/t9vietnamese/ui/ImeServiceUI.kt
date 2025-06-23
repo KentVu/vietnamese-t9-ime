@@ -4,15 +4,18 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,8 +30,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
@@ -187,18 +189,39 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
 
     @Composable
     override fun CandidateView(state: State) {
-        CandidatesView(state.candidates) {
+        val modifier = Modifier.background(Color.LightGray)
+        if (state.reporting)
+            Row(
+                modifier.semantics { attach(Semantic.ReportUi) }
+                    .horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val uri = "https://kentvu.github.io/vietnamese-t9-ime/"
+                val handler = LocalUriHandler.current
+                Text("Please report at ")
+                TextButton(onClick = {
+                    handler.openUri(uri)
+                    state.keypadEventSink(KeypadEvent.ReportClick)
+                }) { Text(uri) }
+            }
+        else CandidatesView(state.candidates, modifier, onReportClick = {
+            state.keypadEventSink(KeypadEvent.ShowReportClick)
+        }) {
             state.keypadEventSink(KeypadEvent.CandidateSelect(it))
         }
     }
 
     @Composable
-    protected fun CandidatesView(candidates: CandidateSelection, onItemSelected: (Int) -> Unit) {
+    protected fun CandidatesView(
+        candidates: CandidateSelection,
+        modifier: Modifier = Modifier,
+        onReportClick: () -> Unit,
+        onItemSelected: (Int) -> Unit
+    ) {
         val state = rememberLazyListState(candidates.selectedCandidateId)
         LazyRow(
-            modifier = Modifier
-                .semantics { attach(Semantic.Candidates) }
-                .background(Color.LightGray),
+            modifier = modifier
+                .semantics { attach(Semantic.Candidates) },
             state = state
         ) {
             candidates.forEachIndexed { i, cand ->
@@ -214,13 +237,13 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
                             }
                     )
                 }
-                if (i == candidates.lastIndex()) item(Semantic.report_button) {
+                if (i == candidates.lastIndex()) item(Semantic.ShowReportUiButton) {
                     Text(
                         "+",
                         Modifier
                             .padding(start = 6.dp)
-                            .clickable { TODO() }
-                            .semantics { attach(Semantic.report_button) }
+                            .clickable { onReportClick() }
+                            .semantics { attach(Semantic.ShowReportUiButton) }
                     )
                 }
             }
@@ -290,8 +313,9 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
     enum class Semantic: CommonUI.Semantic {
         Candidates,
         selected_candidate,
-        report_button,
-        `report_ui`,
+        ShowReportUiButton,
+        ReportUi,
+        ReportButton,
         ;
         // Example of receiver hell :sigh:
         //val attach: SemanticsPropertyReceiver.() -> Unit = {

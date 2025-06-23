@@ -4,13 +4,11 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
 import com.github.kentvu.t9vietnamese.model.KeyPads
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import kotlin.test.Test
-import kotlin.text.Regex
 
 @OptIn(ExperimentalTestApi::class)
 class T9AppEndToEndTest {
@@ -46,11 +44,11 @@ class T9AppEndToEndTest {
   fun reportMissingWord_whenCandidatesEmpty_doNotDisplay() = runComposeUiTest {
     with(runner) {
       startApp()
-      find(ImeServiceUI.Semantic.report_button).assertDoesNotExist()
+      find(ImeServiceUI.Semantic.ShowReportUiButton).assertDoesNotExist()
       type("2")
-      find(ImeServiceUI.Semantic.report_button).assertIsDisplayed()
+      find(ImeServiceUI.Semantic.ShowReportUiButton).assertIsDisplayed()
       type(KeyPads.VN.keyBackspace)
-      find(ImeServiceUI.Semantic.report_button).assertDoesNotExist()
+      find(ImeServiceUI.Semantic.ShowReportUiButton).assertDoesNotExist()
     }
   }
 
@@ -59,7 +57,7 @@ class T9AppEndToEndTest {
     with(runner) {
       startApp()
       type("2")
-      find(ImeServiceUI.Semantic.report_button).performClick()
+      find(ImeServiceUI.Semantic.ShowReportUiButton).performClick()
       showsReportUi()
     }
   }

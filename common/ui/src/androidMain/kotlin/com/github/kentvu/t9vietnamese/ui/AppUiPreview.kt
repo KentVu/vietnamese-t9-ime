@@ -25,6 +25,8 @@ fun AppPreview() {
                     KeypadEvent.CloseRequest -> TODO()
                     is KeypadEvent.KeyPress -> TODO()
                     is KeypadEvent.InputViewStart -> TODO()
+                    KeypadEvent.ShowReportClick -> TODO()
+                    KeypadEvent.ReportClick -> TODO()
                 }
               }
         ),

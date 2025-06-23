@@ -47,6 +47,7 @@ jobs:
 
       - name: Persist test result
         uses: actions/upload-artifact@v4
+        if: (!cancelled())
         with:
           name: vietnamese-t9-ime-test-result
           path: | #webDemo/build/test-results/

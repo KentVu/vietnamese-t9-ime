@@ -1,7 +1,6 @@
 package com.github.kentvu.t9vietnamese.ui.test
 
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
@@ -29,7 +28,6 @@ import com.github.kentvu.t9vietnamese.ui.DesktopUI
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import kotlinx.coroutines.test.TestScope
 import kotlin.also
-import kotlin.test.assertTrue
 import kotlin.text.forEach
 
 @OptIn(ExperimentalTestApi::class)
@@ -98,7 +96,7 @@ class AppRunner {
   }
 
   fun ComposeUiTest.showsReportUi() {
-    onNodeWithContentDescription(ImeServiceUI.Semantic.report_ui.name).isDisplayed()
+    onNodeWithContentDescription(ImeServiceUI.Semantic.ReportUi.name).isDisplayed()
   }
 
   fun ComposeUiTest.find(semantic: CommonUI.Semantic): SemanticsNodeInteraction =

@@ -17,6 +17,7 @@ interface Presenter {
         val initialized: Boolean = false,
         val error: Exception? = null,
         val closed: Boolean = false,
+        val reporting: Boolean = false,
 
         val keyPad: KeyPad = KeyPads.VN,
         val candidates: CandidateSelection = CandidateSelection(),
