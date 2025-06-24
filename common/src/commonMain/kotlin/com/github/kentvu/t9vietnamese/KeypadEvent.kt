@@ -12,7 +12,7 @@ sealed class KeypadEvent: AppEvent {
     data class CandidateSelect(val candidateId: Int) : KeypadEvent() {}
     data class InputViewStart(val editorInfo: EditorInfo) : KeypadEvent() {}
     data object ShowReportClick : KeypadEvent()
-    data object ReportClick : KeypadEvent()
+    data object DismissReportClick : KeypadEvent()
 
     data object CloseRequest : KeypadEvent()
 }

@@ -9,8 +9,8 @@ class DecomposeVietnameseTest {
     @Test
     fun decomposeVietnameseTest() {
         val s = "đ"
-        val normalized = s.normalize(Form.NFKD)
-        println(normalized)
-        assertEquals(s, normalized)
+        val decomposed = s.normalize(Form.NFKD)
+        println(decomposed)
+        assertEquals(s, decomposed)
     }
 }

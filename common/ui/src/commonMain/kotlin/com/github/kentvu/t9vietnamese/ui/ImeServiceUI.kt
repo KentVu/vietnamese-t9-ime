@@ -191,24 +191,37 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
     @Composable
     override fun CandidateView(state: State) {
         val modifier = Modifier.background(Color.LightGray)
-        if (state.reporting)
-            Row(
-                modifier.semantics { attach(Semantic.ReportUi) }
-                    .horizontalScroll(rememberScrollState()),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val uri = "https://kentvu.github.io/vietnamese-t9-ime/"
-                val handler = LocalUriHandler.current
-                Text("Please report at ")
-                TextButton(onClick = {
-                    handler.openUri(uri)
-                    state.keypadEventSink(KeypadEvent.ReportClick)
-                }, Semantic.ReportButton.modifier()) { Text(uri) }
-            }
-        else CandidatesView(state.candidates, modifier, onReportClick = {
+        if (state.reporting) ReportUi(modifier) {
+            state.keypadEventSink(KeypadEvent.DismissReportClick)
+        } else CandidatesView(state.candidates, modifier, onReportClick = {
             state.keypadEventSink(KeypadEvent.ShowReportClick)
         }) {
             state.keypadEventSink(KeypadEvent.CandidateSelect(it))
+        }
+    }
+
+    @Composable
+    private fun ReportUi(
+        modifier: Modifier,
+        //onReportBtnClick: () -> Unit
+        onDismiss: () -> Unit
+    ) {
+        Row(
+            modifier.semantics { attach(Semantic.ReportUi) }
+                .horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Please report at ")
+            val handler = LocalUriHandler.current
+            val uri = "https://kentvu.github.io/vietnamese-t9-ime/"
+            TextButton(onClick = {
+                handler.openUri(uri)
+                //onReportBtnClick()
+            }, Semantic.ReportButton.modifier()) { Text(uri) }
+            TextButton(
+                onClick = onDismiss,//{ () },
+                Semantic.DismissButton.modifier().padding(horizontal = 4.dp)
+            ) { Text("❌") }
         }
     }
 
@@ -317,6 +330,7 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         ShowReportUiButton,
         ReportUi,
         ReportButton,
+        DismissButton,
         ;
 
         fun modifier(org: Modifier = Modifier): Modifier {

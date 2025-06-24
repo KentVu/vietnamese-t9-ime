@@ -4,9 +4,11 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.util.fastJoinToString
 import com.github.kentvu.t9vietnamese.model.KeyPads
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import kotlin.test.Test
@@ -70,8 +72,20 @@ class T9AppEndToEndTest {
       type("2")
       find(ImeServiceUI.Semantic.ShowReportUiButton).performClick()
       onReportUi().isDisplayed()
-      find(ImeServiceUI.Semantic.ReportButton).performClick()
+      find(ImeServiceUI.Semantic.DismissButton).performClick()
       onReportUi().assertDoesNotExist()
+    }
+  }
+
+  @Test
+  fun reportMissingWord_containsCurrentState() = runComposeUiTest {
+    with(runner) {
+      startApp()
+      val c = '2'
+      type(c)
+      val candidatesStr = getCandidates().fastJoinToString(",", limit = 50, truncated = "")
+      find(ImeServiceUI.Semantic.ShowReportUiButton).performClick()
+      onReportUi().assertTextContains("?numSeq=$c&candidates=$candidatesStr")
     }
   }
 

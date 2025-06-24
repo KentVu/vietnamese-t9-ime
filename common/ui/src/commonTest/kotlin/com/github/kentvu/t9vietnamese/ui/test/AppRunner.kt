@@ -1,6 +1,7 @@
 package com.github.kentvu.t9vietnamese.ui.test
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
@@ -8,7 +9,9 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.isDisplayed
@@ -28,6 +31,8 @@ import com.github.kentvu.t9vietnamese.ui.DesktopUI
 import com.github.kentvu.t9vietnamese.ui.ImeServiceUI
 import kotlinx.coroutines.test.TestScope
 import kotlin.also
+import kotlin.collections.dropLast
+import kotlin.collections.mapNotNull
 import kotlin.text.forEach
 
 @OptIn(ExperimentalTestApi::class)
@@ -73,7 +78,7 @@ class AppRunner {
     //.assertExists()
   }
 
-  private fun ComposeUiTest.type(c: Char) {
+  internal fun ComposeUiTest.type(c: Char) {
     val keypad = presenter.stateSource.value.keyPad
     type(keypad.findKey(c))
   }
@@ -101,6 +106,15 @@ class AppRunner {
 
   fun ComposeUiTest.find(semantic: CommonUI.Semantic): SemanticsNodeInteraction =
     onNodeWithContentDescription(semantic.name)
+
+  fun ComposeUiTest.getCandidates(): List<String> {
+    return onCandidates().onChildren()
+      .filter(!hasContentDescription(ImeServiceUI.Semantic.ShowReportUiButton.name))
+      .fetchSemanticsNodes().map/*NotNull*/ { node ->
+      //if (node.config[SemanticsProperties.ContentDescription]) null
+      node.config[SemanticsProperties.Text].joinToString("")//[0] one elm only?
+    }//.dropLastWhile { it = "+" }
+  }
 
   companion object {
     private fun ComposeUiTest.hasKeyEnabled(key: Key) {
