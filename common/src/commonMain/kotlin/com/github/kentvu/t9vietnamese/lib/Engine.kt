@@ -8,6 +8,7 @@ import com.github.kentvu.t9vietnamese.model.KeyPad
 import com.github.kentvu.t9vietnamese.model.KeyPads
 import kotlin.Exception
 import kotlin.apply
+import kotlin.collections.map
 import kotlin.text.deleteAt
 import kotlin.text.lastIndex
 import kotlin.text.map
@@ -305,6 +306,13 @@ class Engine(
         ui.updateState { it.copy(
             keyPad = keyPad
         ) }
+    }
+
+    fun reportState() {
+        ui.updateState { it.copy(reportInfo = Presenter.ReportInfo(
+            numSeq = fullSequence.toString(),
+            candidates = candidates.map { it.text },
+        )) }
     }
 
     companion object {

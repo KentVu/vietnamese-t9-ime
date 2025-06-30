@@ -110,10 +110,9 @@ class AppRunner {
   fun ComposeUiTest.getCandidates(): List<String> {
     return onCandidates().onChildren()
       .filter(!hasContentDescription(ImeServiceUI.Semantic.ShowReportUiButton.name))
-      .fetchSemanticsNodes().map/*NotNull*/ { node ->
-      //if (node.config[SemanticsProperties.ContentDescription]) null
+      .fetchSemanticsNodes().map { node ->
       node.config[SemanticsProperties.Text].joinToString("")//[0] one elm only?
-    }//.dropLastWhile { it = "+" }
+    }
   }
 
   companion object {

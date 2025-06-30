@@ -13,33 +13,21 @@ repositories {
 }
 
 // https://stackoverflow.com/a/72099910/1562087
-/*val gitHash: String by lazy {
-  val stdout = ByteArrayOutputStream()
-  rootProject.exec {
-    commandLine("git", "rev-parse", "--verify", "--short", "HEAD")
-    standardOutput = stdout
-  }
-  stdout.toString().trim()
-}*/
-// gradle 8.11 is making things harder:( https://github.com/gradle/gradle/issues/30822#issuecomment-2736720755
-/*val commitHash = Runtime
-.getRuntime()
-.exec(arrayOf("git", "rev-parse", "--short", "HEAD"))
-.let { process ->
-  process.waitFor()
-  val output = process.inputStream.use {
-    it.bufferedReader().use(BufferedReader::readText)
-  }
-  process.destroy()
-  output.trim()
-}*/
-val gitVersion = providers.exec {
+/*val gitVersion = providers.exec {
   commandLine("git", "rev-parse", "--short", "HEAD")
-}.standardOutput.asText.get()
+}.standardOutput.asText.get()*/
 
 kotlin {
   js(IR) {
-    browser()
+    browser {
+      testTask {
+        useKarma {
+          useSourceMapSupport()
+          //useChrome()
+          useChromeHeadless()
+        }
+      }
+    }
     binaries.executable()
   }
   sourceSets {
@@ -56,6 +44,15 @@ kotlin {
         implementation(libs.kotlinx.coroutines.core)
         implementation(libs.okio.fakefilesystem)
       }
+    }
+    // https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/HTML/Using_Test_Utils/README.md#using-test-utils-for-unit-testing
+    val jsTest by getting {
+        dependencies {
+          implementation(kotlin("test-js"))
+          implementation(compose.html.testUtils)
+          // For resources to be available in test also.
+          implementation(compose.components.resources)
+        }
     }
   }
 }

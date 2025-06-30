@@ -9,6 +9,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 //import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.H2
 import org.jetbrains.compose.web.dom.Img
@@ -36,6 +37,14 @@ fun main() {
     app.start()
   }
   renderComposable(rootElementId = "root") {
-    ui.Emulator(inputConnection.confirmedText)
+    ui.Emulator(inputConnection.confirmedTextState)
+    Div({classes("row")}) { }
+    /*Div({classes("row")}) {
+      Div({classes("col")}) {
+        Button() {
+          Text("Report")
+        }
+      }
+    }*/
   }
 }

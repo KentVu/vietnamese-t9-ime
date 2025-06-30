@@ -1,12 +1,16 @@
 package com.github.kentvu.t9vietnamese.ui.test
 
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.util.fastJoinToString
 import com.github.kentvu.t9vietnamese.model.KeyPads
@@ -85,7 +89,17 @@ class T9AppEndToEndTest {
       type(c)
       val candidatesStr = getCandidates().fastJoinToString(",", limit = 50, truncated = "")
       find(ImeServiceUI.Semantic.ShowReportUiButton).performClick()
-      onReportUi().assertTextContains("?numSeq=$c&candidates=$candidatesStr")
+      onReportUi().onChildren().also { it.printToLog("reportUi") }
+        .filterToOne(hasTextMatches(Regex("^https?://")))
+        .assertTextContains("?numSeq=$c&candidates=$candidatesStr", true)
+    }
+  }
+
+  private fun hasTextMatches(regex: Regex) = SemanticsMatcher("${SemanticsProperties.Text.name} matches $regex") { node ->
+    if (!node.mergingEnabled) false
+    else node.config[SemanticsProperties.Text].any { regex.containsMatchIn(it) } ?: run {
+      println("${node.config} does not contains Text")
+      false
     }
   }
 

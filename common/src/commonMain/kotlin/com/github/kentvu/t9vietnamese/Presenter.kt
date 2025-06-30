@@ -17,13 +17,23 @@ interface Presenter {
         val initialized: Boolean = false,
         val error: Exception? = null,
         val closed: Boolean = false,
-        val reporting: Boolean = false,
+        val reportInfo: ReportInfo? = null,
 
         val keyPad: KeyPad = KeyPads.VN,
         val candidates: CandidateSelection = CandidateSelection(),
         //https://slackhq.github.io/circuit/states-and-events/
         val keypadEventSink : ((KeypadEvent) -> Unit)
     )
+
+    data class ReportInfo(
+        val numSeq: String,
+        val candidates: List<String>
+    ) {
+        val reportUrl: String = "https://kentvu.github.io/vietnamese-t9-ime/" +
+                "report.html?numSeq=$numSeq" +
+                "&candidates=${candidates.joinToString(",")}"
+    }
+
     companion object {
         inline fun Presenter.update(crossinline manipulator: State.() -> State) =
             updateState { it.manipulator() }

@@ -191,7 +191,8 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
     @Composable
     override fun CandidateView(state: State) {
         val modifier = Modifier.background(Color.LightGray)
-        if (state.reporting) ReportUi(modifier) {
+        val reportInfo = state.reportInfo
+        if (reportInfo != null) ReportUi(reportInfo, modifier) {
             state.keypadEventSink(KeypadEvent.DismissReportClick)
         } else CandidatesView(state.candidates, modifier, onReportClick = {
             state.keypadEventSink(KeypadEvent.ShowReportClick)
@@ -202,8 +203,9 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
 
     @Composable
     private fun ReportUi(
-        modifier: Modifier,
+        reportInfo: Presenter.ReportInfo,
         //onReportBtnClick: () -> Unit
+        modifier: Modifier,
         onDismiss: () -> Unit
     ) {
         Row(
@@ -213,7 +215,7 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         ) {
             Text("Please report at ")
             val handler = LocalUriHandler.current
-            val uri = "https://kentvu.github.io/vietnamese-t9-ime/"
+            val uri = reportInfo.reportUrl
             TextButton(onClick = {
                 handler.openUri(uri)
                 //onReportBtnClick()
