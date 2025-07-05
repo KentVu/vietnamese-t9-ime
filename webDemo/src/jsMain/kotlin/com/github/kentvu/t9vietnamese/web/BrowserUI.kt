@@ -27,6 +27,7 @@ import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Ul
 import kotlin.collections.elementAt
 import kotlin.collections.forEachIndexed
+import kotlin.collections.isNotEmpty
 import kotlin.text.orEmpty
 
 class BrowserUI(
@@ -167,9 +168,20 @@ class BrowserUI(
     }
     //Div({classes("w-100")})
     Div({classes("col")}) {
-      Button() {
-        Text("Missing a word?")
-      }
+      state.reportInfo?.let { reportInfo ->
+        A(reportInfo.reportUrl(""), { /*classes("col")*/ }) {
+          Text(reportInfo.reportUrl)
+        }
+      } ?: 
+        Button({
+          onClick { state.keypadEventSink(KeypadEvent.ShowReportClick) }
+          //classes("col")
+          attr("data-testid", "${Semantic.ShowReportUiButton}")
+          //"data-testid" = ""
+          if (state.candidates.isEmpty()) attr("disabled", "")
+        }) {
+          Text("Missing a word?")
+        }
     }
   }
 

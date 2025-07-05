@@ -5,8 +5,10 @@ import kotlin.test.assertNotNull
 
 class BrowserAppRunner(private val root: HTMLElement) {
   fun showsReportButton(enabled: Boolean) {
+    console.log(root)
+    val qRes = root.querySelector("[data-testid='${BrowserUI.Semantic.ShowReportUiButton}']")
     assertNotNull(
-      root.querySelector("[data-testid='${BrowserUI.Semantic.ShowReportUiButton}]")
+      qRes
     )
   }
 

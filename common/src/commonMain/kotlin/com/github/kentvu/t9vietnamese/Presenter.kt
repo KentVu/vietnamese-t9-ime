@@ -29,9 +29,12 @@ interface Presenter {
         val numSeq: String,
         val candidates: List<String>
     ) {
-        val reportUrl: String = "https://kentvu.github.io/vietnamese-t9-ime/" +
-                "report.html?numSeq=$numSeq" +
-                "&candidates=${candidates.joinToString(",")}"
+        val reportUrl: String = reportUrl("https://kentvu.github.io/vietnamese-t9-ime/")
+        /** @param base should have a trailing `/` */
+        fun reportUrl(base: String) = base +
+          "report.html?numSeq=$numSeq" +
+          "&candidates=${candidates.joinToString(",")}"
+
     }
 
     companion object {

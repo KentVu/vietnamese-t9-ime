@@ -4,8 +4,10 @@ import com.github.kentvu.lib.logging.NapierLogger
 import com.github.kentvu.t9vietnamese.FakeInputConnection
 import com.github.kentvu.t9vietnamese.ImeServicePresenter
 import com.github.kentvu.t9vietnamese.KeypadEvent
+import com.github.kentvu.t9vietnamese.Presenter.Companion.update
 import com.github.kentvu.t9vietnamese.T9App
 import com.github.kentvu.t9vietnamese.model.EditorInfo
+import com.github.kentvu.t9vietnamese.model.KeyPads
 import com.github.kentvu.t9vietnamese.tests.TestPresenter
 import org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi
 import org.jetbrains.compose.web.testutils.runTest
@@ -48,6 +50,13 @@ class BrowserUITest {
 
     console.log("TODO app.start() when resource are available in karma\n" +
       "https://youtrack.jetbrains.com/issue/KT-42923/KJS-Resources-are-not-available-when-running-Karma-tests")
+    /*presenter.update { copy(keypadEventSink = {
+      when(it) {
+        is KeypadEvent.InputViewStart -> it.keyPad...
+      }
+    }) }*/
+    //presenter.update { copy(keyPad = KeyPads.VN) }
+    presenter.update { copy(initialized = true) }
     composition {
       ui.Emulator(inputConnection.confirmedTextState)
     }
