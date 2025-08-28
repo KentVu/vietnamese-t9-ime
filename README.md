@@ -49,6 +49,11 @@ Specifications (Stories):
 7. For Vietnamese:
     1. [ ] The output should NOT contain combining character, it should contains only rigid unicode
      character.
+#### Gherkin
+```gherkin
+Given I open the app
+When s type "2423"
+```
 
 Basic Design:
 ===========

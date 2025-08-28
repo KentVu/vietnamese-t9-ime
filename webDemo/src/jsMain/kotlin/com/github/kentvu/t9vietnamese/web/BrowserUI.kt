@@ -1,6 +1,9 @@
 package com.github.kentvu.t9vietnamese.web
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.DisposableEffectResult
+import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -15,6 +18,8 @@ import com.github.kentvu.t9vietnamese.UI
 import com.github.kentvu.t9vietnamese.model.Action
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key
+import com.github.kentvu.t9vietnamese.model.KeyPad
+import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.value
 import org.jetbrains.compose.web.dom.A
 import org.jetbrains.compose.web.dom.Button
@@ -25,6 +30,8 @@ import org.jetbrains.compose.web.dom.Small
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Ul
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.KeyboardEvent
 import kotlin.collections.elementAt
 import kotlin.collections.forEachIndexed
 import kotlin.collections.isNotEmpty
@@ -138,13 +145,9 @@ class BrowserUI(
             Key(key7); Key(key8); Key(key9)
             //Key(key0)
             Key(Key(Action.Zero))
-            /*Button({
-            onClick{ onKeyClick(key0, true) }
-            classes("key", "key-0")
-            value("0")
-          }) {
-            Text("0")
-          }*/
+            DisposableEffect(state.keypadEventSink) {
+              handleKeydownEv(keypad, ::onKeyClick)
+            }
             Button({
               onClick { onKeyClick(keyStar) }
               classes("key", "key-star")
@@ -182,6 +185,20 @@ class BrowserUI(
         }) {
           Text("Missing a word?")
         }
+    }
+  }
+
+  private fun DisposableEffectScope.handleKeydownEv(keypad: KeyPad, onKeyClick: (Key) -> Unit): DisposableEffectResult {// listenKeydown()
+    val handler = { ev: Event ->
+      ev as KeyboardEvent
+      val map = keypad.keyboardMap()
+      // TODO use .let {}
+      if (map.contains(ev.key))
+        onKeyClick(map[ev.key]!!)
+    }
+    document.addEventListener("keydown", handler)
+    return onDispose {
+      document.removeEventListener("keydown", handler)
     }
   }
 

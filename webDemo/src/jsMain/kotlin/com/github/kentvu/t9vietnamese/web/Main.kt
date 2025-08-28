@@ -36,6 +36,7 @@ fun main() {
   scope.launch {
     app.start()
   }
+
   renderComposable(rootElementId = "root") {
     ui.Emulator(inputConnection.confirmedTextState)
     Div({classes("row")}) { }
