@@ -1,13 +1,13 @@
 [versions]
 
 project = "1.0.0"
-kotlin = "2.1.20" # https://github.com/JetBrains/kotlin/releases
-agp = "8.9.0" # https://developer.android.com/studio/releases/gradle-plugin
+kotlin = "2.2.10" # https://github.com/JetBrains/kotlin/releases
+agp = "8.11.1" # https://developer.android.com/studio/releases/gradle-plugin
 jvmTarget = "11"
 #jvmToolchain = "17"
 
 android-minSdk = "24"
-android-compileSdk = "35"
+android-compileSdk = "36"
 android-targetSdk = "34"
 
 compose-multiplatform = "1.7.3" # https://github.com/JetBrains/compose-multiplatform/releases
@@ -31,6 +31,9 @@ sqlDelight = "2.0.2" # https://github.com/cashapp/sqldelight/releases
 datetime = "0.6.2" # https://github.com/Kotlin/kotlinx-datetime
 kotlinxSerialization = "1.6.3"
 
+ksp = "2.2.10-2.0.2"
+kotest = "6.0.0"
+
 [plugins]
 
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -39,6 +42,8 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotest = { id = "io.kotest", version.ref = "kotest" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [libraries]
 
@@ -65,3 +70,6 @@ napier = { group = "io.github.aakira", name = "napier", version = "2.6.1" }
 okio = { group = "com.squareup.okio", name = "okio", version = "3.8.0" }
 okio-fakefilesystem = { group = "com.squareup.okio", name = "okio-fakefilesystem", version = "3.8.0" }
 doistx-normalize = { group = "com.doist.x", name = "normalize", version = "1.0.5" }
+
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }

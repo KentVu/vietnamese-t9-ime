@@ -45,3 +45,16 @@ jobs:
             common/ui/build/test-results/**/*.xml
             webDemo/build/test-results/**/*.xml
 
+      - name: Persist test result
+        uses: actions/upload-artifact@v4
+        if: (!cancelled())
+        with:
+          name: vietnamese-t9-ime-test-result
+          path: | #webDemo/build/test-results/
+            common/build/test-results/
+            common/build/reports/tests/
+            common/ui/build/test-results/
+            common/ui/build/reports/tests/
+            webDemo/build/test-results/
+            webDemo/build/reports/tests/
+

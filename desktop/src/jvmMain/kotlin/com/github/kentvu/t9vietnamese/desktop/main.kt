@@ -26,7 +26,7 @@ fun main() {
     val presenter = DesktopPresenter(scope)
     val app by lazy {
         T9App(
-            DesktopEnvironmentInteraction,
+            DesktopEnvironmentInteraction(),
             scope,
             presenter,
         )

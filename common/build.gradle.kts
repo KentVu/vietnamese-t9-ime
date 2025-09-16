@@ -56,7 +56,7 @@ kotlin {
 }
 
 compose.resources {
-    //packageOfResClass = "com.finggallink.mmwave.notification.ui"
+    //packageOfResClass = "com.github.kentvu.t9vietnamese.ui"
     //generateResClass = always
     publicResClass = true
 }

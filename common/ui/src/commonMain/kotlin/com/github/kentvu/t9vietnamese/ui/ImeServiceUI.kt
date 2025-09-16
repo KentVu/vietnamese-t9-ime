@@ -4,15 +4,18 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +30,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -39,6 +43,7 @@ import com.github.kentvu.t9vietnamese.model.CandidateSelection
 import com.github.kentvu.t9vietnamese.model.EditorInfo
 import com.github.kentvu.t9vietnamese.model.Key as ModelKey
 import com.github.kentvu.t9vietnamese.model.KeyPad
+import com.github.kentvu.t9vietnamese.ui.CommonUI.Semantic.Companion.attach
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -185,32 +190,76 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
 
     @Composable
     override fun CandidateView(state: State) {
-        CandidatesView(state.candidates) {
+        val modifier = Modifier.background(Color.LightGray)
+        val reportInfo = state.reportInfo
+        if (reportInfo != null) ReportUi(reportInfo, modifier) {
+            state.keypadEventSink(KeypadEvent.DismissReportClick)
+        } else CandidatesView(state.candidates, modifier, onReportClick = {
+            state.keypadEventSink(KeypadEvent.ShowReportClick)
+        }) {
             state.keypadEventSink(KeypadEvent.CandidateSelect(it))
         }
     }
 
     @Composable
-    protected fun CandidatesView(candidates: CandidateSelection, onItemSelected: (Int) -> Unit) {
+    private fun ReportUi(
+        reportInfo: Presenter.ReportInfo,
+        //onReportBtnClick: () -> Unit
+        modifier: Modifier,
+        onDismiss: () -> Unit
+    ) {
+        Row(
+            modifier.semantics { attach(Semantic.ReportUi) }
+                .horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Please report at ")
+            val handler = LocalUriHandler.current
+            val uri = reportInfo.reportUrl
+            TextButton(onClick = {
+                handler.openUri(uri)
+                //onReportBtnClick()
+            }, Semantic.ReportButton.modifier()) { Text(uri) }
+            TextButton(
+                onClick = onDismiss,//{ () },
+                Semantic.DismissButton.modifier().padding(horizontal = 4.dp)
+            ) { Text("❌") }
+        }
+    }
+
+    @Composable
+    protected fun CandidatesView(
+        candidates: CandidateSelection,
+        modifier: Modifier = Modifier,
+        onReportClick: () -> Unit,
+        onItemSelected: (Int) -> Unit
+    ) {
         val state = rememberLazyListState(candidates.selectedCandidateId)
         LazyRow(
-            modifier = Modifier.semantics {
-                contentDescription = Semantic.candidates
-            }.background(Color.LightGray),
+            modifier = modifier
+                .semantics { attach(Semantic.Candidates) },
             state = state
         ) {
-            CandidateSelection.forEachIndexed(candidates) { i, cand ->
+            candidates.forEachIndexed { i, cand ->
                 item(cand.text) {
                     Text(
                         cand.text,
                         Modifier.padding(start = 4.dp)
                             .run {
                                 if (candidates.selectedCandidate == cand)
-                                    semantics {
-                                        contentDescription = Semantic.selectedCandidate
-                                    }.background(Color.Gray)
+                                    semantics { attach(Semantic.selected_candidate) }
+                                        .background(Color.Gray)
                                 else clickable { onItemSelected(i) }
                             }
+                    )
+                }
+                if (i == candidates.lastIndex()) item(Semantic.ShowReportUiButton) {
+                    Text(
+                        "+",
+                        Modifier
+                            .padding(start = 6.dp)
+                            .clickable { onReportClick() }
+                            .semantics { attach(Semantic.ShowReportUiButton) }
                     )
                 }
             }
@@ -277,10 +326,22 @@ class ImeServiceUI(presenter: Presenter) : CommonUI {
         }
     }
 
-    object Semantic {
-        const val candidates = "Candidates"
-        const val selectedCandidate: String = "selected_candidate"
-        const val testOutput: String = "test_output"
+    enum class Semantic: CommonUI.Semantic {
+        Candidates,
+        selected_candidate,
+        ShowReportUiButton,
+        ReportUi,
+        ReportButton,
+        DismissButton,
+        ;
+
+        fun modifier(org: Modifier = Modifier): Modifier {
+            return org.semantics { contentDescription = name }
+        }
+        // Example of receiver hell :sigh:
+        //val attach: SemanticsPropertyReceiver.() -> Unit = {
+        //fun SemanticsPropertyReceiver.attach () {
+        //fun attach(receiver: SemanticsPropertyReceiver) = receiver.contentDescription = name
     }
 
     companion object {

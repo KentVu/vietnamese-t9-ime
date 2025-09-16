@@ -33,6 +33,8 @@ class Backend(
             KeypadEvent.CloseRequest -> presenter.update { copy(closed = true) }
             is KeypadEvent.CandidateSelect -> engine.selectCandidate(ev.candidateId)
             is KeypadEvent.InputViewStart -> engine.switchMode(ev.editorInfo)
+            KeypadEvent.ShowReportClick -> engine.reportState()
+            KeypadEvent.DismissReportClick -> presenter.update { copy(reportInfo = null) }
         }
     }
 

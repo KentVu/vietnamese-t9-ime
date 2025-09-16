@@ -32,13 +32,13 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.github.kentvu.lib.logging.Logger
 import com.github.kentvu.t9vietnamese.Presenter.State
 import com.github.kentvu.t9vietnamese.model.EditorInfo
+import com.github.kentvu.t9vietnamese.ui.CommonUI.Semantic.Companion.attach
 import com.github.kentvu.t9vietnamese.ui.theme.T9VietnameseTheme
 
 class DesktopUI(
@@ -98,9 +98,8 @@ class DesktopUI(
             val confirmedText = _ic.confirmedText
             TextField(
                 value = confirmedText,
-                modifier = Modifier.semantics {
-                    contentDescription = ImeServiceUI.Semantic.testOutput
-                },
+                //modifier = Modifier.semantics { Semantic.test_output.attach(this) },
+                modifier = Modifier.semantics { attach(Semantic.test_output) },
                 onValueChange = { _ic.confirmedText = it }
             )
             val clipboardManager = LocalClipboardManager.current
@@ -150,11 +149,11 @@ class DesktopUI(
         }
     }
 
+    enum class Semantic: CommonUI.Semantic {
+        test_output,
+    }
+
     companion object {
         private val log = Logger.tag("DesktopUI")
-
-        fun KeyEvent.isCtrlQ(): Boolean {
-            return (type == KeyEventType.KeyUp) && isCtrlPressed && (key == Key.Q)
-        }
     }
 }
